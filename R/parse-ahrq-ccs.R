@@ -5,20 +5,18 @@
 #' @template dotdotdot
 #' @keywords internal
 #' @noRd
-icd9_fetch_ahrq_ccs <- function(single = TRUE, ...) {
+icd9_fetch_ahrq_ccs <- function(single = TRUE) {
   assert_flag(single)
   ccs_base <- "https://www.hcup-us.ahrq.gov/toolssoftware/ccs"
   if (single) {
     .unzip_to_data_raw(
-      url = paste0(ccs_base, "Single_Level_CCS_2015.zip"),
-      file_name = "$dxref 2015.csv",
-      ...
+      url = paste0(c(ccs_base, "Single_Level_CCS_2015.zip"), collapse = "/"),
+      file_name = "$dxref 2015.csv"
     )
   } else {
     .unzip_to_data_raw(
-      url = paste0(ccs_base, "Multi_Level_CCS_2015.zip"),
-      file_name = "ccs_multi_dx_tool_2015.csv",
-      ...
+      url = paste0(c(ccs_base, "Multi_Level_CCS_2015.zip"), collapse = "/"),
+      file_name = "ccs_multi_dx_tool_2015.csv"
     )
   }
 }
@@ -63,12 +61,10 @@ icd10_fetch_ahrq_ccs <- function(version = "2018.1", ...) {
 #' @keywords internal manip
 #' @noRd
 icd9_parse_ahrq_ccs <- function(single = TRUE,
-                                save_data = FALSE,
-                                offline = getOption("icd.data.offline")) {
+                                save_data = FALSE) {
   assert_flag(single)
   assert_flag(save_data)
-  assert_flag(offline)
-  ahrq_ccs <- icd9_fetch_ahrq_ccs(single = single, offline = offline)
+  ahrq_ccs <- icd9_fetch_ahrq_ccs(single = single)
   clean_icd9 <- function(x) as.short_diag(as.icd9(trimws(x)))
   resort_lvls <- function(x) {
     # Function to reorder numbers of CCS

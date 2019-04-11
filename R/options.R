@@ -227,7 +227,7 @@
   )
 }
 
-.clear_options <- function() {
+.clean_options <- function() {
   icd_data_opts <- names(.show_options())
   icd_data_opts <- sapply(
     icd_data_opts,

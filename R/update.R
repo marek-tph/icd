@@ -9,7 +9,8 @@
 #' @keywords internal datagen
 #' @noRd
 update_everything <- function() {
-  old_opt <- options(icd.data.offline = FALSE)
+  old_opt <- options(icd.data.offline = FALSE,
+                     icd.data.verbose = TRUE)
   on.exit(options(old_opt), add = TRUE)
   .parse_icd9cm_leaf_year(
     year = "2014",

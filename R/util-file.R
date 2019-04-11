@@ -113,12 +113,16 @@
     ...
   )
   stopifnot(dl_code == 0)
-  # I do want tempfile, so I get an empty new directory
+  # I do want tempfile, so unzip makes the empty new directory
   zipdir <- tempfile()
   on.exit(unlink(zipdir), add = TRUE)
   dir.create(zipdir)
+  optwarn <- options(warn = 10)
+  on.exit(options(optwarn), add = FALSE)
   file_paths <- utils::unzip(zipfile, exdir = zipdir)
-  if (length(file_paths) == 0) stop("No files found in zip")
+  options(optwarn)
+  if (length(file_paths) == 0)
+    stop("No files found in zip: ", zipfile)
   files <- list.files(zipdir)
   if (length(files) == 0) stop("No files in unzipped directory")
   if (missing(file_name)) {

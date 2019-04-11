@@ -66,7 +66,7 @@ skip_flat_icd9_all_avail <- function() {
 
 skip_icd10cm_flat_avail <- function(year, dx = TRUE) {
   msg <- paste(
-    "skipping test flat file ICD-10-CM source for ",
+    "skipping test flat file ICD-10-CM source for",
     year, ", and dx = ", dx
   )
   if (!.exists_in_cache(.get_icd10cm_name(year, dx))) {

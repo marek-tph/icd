@@ -6,6 +6,13 @@
 # Set up an environment to cache chars_in_icd10cm
 .lookup_chars_in_icd10cm <- new.env(parent = emptyenv())
 
+.onLoad <- function(libname, pkgname) {
+  if (.icd_data_dir_exists()) {
+    .set("icd.data.resource" = .icd_data_default)
+    .set("icd.data.offline" = FALSE)
+  }
+}
+
 .onAttach <- function(libname, pkgname) {
   if (system.file(package = "icd9") != "") {
     packageStartupMessage(paste(

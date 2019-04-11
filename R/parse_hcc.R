@@ -88,12 +88,15 @@ icd9_parse_cc <- function(save_data = FALSE) {
 icd10_parse_cc <- function(save_data = FALSE) {
   assert_flag(save_data)
   hcc_icd10_dir <- file.path(get_raw_data_dir(), "icd_hcc_rawdata", "icd10")
-  # Import raw CMS data for ICD9
+  # Import raw CMS data for ICD-9
   icd10_map_cc <- lapply(
-    list.files(hcc_icd10_dir, full.names = TRUE),
-    FUN = read.fwf, widths = c(7, 4), header = FALSE, stringsAsFactors = FALSE
+    list.files(hcc_icd10_dir,
+               full.names = TRUE),
+    FUN = read.fwf,
+    widths = c(7, 4),
+    header = FALSE,
+    stringsAsFactors = FALSE
   )
-
   # TODO: do use factors, as there is much duplication in "year" and "cc" which
   # shaves 20% off the memory requirement of the data.frame. This is likely to
   # improve speed downstream since more of the lookup table can be held in cache
@@ -106,8 +109,10 @@ icd10_parse_cc <- function(save_data = FALSE) {
   )
   # Assign year to each dataframe within the list of dataframes
   icd10_map_cc <- mapply(
-    cbind, icd10_map_cc,
-    "year" = years$icd10, SIMPLIFY = FALSE
+    cbind,
+    icd10_map_cc,
+    "year" = years$icd10,
+    SIMPLIFY = FALSE
   )
   rm(years)
   # Combine lsit of DFs into a single DF

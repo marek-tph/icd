@@ -405,3 +405,8 @@ capitalize_first <- function(x)
 get_raw_data_dir <- function() {
   system.file("data-raw", package = "icd")
 }
+
+.stopifnot_year <- function(year) {
+  if (!all(grepl("^[[:digit:]]{4}$", as.character(year))))
+    stop(year, " is not a four-digit year.", call. = FALSE)
+}

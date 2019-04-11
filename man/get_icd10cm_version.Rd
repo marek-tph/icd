@@ -5,9 +5,9 @@
 \alias{get_icd10cm_active}
 \title{Get the data for a given version (four-digit year) of ICD-10-CM}
 \usage{
-get_icd10cm_version(ver, verbose = .verbose())
+get_icd10cm_version(ver)
 
-get_icd10cm_active(verbose = FALSE)
+get_icd10cm_active()
 }
 \arguments{
 \item{ver}{Character vector of length one: the version of ICD-10-CM to use,

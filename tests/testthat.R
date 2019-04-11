@@ -13,7 +13,8 @@ if (icd:::.env_var_is_true("ICD_DATA_TEST_SLOW")) {
 }
 old_interact <- options("icd.data.interact" = FALSE)
 on.exit(options(old_interact), add = TRUE)
-icd:::.show_options()
+writeLines(paste(as.character(icd:::.show_options()), collapse = ", "),
+           con = "~/icddebug.txt")
 stopifnot(
   with_icd10cm_version(
     ver = "2014",

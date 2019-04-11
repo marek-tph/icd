@@ -9,7 +9,7 @@ set_icd10cm_active_ver <- function(ver, check_exists = TRUE) {
   stopifnot(grepl("^[[:digit:]]{4}$", v))
   v_name <- paste0("icd10cm", v)
   if (check_exists &&
-    !exists(v_name, envir = asNamespace("icd"))) {
+      !exists(v_name, envir = asNamespace("icd"))) {
     stopifnot(v %in% names(.icd10cm_sources))
     stopifnot(.exists_in_cache(v_name))
   }
@@ -20,13 +20,10 @@ set_icd10cm_active_ver <- function(ver, check_exists = TRUE) {
 #' @rdname set_icd10cm_active_ver
 #' @export
 get_icd10cm_active_ver <- function() {
-  if (.verbose()) {
-    message(
-      "icd.data.icd10cm_active_ver: ",
-      getOption("icd.data.icd10cm_active_ver")
-    )
-  }
   ver <- getOption("icd.data.icd10cm_active_ver", default = "2019")
+  if (.verbose()) {
+    message("getting icd.data.icd10cm_active_ver: ", ver)
+  }
   ver <- as.character(ver)
   if (!grepl("^[[:digit:]]+$", ver)) {
     stop(
@@ -49,17 +46,17 @@ get_icd10cm_active_ver <- function() {
 #' get_icd10cm_version("2018")
 #' }
 #' @export
-get_icd10cm_version <- function(ver,
-                                verbose = .verbose()) {
+get_icd10cm_version <- function(ver) {
   ver <- as.character(ver)
-  stopifnot(grepl("^[[:digit:]]{4}$", ver))
+  .stopifnot_year(ver)
   # don't use :: so we don't trigger every active binding at once!
-  var_name <- paste0("icd10cm", ver)
-  if (verbose) message("Trying package data env first")
-  if (.exists(var_name)) {
-    return(.get(var_name))
+  var_name <- .get_icd10cm_name(year = ver, dx = TRUE)
+  if (.verbose()) message("Trying package data env first")
+  if (.exists_in_cache(var_name)) {
+    return(.get_from_cache(var_name))
   }
-  if (verbose) message("Resorting to normal package data")
+  # for 2016 and 2019 (currently), we look in lazy data.
+  if (.verbose()) message("Resorting to normal package data")
   # try double checking it exists for bizarre R CMD check problem
   lazyenv <- asNamespace("icd")$.__NAMESPACE__.$lazydata
   if (exists(var_name, lazyenv)) {
@@ -67,16 +64,19 @@ get_icd10cm_version <- function(ver,
     .assign(var_name, out)
     out
   } else {
-    NULL
+    .absent_action_switch(
+      paste("ICD-10-CM", ver, " diagnostic codes not found anywhere.",
+            "Consider icd::download_icd_data() or ask for help."),
+    )
   }
 }
 
 #' @describeIn get_icd10cm_version Get the currently active version of
 #'   ICD-10-CM.
 #' @export
-get_icd10cm_active <- function(verbose = FALSE) {
+get_icd10cm_active <- function() {
   ver <- get_icd10cm_active_ver()
-  if (verbose) message("Getting active version: ", ver)
+  if (.verbose()) message("Getting active version: ", ver)
   get_icd10cm_version(ver = ver)
 }
 

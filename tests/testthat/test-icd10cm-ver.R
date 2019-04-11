@@ -3,10 +3,28 @@ context("icd10cm versions")
 test_that("active version set to latest version", {
   with_icd10cm_version(
     ver = "2019",
-    expect_identical(
+    code = expect_identical(
       get_icd10cm_active(),
       icd10cm2019
     )
+  )
+  # and the other way, because something funny is going on during testing only
+  expect_identical(
+    with_icd10cm_version(
+      ver = "2019",
+      code = get_icd10cm_active()
+    ),
+    icd10cm2019
+  )
+  # and for good measure
+  expect_identical(
+    icd::get_icd10cm2019(),
+    icd10cm2019
+  )
+  skip_missing_dat("icd10cm2017")
+  expect_identical(
+    icd::get_icd10cm2017(),
+    icd:::.get_icd10cm2017(must_work = TRUE)
   )
 })
 
@@ -20,15 +38,36 @@ test_that("all available data is reported", {
 
 test_that("temporarily set active version", {
   skip_icd10cm_flat_avail("2014")
-  expect_equal(with_icd10cm_version("2014", get_icd10cm_active_ver()), "2014")
+  expect_equal(
+    with_icd10cm_version(
+      ver = "2014",
+      code = {
+        get_icd10cm_active_ver()
+      }
+    ),
+    "2014")
   expect_identical(
-    object = with_icd10cm_version("2014", nrow(get_icd10cm_active())),
+    object = with_icd10cm_version("2014", {
+      writeLines(paste(as.character(icd:::.show_options()), collapse = ", "),
+                 con = "~/icddebug.txt")
+    }),
+    nrow(get_icd10cm_active()),
     expected = nrow(get_icd10cm2014()),
     info = paste(
       "With icd10-cm-ver set: ",
       with_icd10cm_version(
-        "2014",
-        paste(names(.show_options()), .show_options(), sep = "=", collapse = ", ")
+        ver = "2014",
+        code = {
+          if (testthat::is_testing()) {
+            debugtxt <- paste(names(icd:::.show_options()),
+                              as.character(icd:::.show_options()),
+                              sep = "=",
+                              collapse = ", \n")
+            #writeLines(debugtxt, con = "~/icddebug.txt")
+            message(debugtxt)
+          }
+          paste(names(.show_options()), .show_options(), sep = "=", collapse = ", ")
+        }
       ),
       "Without: ",
       paste(names(.show_options()), .show_options(), sep = "=", collapse = ", ")
