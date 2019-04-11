@@ -9,7 +9,7 @@ set_icd10cm_active_ver <- function(ver, check_exists = TRUE) {
   stopifnot(grepl("^[[:digit:]]{4}$", v))
   v_name <- paste0("icd10cm", v)
   if (check_exists &&
-      !exists(v_name, envir = asNamespace("icd"))) {
+    !exists(v_name, envir = asNamespace("icd"))) {
     stopifnot(v %in% names(.icd10cm_sources))
     stopifnot(.exists_in_cache(v_name))
   }
@@ -65,8 +65,10 @@ get_icd10cm_version <- function(ver) {
     out
   } else {
     .absent_action_switch(
-      paste("ICD-10-CM", ver, " diagnostic codes not found anywhere.",
-            "Consider icd::download_icd_data() or ask for help."),
+      paste(
+        "ICD-10-CM", ver, " diagnostic codes not found anywhere.",
+        "Consider icd::download_icd_data() or ask for help."
+      ),
     )
   }
 }
@@ -123,7 +125,7 @@ get_icd10cm2016 <- function() {
 
 #' Get the 2019 ICD-10-CM codes and descriptions
 #'
-#' This is also available as the package data \code{icd10cm2016}
+#' This is also available as the package data \code{icd10cm2016}, but will be deprecated in a future version of \CRANpkg{icd}.
 #' @export
 get_icd10cm2019 <- function() {
   icd10cm2019
@@ -147,7 +149,7 @@ with_icd10cm_version <- function(ver, code) {
   force(code)
 }
 
-#' Internal function used to search and maybe prompt when active binding used.
+#' Get a particular annual version of diagnostic or procedure codes
 #'
 #' Tries to get from the local environment first, then from resource directory,
 #' and failing that, if interactive, prompts user to download and parse.
@@ -158,20 +160,8 @@ with_icd10cm_version <- function(ver, code) {
 .get_icd10cm_ver <- function(ver, dx) {
   ver <- as.character(ver)
   stopifnot(grepl("^[[:digit:]]{4}$", ver))
-  var_name <- paste0("icd10cm", ver)
-  dat_path <- .rds_path(var_name)
-  if (exists(var_name, .icd_data_env)) {
-    return(get(var_name, .icd_data_env))
-  }
-  lazyenv <- asNamespace("icd")$.__NAMESPACE__.$lazydata
-  if (exists(var_name, lazyenv)) {
-    return(get(var_name, lazyenv))
-  }
-  if (file.exists(dat_path)) {
-    dat <- readRDS(dat_path)
-    assign(var_name, dat, envir = .icd_data_env)
-    return(dat)
-  }
+  var_name <- .get_icd10cm_name(ver, dx = dx)
+  if (.exists_in_cache(var_name)) return(.get_from_cache(var_name))
   if (dx) {
     dat <- .parse_icd10cm_year(year = ver)
   } else {

@@ -380,6 +380,13 @@ fin <- function(x, table) {
     .Call(`_icd_inFast`, x, table)
 }
 
+#' Get some information about how this DLL was compiled
+#' @keywords internal
+#' @noRd
+build_info <- function() {
+    invisible(.Call(`_icd_build_info`))
+}
+
 valgrindCallgrindStart <- function(zerostats = FALSE) {
     .Call(`_icd_valgrindCallgrindStart`, zerostats)
 }

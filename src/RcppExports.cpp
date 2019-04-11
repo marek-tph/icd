@@ -658,6 +658,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// build_info
+void build_info();
+RcppExport SEXP _icd_build_info() {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    build_info();
+    return R_NilValue;
+END_RCPP
+}
 // valgrindCallgrindStart
 int valgrindCallgrindStart(bool zerostats);
 RcppExport SEXP _icd_valgrindCallgrindStart(SEXP zerostatsSEXP) {
@@ -736,6 +745,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_icd_trimCpp", (DL_FUNC) &_icd_trimCpp, 1},
     {"_icd_matchFast", (DL_FUNC) &_icd_matchFast, 2},
     {"_icd_inFast", (DL_FUNC) &_icd_inFast, 2},
+    {"_icd_build_info", (DL_FUNC) &_icd_build_info, 0},
     {"_icd_valgrindCallgrindStart", (DL_FUNC) &_icd_valgrindCallgrindStart, 1},
     {"_icd_valgrindCallgrindStop", (DL_FUNC) &_icd_valgrindCallgrindStop, 0},
     {NULL, NULL, 0}

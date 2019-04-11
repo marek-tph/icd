@@ -4,7 +4,8 @@
 \alias{get_icd10cm2016}
 \title{Get the 2019 ICD-10-CM codes and descriptions}
 \usage{
-get_icd10cm2016()
+get_icd10cm2016(alt = NULL, must_work = is.null(alt),
+  msg = paste("Unable to find", var_name))
 }
 \description{
 The most recent available data is also available as the package data,

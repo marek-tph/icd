@@ -20,37 +20,69 @@
 
 #' Save given variable in package data directory
 #'
-#' File is named \code{varname.suffix.rda}
+#' File is named \code{varname.rda}
 #' @param var_name character name of variable or its symbol either of which
 #'   would find \code{myvar} in the parent environment, and save it as
 #'   \code{myvar.RData} in \code{package_root/data}.
-#' @param suffix character scalar
 #' @param compress gzip default because it is fastest to unzip
 #' @param envir environment in which to look for the variable to save
 #' @return invisibly returns the data
 #' @keywords internal
 #' @noRd
 .save_in_data_dir <- function(var_name,
-                              suffix = "",
+                              x = NULL,
                               compress = "gzip",
                               envir = parent.frame()) {
-  warning("Saving to data dir: save to user's resource directory instead?")
-  package_dir <- getwd()
-  data_path <- "data"
-  stopifnot(is.character("suffix"))
+  message("Saving to data dir: save to user's resource directory instead?")
   if (!is.character(var_name)) {
     var_name <- as.character(substitute(var_name))
   }
   stopifnot(is.character(var_name))
-  stopifnot(exists(var_name, envir = envir))
+  if (is.null(x)) {
+    stopifnot(exists(var_name, envir = envir))
+    x <- get(var_name, envir = envir)
+  }
+  package_dir <- getwd()
+  data_path <- "data"
+  assign(x = var_name, value = x)
+  .assign(var_name = var_name, value = x)
+  out_file <- file.path(
+    package_dir,
+    data_path,
+    paste0(var_name, ".rda")
+  )
+  # check diff before overwrite:
+  load(file = out_file, envir = tenv <- new.env(emptyenv()))
+  oldx <- tenv[[var_name]]
+  if (!identical(x, oldx)) {
+    warning("Data for ", sQuote(var_name), " is being updated.")
+    old_file <- tempfile(paste0(var_name, ".old"), fileext = "rds")
+    new_file <- tempfile(paste0(var_name, ".new"), fileext = "rds")
+    message(
+      "Saving old to: ", old_file,
+      " and new to: ", new_file
+    )
+    saveRDS(oldx, old_file)
+    saveRDS(x, new_file)
+    if (!askYesNo("Yes to proceed, no to debug?", default = FALSE)) {
+      message(
+        "Examine differences. Consider:",
+        "testthat::compare(x, oldx), ",
+        "daff::diff_data, ",
+        "compareDF (slow), compare::compare (may need lapply), ",
+        "arsenal::comparedf may have details but summary superficial, ",
+        "base::setdiff not so helpful"
+      )
+      browser()
+      if (!askYesNo("Continue saving?", default = FALSE)) {
+        stop("Not saved in package data.")
+      }
+    }
+  }
   save(
     list = var_name,
     envir = envir,
-    file = file.path(
-      package_dir,
-      data_path,
-      paste0(var_name, suffix, ".rda")
-    ),
+    file = out_file,
     compress = compress
   )
   message("Now reload package to enable updated/new data: ", var_name)
@@ -121,8 +153,9 @@
   on.exit(options(optwarn), add = FALSE)
   file_paths <- utils::unzip(zipfile, exdir = zipdir)
   options(optwarn)
-  if (length(file_paths) == 0)
+  if (length(file_paths) == 0) {
     stop("No files found in zip: ", zipfile)
+  }
   files <- list.files(zipdir)
   if (length(files) == 0) stop("No files in unzipped directory")
   if (missing(file_name)) {

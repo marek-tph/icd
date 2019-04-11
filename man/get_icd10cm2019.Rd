@@ -4,8 +4,9 @@
 \alias{get_icd10cm2019}
 \title{Get the 2019 ICD-10-CM codes and descriptions}
 \usage{
-get_icd10cm2019()
+get_icd10cm2019(alt = NULL, must_work = is.null(alt),
+  msg = paste("Unable to find", var_name))
 }
 \description{
-This is also available as the package data \code{icd10cm2016}
+This is also available as the package data \code{icd10cm2016}, but will be deprecated in a future version of \CRANpkg{icd}.
 }

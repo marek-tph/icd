@@ -33,6 +33,10 @@
   paste0(".parse_", paste0("icd9cm", ver))
 }
 
+.get_icd9cm_name <- function(year, leaf) {
+  paste0("icd9cm", year, ifelse(leaf, "_leaf", ""))
+}
+
 .get_icd10cm_name <- function(year, dx) {
   paste0("icd10cm", year, ifelse(dx, "", "_pc"))
 }
@@ -59,10 +63,11 @@
 }
 
 .get_data_dir <- function() {
-  if (.icd_data_dir_exists())
+  if (.icd_data_dir_exists()) {
     getOption("icd.data.resource", default = .icd_data_default)
-  else
+  } else {
     NULL
+  }
 }
 
 .exists_in_cache <- function(var_name) {
@@ -72,9 +77,11 @@
   }
   if (!.icd_data_dir_exists()) {
     if (.verbose()) {
-      message("Don't even have the icd.data.resource option defined,",
-              " and default location of ", sQuote(.icd_data_default),
-              " is missing.")
+      message(
+        "Don't even have the icd.data.resource option defined,",
+        " and default location of ", sQuote(.icd_data_default),
+        " is missing."
+      )
     }
     return(FALSE)
   }

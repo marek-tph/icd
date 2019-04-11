@@ -1,12 +1,12 @@
-# nocov start
-
-expect_no_warn <- function(object, expected, ...)
+expect_no_warn <- function(object, expected, ...) {
   testthat::expect_warning(object, regexp = NA, ...)
+}
 
-expect_no_error <- function(object, expected, ...)
+expect_no_error <- function(object, expected, ...) {
   testthat::expect_error(object, regexp = NA, ...)
+}
 
-#' expect equal, ignoring any ICD classes
+#' Expect equal, ignoring any ICD classes
 #'
 #' Strips any \code{icd} classes (but not others) before making comparison
 #' @noRd
@@ -28,25 +28,29 @@ expect_equal_no_class_order <- function(object, expected, ...) {
 #'   for ICD classes to be in correct order.
 #' @keywords internal debugging
 #' @noRd
-expect_classes_ordered <- function(x)
+expect_classes_ordered <- function(x) {
   eval(bquote(testthat::expect_true(classes_ordered(.(x)))))
+}
 
 #' generate random ICD-9 codes
 #'
 #' @keywords internal debugging datagen
 #' @noRd
-generate_random_short_icd9 <- function(n = 50000)
+generate_random_short_icd9 <- function(n = 50000) {
   as.character(floor(stats::runif(min = 1, max = 99999, n = n)))
+}
 
-generate_random_decimal_icd9 <- function(n = 50000)
+generate_random_decimal_icd9 <- function(n = 50000) {
   paste(
     round(stats::runif(min = 1, max = 999, n = n)),
     sample(expand_minor.icd9(""), replace = TRUE, size = n),
     sep = "."
   )
+}
 
-generate_random_pts <- function(...)
+generate_random_pts <- function(...) {
   generate_random_ordered_pts(...)
+}
 
 generate_random_ordered_pts <- function(...) {
   x <- generate_random_unordered_pts(...)
@@ -175,8 +179,6 @@ generate_neds_pts <- function(n = 1000L,
   dat_wide_str
 }
 
-# nocov end
-
 assert_flag <- function(x) {
   stopifnot(is.logical(x), length(x) == 1L)
 }
@@ -281,8 +283,9 @@ skip_missing_icd10fr <- function() {
   }
 }
 
-set_test_slow <- function(do_slow = TRUE) {
-  Sys.setenv("ICD_TEST_SLOW" = do_slow)
+.test_slow <- function(slow = TRUE) {
+  Sys.setenv("ICD_TEST_SLOW" = slow)
+  options(icd.data.test_slow = slow)
 }
 
 skip_slow <- function(msg = "Skipping slow test") {

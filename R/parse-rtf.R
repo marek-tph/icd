@@ -24,7 +24,7 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
   )
 }
 
-#' parse RTF description of entire ICD-9-CM for a specific year
+#' Parse RTF description of entire ICD-9-CM for a specific year
 #'
 #' Currently only the most recent update is implemented. Note that CMS have
 #' published additional ICD-9-CM billable code lists since the last one from the
@@ -32,13 +32,15 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
 #' CDC release is \code{Dtab12.rtf} from 2011.
 #'
 #' The file itself is 7 bit ASCII, but has its own internal encoding using
-#' 'CP1252.' Test 'Meniere's' disease with lines 24821 to 24822 from 2012 RTF
+#' \sQuote{CP1252}. Test \sQuote{Meniere's disease} with lines 24821 to 24822
+#' from 2012 RTF
 #' @param year from 1996 to 2012 (this is what CDC has published). Only 2012
 #'   implemented thus far
 #' @template save_data
 #' @source \url{https://www.cdc.gov/nchs/icd/icd9cm.htm} Navigate to
-#' 'Dtab12.zip' in the 2011 data. and similar files run from 1996 to 2011.
+#'   'Dtab12.zip' in the 2011 data. and similar files run from 1996 to 2011.
 #' @keywords internal datagen
+#' @seealso .parse_icd9cm_hierarchy_rtf
 #' @noRd
 .parse_icd9cm_rtf_year <- function(year = "2014",
                                    ...,
@@ -64,7 +66,36 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
     stringsAsFactors = FALSE
   )
   out_df <- out_df[order.icd9(out), ]
-  invisible(.lookup_icd9_hier(out_df, short_code = TRUE))
+  out_df <- .lookup_icd9_hier(out_df, short_code = TRUE)
+  # set class here so merge's sort will use correct S3 method
+  out_df$code <- as.icd9cm(out_df$code)
+  # replace desc with desc_short and desc_long (or short_desc etc?)
+  leaves <- .get_fetcher_fun(
+    .get_icd9cm_name(year = year, leaf = TRUE)
+    )()
+  leaves[["leaf"]] <- TRUE
+  out_df <- merge.data.frame(
+    x = out_df,
+    y = leaves,
+    by = "code",
+    all = TRUE,
+    sort = TRUE
+  )
+  out_df[is.na(out_df$short_desc), "short_desc"] <-
+    out_df[is.na(out_df$short_desc), "desc"]
+  out_df[is.na(out_df$long_desc), "long_desc"] <-
+    out_df[is.na(out_df$long_desc), "desc"]
+  out_df[is.na(out_df$leaf), "leaf"] <- FALSE
+  out_df$desc <- NULL
+  out_df <- out_df[c("code",
+                     "leaf",
+                     "short_desc",
+                     "long_desc",
+                     "three_digit",
+                     "major",
+                     "sub_chapter",
+                     "chapter")]
+  invisible(out_df)
 }
 
 .lookup_icd9_hier <- function(x,
@@ -116,9 +147,9 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
   major_merge <- major_merge[order.icd9(major_merge$three_digit), ]
   sub_chap_merge <- sub_chap_merge[order.icd9(sub_chap_merge$three_digit), ]
   chap_merge <- chap_merge[order.icd9(chap_merge$three_digit), ]
-  dat[["major"]] <- major_merge[["mj_major"]]
-  dat[["sub_chapter"]] <- sub_chap_merge[["sc_desc"]]
-  dat[["chapter"]] <- chap_merge[["chap_desc"]]
+  dat[["major"]] <- factor_nosort(major_merge[["mj_major"]])
+  dat[["sub_chapter"]] <- factor_nosort(sub_chap_merge[["sc_desc"]])
+  dat[["chapter"]] <- factor_nosort(chap_merge[["chap_desc"]])
   # levels specified to keep ICD-9 ordering 0-9VE?
   dat[["three_digit"]] <- factor(dat[["three_digit"]],
     levels = unique(dat[["three_digit"]])

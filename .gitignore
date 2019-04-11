@@ -56,6 +56,7 @@ rprof.out
 src-i386
 src-x64
 src/*.o.tmp
+src/makevars.h
 test-all-disabled.R
 tests/testthat-split-*.R
 tests/testthat/Rplots.pdf

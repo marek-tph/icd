@@ -71,8 +71,8 @@ release_questions <- function() {
     "Travis and appveyor?",
     "rhub::check_with_sanitizers()",
     "rhub::check_for_cran()",
-    "Have you checked on Windows, win_builder (if possible with configure script), Mac, Ubuntu, rhub::check_with_sanitizers() etc", #nolint
-    "Did you check with verbose, offline, interact, with undefined, TRUE and FALSE", #nolint
+    "Have you checked on Windows, win_builder (if possible with configure script), Mac, Ubuntu, rhub::check_with_sanitizers() etc", # nolint
+    "Did you check with verbose, offline, interact, with undefined, TRUE and FALSE", # nolint
     # final manual check:
     "Have all unnecessary files been ignored in built source package?"
   )

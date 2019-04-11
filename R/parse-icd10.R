@@ -5,6 +5,7 @@
 #' The factor generation uses \code{sort.default} which is locale dependent.
 #' This meant a lot of time debugging a problem when white space was ignored for
 #' sorting on some platforms, but not others.
+#' @param save_pkg_data Save specific year diagnostic codes in the package data directory for CRAN package. All data retrieved is saved in the user cache regardless.
 #' @source \url{https://www.cms.gov/Medicare/Coding/ICD10} also available from
 #'   \url{http://www.cdc.gov/nchs/data/icd/icd10cm/2016/ICD10CM_FY2016_code_descriptions.zip}.
 #' @references
@@ -12,33 +13,26 @@
 #'   \href{https://www.cdc.gov/nchs/icd/icd10cm.htm#FY\%202019\%20release\%20of\%20ICD-10-CM}{CDC copy of ICD-10-CM for 2019}
 #' @keywords internal datagen
 #' @noRd
-.parse_icd10cm_all <- function(save_data = FALSE,
-                               offline = .offline(),
-                               verbose = .verbose(),
-                               twentysixteen = FALSE,
-                               ...) {
-  if (verbose) message("Parsing all ICD-10-CM diagnostic codes.")
+.parse_icd10cm_all <- function(save_pkg_data = FALSE, ...) {
+  if (.verbose()) message("Parsing all ICD-10-CM diagnostic codes.")
   yrs <- names(.icd10cm_sources)
-  yrs <- if (twentysixteen) {
-    "2016"
-  } else {
-    yrs[yrs %nin% "2016"]
-  }
   out <- lapply(
     yrs,
     .parse_icd10cm_year,
-    save_data = save_data,
     ...
   )
   names(out) <- yrs
-  invisible(out)
+  invisible(names(out))
 }
 
-.parse_icd10cm_year <- function(year, save_pkg_data = FALSE, ...) {
+.parse_icd10cm_year <- function(year,
+                                save_pkg_data = FALSE,
+                                dx = TRUE,
+                                ...) {
   stopifnot(is.numeric(year) || is.character(year))
   year <- as.character(year)
   stopifnot(as.character(year) %in% names(.icd10cm_sources))
-  f_info <- .dl_icd10cm_year(year = year, dx = TRUE)
+  f_info <- .dl_icd10cm_year(year = year, dx = dx)
   if (is.null(f_info)) {
     .absent_action_switch(
       paste("No path to downloaded data. Options are: "),
@@ -94,14 +88,26 @@
   if (.verbose()) message("Generating chap lookup for year: ", year)
   chap_lookup <- .icd10_generate_chap_lookup()
   dat[["chapter"]] <-
-    merge(dat["three_digit"], chap_lookup,
+    merge(
+      dat["three_digit"], chap_lookup,
       by.x = "three_digit", by.y = "chap_major",
       all.x = TRUE
     )[["chap_desc"]]
   dat <- dat[order.icd10cm(dat$code), ]
   class(dat$code) <- c("icd10cm", "icd10", "character")
+  class(dat$three_digit) <- c("icd10cm", "icd10", "factor")
   row.names(dat) <- NULL
-  .save_in_resource_dir(var_name = paste0("icd10cm", year), x = dat)
-  if (save_pkg_data && year == "2016") .save_in_data_dir("icd10cm2016", compress = "xz")
+  if (.verbose()) message("Correcting order")
+  dat <- dat[order.icd10cm(dat$code), ]
+  .save_in_resource_dir(
+    var_name = .get_icd10cm_name(year = year, dx = dx),
+    x = dat
+  )
+  if (save_pkg_data && year %in% c("2016", "2019")) {
+    if (.verbose()) {
+      message("Saving in package data: ", .get_icd10cm_name(year, dx))
+    }
+    .save_in_data_dir(.get_icd10cm_name(year, dx), compress = "xz")
+  }
   invisible(dat)
 }

@@ -45,11 +45,13 @@ test_that("temporarily set active version", {
         get_icd10cm_active_ver()
       }
     ),
-    "2014")
+    "2014"
+  )
   expect_identical(
     object = with_icd10cm_version("2014", {
       writeLines(paste(as.character(icd:::.show_options()), collapse = ", "),
-                 con = "~/icddebug.txt")
+        con = "~/icddebug.txt"
+      )
     }),
     nrow(get_icd10cm_active()),
     expected = nrow(get_icd10cm2014()),
@@ -60,10 +62,11 @@ test_that("temporarily set active version", {
         code = {
           if (testthat::is_testing()) {
             debugtxt <- paste(names(icd:::.show_options()),
-                              as.character(icd:::.show_options()),
-                              sep = "=",
-                              collapse = ", \n")
-            #writeLines(debugtxt, con = "~/icddebug.txt")
+              as.character(icd:::.show_options()),
+              sep = "=",
+              collapse = ", \n"
+            )
+            # writeLines(debugtxt, con = "~/icddebug.txt")
             message(debugtxt)
           }
           paste(names(.show_options()), .show_options(), sep = "=", collapse = ", ")

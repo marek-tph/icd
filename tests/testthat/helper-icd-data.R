@@ -14,7 +14,14 @@ rtf_year_ok <- function(year, ...) {
 }
 
 have_icd_data_resource <- function() {
-  !is.null(getOption("icd.data.resource", default = NULL))
+  opt_ok <- !is.null(getOption("icd.data.resource", default = NULL))
+  if (!opt_ok && dir.exists(.icd_data_default)) {
+    if (.verbose())
+      message("have_icd_data_resource is setting data opt to default")
+    options("icd.data.resource" = .icd_data_default)
+    return(TRUE)
+  }
+  opt_ok
 }
 
 skip_no_icd_data_resource <- function() {

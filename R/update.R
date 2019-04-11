@@ -9,8 +9,10 @@
 #' @keywords internal datagen
 #' @noRd
 update_everything <- function() {
-  old_opt <- options(icd.data.offline = FALSE,
-                     icd.data.verbose = TRUE)
+  old_opt <- options(
+    icd.data.offline = FALSE,
+    icd.data.verbose = TRUE
+  )
   on.exit(options(old_opt), add = TRUE)
   .parse_icd9cm_leaf_year(
     year = "2014",
@@ -19,19 +21,10 @@ update_everything <- function() {
   .parse_icd9cm_hierarchy_rtf(save_pkg_data = TRUE)
   # TODO: just need to save icd10cm2016 and icd10cm2019 in data, and have
   # special getter functions for them.
-  .parse_icd10cm_all(
-    save_data = TRUE,
-    twentysixteen = TRUE
-  )
   .icd10cm_extract_sub_chapters(.icd10cm_extract_sub_chapters = TRUE)
   #  icd9cm_billable <- list()
   #  icd9cm_billable[["32"]] <- get_icd9cm2014_leaf(must_work = TRUE)
   #  .save_in_data_dir(icd9cm_billable)
-
-  # this is not strictly a parsing step, but is quite slow. It relies on picking
-  # up already saved files from previous steps. It can take hours to complete,
-  # but only needs to be done rarely. This is only intended to be run from
-  # development tree, not as installed package
   generate_sysdata()
   load(file.path("R", "sysdata.rda"))
   generate_spelling()
@@ -48,6 +41,7 @@ update_everything <- function() {
   icd9_generate_map_quan_elix(save_data = TRUE)
   icd9_generate_map_elix(save_data = TRUE)
   # ICD 10
+  .parse_icd10cm_all(save_pkg_data = TRUE)
   icd10_parse_ahrq_sas(save_data = TRUE)
   icd10_parse_cc(save_data = TRUE)
   icd10_generate_map_quan_elix(save_data = TRUE)
@@ -56,9 +50,16 @@ update_everything <- function() {
   generate_maps_pccc(save_data = TRUE)
   icd10_parse_map_ahrq_pc(save_pkg_data = TRUE)
   icd_parse_cc_hierarchy(save_data = TRUE)
-  # formerly "icd9cm_billable[[version_number]]"
+  # icd9cm2014_leaf was formerly "icd9cm_billable[[version_number]]"
   icd9cm2014_leaf <- get_icd9cm2014_leaf()
   .save_in_data_dir(icd9cm2014_leaf)
+  # TODO: deprecate and remove icd10cm2016 in icd 4.1 or 4.2
+  icd10cm2016 <- .parse_icd10cm2016()
+  .save_in_data_dir(icd10cm2016)
+  icd10cm2019 <- .parse_icd10cm2019()
+  .save_in_data_dir(icd10cm2019)
+  icd9cm_hierarchy <- get_icd9cm2014()
+  .save_in_data_dir(icd9cm_hierarchy)
 }
 
 #' Generate \code{sysdata.rda}
