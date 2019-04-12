@@ -173,10 +173,11 @@ children_defined.icd10cm <- function(x,
   if (!short_code) {
     x <- decimal_to_short.icd10cm(x)
   }
-  ver <- get_icd10cm_active_ver()
+  ver <- get_icd10cm_active_year()
   if (verbose) message("Using ICD-10-CM version: ", ver)
   nc <- .icd10cm_get_nchars(ver)
   lu <- get_icd10cm_active()
+  stopifnot(!is.null(lu))
   if (length(nc) != nrow(lu)) browser()
   kids <- icd10_children_defined_rcpp(
     x = x,
@@ -214,9 +215,9 @@ children_defined.icd10who <- function(x,
     x <- decimal_to_short.icd10cm(x)
   }
   d <- if (who_ver == "icd10who2008fr") {
-    .idget("icd10who2008fr")
+    get_icd10who2008fr()
   } else {
-    .idget("icd10who2016")
+    get_icd10who2016()
   }
   stopifnot(!is.null(d))
   stopifnot(!is.null(d[["code"]]))

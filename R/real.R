@@ -184,6 +184,7 @@ is_leaf.icd9cm <- function(x,
   )
   res <- rep_len(FALSE, length(x))
   not_na <- !is.na(m)
+  # this will be "leaf" when it becomes get_icd9cm2014 instead
   res[not_na] <- icd9cm_hierarchy[m[not_na], "billable"]
   res
 }

@@ -14,12 +14,10 @@ get_icd10cm_active()
 corresponding to the suffix of the \code{data.frame} name, e.g., for 2019
 ICD-10-CM, use \code{"icd10cm2019"} for Dutch 2014 ICD-CM translations, use
 \code{"icd10cm2014_nl"}}
-
-\item{verbose}{single logical value, defaults to \code{FALSE} in most functions.}
 }
 \description{
 When called without an argument, it returns the currently active version as
-set by \code{set_icd10cm_active_ver()}
+set by \code{set_icd10cm_active_year()}
 }
 \section{Functions}{
 \itemize{

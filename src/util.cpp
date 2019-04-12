@@ -119,7 +119,11 @@ void build_info() {
   Rcpp::Rcout << "__OPTIMIZE__ unset" << std::endl;
 #endif
   Rcpp::Rcout << "__VERSION__ is: " << __VERSION__ << std::endl;
+#ifdef __STDC_NO_THREADS__
   Rcpp::Rcout << "__STDC_NO_THREADS__ is: " << __STDC_NO_THREADS__ << std::endl;
+#else
+  Rcpp::Rcout << "__STDC_NO_THREADS__ not defined, C++ STD not GNU?" << std::endl;
+#endif
 #ifdef __STDC_VERSION__
   Rcpp::Rcout << "__STDC_VERSION__ is: " << __STDC_VERSION__ << std::endl;
 #endif
@@ -131,5 +135,5 @@ void build_info() {
   Rcpp::Rcout << "libc++ from LLVM/clang)" << std::endl;
 #endif
 #include "makevars.h"
-  printf("%s", Makevars);
+  Rcpp::Rcout << Makevars << std::endl;
 }

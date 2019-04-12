@@ -334,7 +334,7 @@ skip_missing_icd10who <- function(ver = "2016", lang = "en") {
 }
 
 skip_missing_dat <- function(var_name) {
-  if (!.exists_in_cache(var_name)) {
+  if (!.exists_in_cache(var_name, USE.NAMES = FALSE)) {
     skip(paste(var_name, "not available"))
   }
 }

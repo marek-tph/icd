@@ -247,38 +247,18 @@ with_absent_action <- function(absent_action, code) {
   force(code)
 }
 
-is_missing_icd_data <- function(var_name) {
-  with_absent_action(
-    absent_action = "silent",
-    with_offline(
-      offline = TRUE,
-      with_interact(
-        interact = FALSE, {
-          d <- .idget(var_name, must_work = FALSE)
-          i <- if (is.function(d)) {
-            d()
-          } else {
-            d
-          }
-          is.null(i)
-        }
-      )
-    )
-  )
-}
-
 # workaround so icd.data 1.0 will not cause CRAN or user errors
 skip_missing_icd10who <- function() {
-  if (is_missing_icd_data("icd10who2016")) {
+  if (!.exists_anywhere("icd10who2016")) {
     testthat::skip("No WHO ICD-10 2016 English data")
   }
-  if (is_missing_icd_data("icd10who2008fr")) {
+  if (!.exists_anywhere("icd10who2008fr")) {
     testthat::skip("No WHO ICD-10 2008 French data")
   }
 }
 
 skip_missing_icd10fr <- function() {
-  if (is_missing_icd_data("icd10fr2019")) {
+  if (!.exists_anywhere("icd10fr2019")) {
     testthat::skip("No ICD-10-FR 2019 French data")
   }
 }

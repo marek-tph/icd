@@ -2472,10 +2472,10 @@ $as_echo_n "checking $HOME/.R/Makevars exists... " >&6; }
 $as_echo "yes" >&6; }
     echo 'unsigned char Makevars[] = {' > src/makevars.h
     xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
+    # must NULL terminate
     echo ", 0x00 };" >> src/makevars.h
   fi
 fi
-xxd -i "/Users/waseyj/.R/Makevars" > makevars.h
 
 
 cat >confcache <<\_ACEOF

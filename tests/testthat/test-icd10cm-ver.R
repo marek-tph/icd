@@ -17,8 +17,9 @@ test_that("active version set to latest version", {
     icd10cm2019
   )
   # and for good measure
+  skip_missing_dat("icd10cm2019")
   expect_identical(
-    icd::get_icd10cm2019(),
+    get_icd10cm2019(),
     icd10cm2019
   )
   skip_missing_dat("icd10cm2017")
@@ -28,11 +29,33 @@ test_that("active version set to latest version", {
   )
 })
 
-test_that("all available data is reported", {
+test_that("all available ICD-10-CM data is reported and gettable", {
   for (pc in c(TRUE, FALSE)) {
-    res <- get_icd10cm_available(pc)
-    data_fun_name <- paste0("get_", res)
-    expect_true(.exists_in_ns(data_fun_name), info = paste(pc))
+    # this gets all possible data available, not what is actually cached
+    res <- get_icd10cm_available(dx = !pc)
+    cache_getter_names <- .get_getter_name(res)
+    fetcher_name <- .get_fetcher_name(res)
+    expect_true(.exists_in_ns(cache_getter_names),
+                info = paste("procedure code =", pc))
+    skip_if_offline()
+    for (r in res) {
+      expect_error(regexp = NA,
+                   .get_fetcher_fun(r)(),
+                   info = paste("Running fetcher for: r =", r, "and pc =", pc)
+      )
+      cache_getter_name <- .get_getter_name(r)
+      expect_is(
+        object = do.call(cache_getter_name, args = list()),
+        class = "data.frame",
+        info = paste("Calling cache getter :", cache_getter_name, "for: r =", r, "and pc =", pc)
+      )
+    }
+    expect_true(
+      all(
+        .exists_in_cache(res)
+      ),
+      info = paste("procedure code =", pc)
+    )
   }
 })
 
@@ -42,7 +65,7 @@ test_that("temporarily set active version", {
     with_icd10cm_version(
       ver = "2014",
       code = {
-        get_icd10cm_active_ver()
+        get_icd10cm_active_year()
       }
     ),
     "2014"
@@ -50,10 +73,10 @@ test_that("temporarily set active version", {
   expect_identical(
     object = with_icd10cm_version("2014", {
       writeLines(paste(as.character(icd:::.show_options()), collapse = ", "),
-        con = "~/icddebug.txt"
+                 con = "~/icddebug.txt"
       )
+      nrow(get_icd10cm_active())
     }),
-    nrow(get_icd10cm_active()),
     expected = nrow(get_icd10cm2014()),
     info = paste(
       "With icd10-cm-ver set: ",

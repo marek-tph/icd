@@ -40,7 +40,6 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
 #' @source \url{https://www.cdc.gov/nchs/icd/icd9cm.htm} Navigate to
 #'   'Dtab12.zip' in the 2011 data. and similar files run from 1996 to 2011.
 #' @keywords internal datagen
-#' @seealso .parse_icd9cm_hierarchy_rtf
 #' @noRd
 .parse_icd9cm_rtf_year <- function(year = "2014",
                                    ...,
@@ -67,19 +66,18 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
   )
   out_df <- out_df[order.icd9(out), ]
   out_df <- .lookup_icd9_hier(out_df, short_code = TRUE)
-  # set class here so merge's sort will use correct S3 method
   out_df$code <- as.icd9cm(out_df$code)
   # replace desc with desc_short and desc_long (or short_desc etc?)
   leaves <- .get_fetcher_fun(
     .get_icd9cm_name(year = year, leaf = TRUE)
-    )()
+  )()
   leaves[["leaf"]] <- TRUE
   out_df <- merge.data.frame(
     x = out_df,
     y = leaves,
     by = "code",
     all = TRUE,
-    sort = TRUE
+    sort = FALSE
   )
   out_df[is.na(out_df$short_desc), "short_desc"] <-
     out_df[is.na(out_df$short_desc), "desc"]
@@ -87,14 +85,20 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
     out_df[is.na(out_df$long_desc), "desc"]
   out_df[is.na(out_df$leaf), "leaf"] <- FALSE
   out_df$desc <- NULL
-  out_df <- out_df[c("code",
-                     "leaf",
-                     "short_desc",
-                     "long_desc",
-                     "three_digit",
-                     "major",
-                     "sub_chapter",
-                     "chapter")]
+  out_df <- out_df[
+    order.icd9(out_df$code),
+    c(
+      "code",
+      "leaf",
+      "short_desc",
+      "long_desc",
+      "three_digit",
+      "major",
+      "sub_chapter",
+      "chapter"
+    )
+  ]
+  rownames(out_df) <- NULL
   invisible(out_df)
 }
 
@@ -597,7 +601,6 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
 #' @noRd
 .rtf_parse_fifth_digit_range <- function(row_str) {
   stopifnot(is.character(row_str))
-  stopifnot(is.logical(.verbose()), length(.verbose()) == 1)
   out <- c()
   # get numbers and number ranges
   vals <- grep(unlist(strsplit(row_str, "[, :;]")),

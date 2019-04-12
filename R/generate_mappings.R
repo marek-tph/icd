@@ -629,7 +629,7 @@ apply_over_icd10cm_vers <- function(raw, verbose = FALSE) {
             }
             if (length(only_this)) {
               if (verbose) message("Year/version = ", yr)
-              message("Only in current for item ", cmb)
+              message("Only in new for item ", cmb)
               print(only_this)
             }
           }
@@ -670,7 +670,7 @@ apply_over_icd10who_vers <- function(raw, verbose) {
           print(only_prev)
         }
         if (length(only_this)) {
-          message("Only in current for item ", cmb)
+          message("Only in new for item ", cmb)
           print(only_this)
         }
       }

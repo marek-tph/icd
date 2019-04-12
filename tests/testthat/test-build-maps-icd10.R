@@ -7,6 +7,11 @@ skip_multi <- function() {
   if (isTRUE(getOption("icd.data.offline", default = TRUE))) {
     skip("Offline")
   }
+  if (!icd_data_dir_okay())
+    skip("Don't have icd data cache directory.")
+  # TODO: should probably let the functions download automatically
+  if (!.all_cached())
+    skip("Don't have all data cached.")
 }
 
 test_that("the icd-10 quan elix comorbidity map is reproduced", {

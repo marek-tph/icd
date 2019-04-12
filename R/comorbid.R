@@ -635,9 +635,12 @@ cr <- function(x) {
 .icd10cm_get_nchars <- function(year) {
   year <- as.character(year)
   if (year %in% names(.lookup_chars_in_icd10cm)) {
-    return(.lookup_chars_in_icd10cm[[year]])
+    nc <- .lookup_chars_in_icd10cm[[year]]
+    if (!is.null(nc) && length(nc) > 0) {
+      return(nc)
+    }
   }
-  dat <- get_icd_data(paste0("icd10cm", year))
+  dat <- .get_fetcher_fun(.get_icd10cm_name(year, TRUE))()
   n <- nchar(dat$code)
   assign(year, n, envir = .lookup_chars_in_icd10cm)
   n

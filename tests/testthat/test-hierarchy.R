@@ -18,9 +18,7 @@ test_that("icd9cm_hierarchy as saved in data can be recreated as expected", {
     "sub_chapter",
     "chapter"
   )
-  cmh <- .parse_icd9cm_hierarchy_rtf(
-    save_pkg_data = FALSE
-  )
+  cmh <- .parse_icd9cm_rtf_year("2014", save_pkg_data = FALSE)
   for (h in cmh_headings)
     expect_equal(cmh[[h]],
       icd9cm_hierarchy[[h]],
@@ -48,7 +46,6 @@ test_that("factors are in the right place and ordered", {
   expect_is(icd9cm_hierarchy$sub_chapter, "factor")
   expect_is(icd9cm_hierarchy$chapter, "factor")
   expect_false(is.unsorted(icd9cm_hierarchy$three_digit))
-  expect_false(is.unsorted(icd9cm_hierarchy$major))
   expect_false(is.unsorted(icd9cm_hierarchy$sub_chapter))
   expect_false(is.unsorted(icd9cm_hierarchy$chapter))
 })

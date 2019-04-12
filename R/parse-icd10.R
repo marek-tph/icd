@@ -32,6 +32,7 @@
   stopifnot(is.numeric(year) || is.character(year))
   year <- as.character(year)
   stopifnot(as.character(year) %in% names(.icd10cm_sources))
+  #
   f_info <- .dl_icd10cm_year(year = year, dx = dx)
   if (is.null(f_info)) {
     .absent_action_switch(
@@ -59,9 +60,13 @@
   )
   dat[["code"]] <-
     icd::as.short_diag(
-      icd::as.icd10cm(dat[["code"]])
+      if (dx) {
+        icd::as.icd10cm(dat[["code"]])
+      } else {
+        icd::as.icd10cm_pc(dat[["code"]])
+      }
     )
-  dat[["three_digit"]] <- factor(get_major.icd10(dat[["code"]]))
+  dat[["three_digit"]] <- factor(get_major(dat[["code"]]))
   # here we must re-factor so we don't have un-used levels in major
   dat[["major"]] <- factor(
     merge(
@@ -72,33 +77,35 @@
     )[["short_desc"]]
   )
   dat[["major"]] <- icd::as.short_diag(icd::as.icd10cm(dat[["major"]]))
-  if (.verbose()) message("Generating sub-chapter lookup for year: ", year)
-  sc_lookup <- .icd10_generate_subchap_lookup()
-  mismatch_sub_chap <-
-    dat$three_digit[which(dat$three_digit %nin% sc_lookup$sc_major)]
-  if (length(mismatch_sub_chap) != 0L) browser()
-  dat[["sub_chapter"]] <-
-    merge(
-      x = dat["three_digit"],
-      y = sc_lookup,
-      by.x = "three_digit",
-      by.y = "sc_major",
-      all.x = TRUE
-    )[["sc_desc"]]
-  if (.verbose()) message("Generating chap lookup for year: ", year)
-  chap_lookup <- .icd10_generate_chap_lookup()
-  dat[["chapter"]] <-
-    merge(
-      dat["three_digit"], chap_lookup,
-      by.x = "three_digit", by.y = "chap_major",
-      all.x = TRUE
-    )[["chap_desc"]]
-  dat <- dat[order.icd10cm(dat$code), ]
+  if (dx) {
+    if (.verbose()) message("Generating sub-chapter lookup for year: ", year)
+    sc_lookup <- .icd10_generate_subchap_lookup()
+    mismatch_sub_chap <-
+      dat$three_digit[which(dat$three_digit %nin% sc_lookup$sc_major)]
+    if (length(mismatch_sub_chap) != 0L) browser()
+    dat[["sub_chapter"]] <-
+      merge(
+        x = dat["three_digit"],
+        y = sc_lookup,
+        by.x = "three_digit",
+        by.y = "sc_major",
+        all.x = TRUE
+      )[["sc_desc"]]
+    if (.verbose()) message("Generating chap lookup for year: ", year)
+    chap_lookup <- .icd10_generate_chap_lookup()
+    dat[["chapter"]] <-
+      merge(
+        dat["three_digit"], chap_lookup,
+        by.x = "three_digit", by.y = "chap_major",
+        all.x = TRUE
+      )[["chap_desc"]]
+  }
   class(dat$code) <- c("icd10cm", "icd10", "character")
   class(dat$three_digit) <- c("icd10cm", "icd10", "factor")
-  row.names(dat) <- NULL
   if (.verbose()) message("Correcting order")
   dat <- dat[order.icd10cm(dat$code), ]
+  row.names(dat) <- NULL
+  if (.verbose()) message("Saving in resource dir")
   .save_in_resource_dir(
     var_name = .get_icd10cm_name(year = year, dx = dx),
     x = dat

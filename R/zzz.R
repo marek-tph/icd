@@ -8,8 +8,12 @@
 
 .onLoad <- function(libname, pkgname) {
   if (.icd_data_dir_exists()) {
-    .set("icd.data.resource" = .icd_data_default)
-    .set("icd.data.offline" = FALSE)
+    if (is.null(getOption("icd.data.resource")))
+      .set(resource = .icd_data_default)
+    .set(offline = FALSE)
+  }
+  if (getOption("icd.data.interact", default = TRUE) && interactive()) {
+    .set(interact = TRUE)
   }
 }
 
@@ -28,7 +32,7 @@
   } else {
     ""
   }
-  if (interactive() && .interact()) {
+  if (interactive()) {
     packageStartupMessage(
       "icd downloads and caches data when needed. Use
 setup_icd_data()
@@ -38,12 +42,13 @@ download_icd_data()
       extra_msg
     )
   }
-  if (.interact() && !.all_cached()) {
+  if (interactive() && !.all_cached()) {
     packageStartupMessage(
-      "Not all the available ICD-9-CM data has been downloaded. To complete the download and parsing process use:
+      "Not all the available ICD-9-CM data has been downloaded. To complete the full download, parsing and caching process (takes a few minutes and a few MB) use:
 download_icd_data()"
     )
   }
+  if (.verbose()) print(.show_options())
 }
 
 .onUnload <- function(libpath) {

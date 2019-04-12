@@ -27,15 +27,6 @@
   "icd10cm2019" # included in package data, being the latest version
 )
 
-#' The latest available version of ICD-10-CM in this package
-#' @details This is an active binding, so is exported explicitly
-#' @docType data
-#' @keywords datasets
-#' @export
-get_icd10cm_latest <- function() {
-  get_icd10cm2019()
-}
-
 #' Localised synonym for \code{\link{get_icd10fr2019}}, with French column names
 #' @seealso \code{\link{get_icd10fr2019}}
 #' @export

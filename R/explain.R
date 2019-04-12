@@ -200,9 +200,9 @@ explain_code.icd10who <- function(x,
   # this is a slow linear lookup, but usually only
   # "explaining" one or a few codes at a time.
   i <- if (lang == "fr") {
-    .idget("icd10who2008fr")
+    get_icd10who2008fr()
   } else {
-    .idget("icd10who2016")
+    get_icd10who2016()
   }
   i[
     i[["code"]] %in% unique(as_char_no_warn(x)),
@@ -290,10 +290,11 @@ explain_code_worker <- function(x,
   if (missing(var_name)) {
     i <- var
   } else {
-    if (substring(var_name, 1, 4) != "get_") {
-      var_name <- paste0("get_", var_name)
+    if (substring(var_name, 1, 4) == "get_") {
+      # probably can remove this
+      stop("var_name should be e.g. icd10cm2015, not get_icd10cm2015")
     }
-    i <- .idget(var_name)()
+    i <- .get_anywhere(var_name)
   }
   i[
     i[["code"]] %in% unique(as_char_no_warn(x)),

@@ -542,7 +542,7 @@ get_invalid.comorbidity_map <- function(x, short_code = guess_short(x), ...) {
 get_major <- function(x)
   UseMethod("get_major")
 
-#' @describeIn get_major Get major part of an ICD-10 code
+#' @describeIn get_major Get major part of an ICD-10 (of any kind) code
 #' @details For ICD-10, this is an initial implementation. If speed needed, then
 #'   can re-use C++ ICD-9 version: just grabbing the first three characters,
 #'   after all, and this is much easier in ICD-10 then ICD-9
@@ -550,6 +550,46 @@ get_major <- function(x)
 #' @export
 #' @noRd
 get_major.icd10 <- function(x) {
+  substr(trimws(x), 1L, 3L)
+}
+
+#' @describeIn get_major Get major part of an ICD-10-CM code
+#' @keywords internal
+#' @export
+#' @noRd
+get_major.icd10cm <- function(x) {
+  get_major.icd10(x)
+}
+
+#' @describeIn get_major Get major part of a French (country, not language) ICD-10-FR code
+#' @keywords internal
+#' @export
+#' @noRd
+get_major.icd10fr <- function(x) {
+  get_major.icd10(x)
+}
+
+#' @describeIn get_major Get major part of a Belgian ICD-10-BE code
+#' @keywords internal
+#' @export
+#' @noRd
+get_major.icd10be <- function(x) {
+  get_major.icd10(x)
+}
+
+#' @describeIn get_major Get major part of a WHO ICD-10 code
+#' @keywords internal
+#' @export
+#' @noRd
+get_major.icd10who <- function(x) {
+  get_major.icd10(x)
+}
+
+#' @describeIn get_major Get major part of an ICD-10-CM procedure code
+#' @keywords internal
+#' @noRd
+#' @export
+get_major.icd10cm_pc <- function(x) {
   substr(trimws(x), 1L, 3L)
 }
 
