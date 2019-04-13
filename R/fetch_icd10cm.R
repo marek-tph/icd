@@ -15,7 +15,6 @@
     # dx_leaf is same, just leaves
     file_name = y$dx_hier,
     save_name = .get_versioned_raw_file_name(y$dx_hier, year),
-    verbose = verbose,
     ...
   )
 }
@@ -38,7 +37,6 @@
       }
       .parse_icd10cm_year(year,
         dx = dx,
-        verbose = verbose,
         ...
       )
     }

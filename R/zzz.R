@@ -8,8 +8,9 @@
 
 .onLoad <- function(libname, pkgname) {
   if (.icd_data_dir_exists()) {
-    if (is.null(getOption("icd.data.resource")))
+    if (is.null(getOption("icd.data.resource"))) {
       .set(resource = .icd_data_default)
+    }
     .set(offline = FALSE)
   }
   if (getOption("icd.data.interact", default = TRUE) && interactive()) {
@@ -28,27 +29,17 @@
     ))
   }
   extra_msg <- if (system.file(package = "icd.data") != "") {
-    paste("The ", sQuote("icd.data"), "")
+    paste("The ", sQuote("icd.data"), " package is deprecated from 'icd' version 4.0")
   } else {
     ""
   }
   if (interactive()) {
     packageStartupMessage(
-      "icd downloads and caches data when needed. Use
-setup_icd_data()
-    to initialize the cache and enable automated downloads. Use:
-download_icd_data()
-    to cache everything at once, or complete an interrupted download. ",
+      sQuote("icd"), " downloads data when needed.",
+      " Use setup_icd_data() to create cache directory. ",
       extra_msg
     )
   }
-  if (interactive() && !.all_cached()) {
-    packageStartupMessage(
-      "Not all the available ICD-9-CM data has been downloaded. To complete the full download, parsing and caching process (takes a few minutes and a few MB) use:
-download_icd_data()"
-    )
-  }
-  if (.verbose()) print(.show_options())
 }
 
 .onUnload <- function(libpath) {

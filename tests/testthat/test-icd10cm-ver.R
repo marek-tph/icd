@@ -36,12 +36,14 @@ test_that("all available ICD-10-CM data is reported and gettable", {
     cache_getter_names <- .get_getter_name(res)
     fetcher_name <- .get_fetcher_name(res)
     expect_true(.exists_in_ns(cache_getter_names),
-                info = paste("procedure code =", pc))
+      info = paste("procedure code =", pc)
+    )
     skip_if_offline()
     for (r in res) {
-      expect_error(regexp = NA,
-                   .get_fetcher_fun(r)(),
-                   info = paste("Running fetcher for: r =", r, "and pc =", pc)
+      expect_error(
+        regexp = NA,
+        .get_fetcher_fun(r)(),
+        info = paste("Running fetcher for: r =", r, "and pc =", pc)
       )
       cache_getter_name <- .get_getter_name(r)
       expect_is(
@@ -73,7 +75,7 @@ test_that("temporarily set active version", {
   expect_identical(
     object = with_icd10cm_version("2014", {
       writeLines(paste(as.character(icd:::.show_options()), collapse = ", "),
-                 con = "~/icddebug.txt"
+        con = "~/icddebug.txt"
       )
       nrow(get_icd10cm_active())
     }),

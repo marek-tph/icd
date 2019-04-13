@@ -5,7 +5,6 @@
   lapply(names(.icd10cm_sources),
     .icd10cm_parse_cms_pcs_year,
     save_data = save_data,
-    verbose = verbose
   )
   invisible()
 }

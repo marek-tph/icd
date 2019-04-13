@@ -859,9 +859,10 @@ is.comorbidity_map <- function(x) inherits(x, "comorbidity_map")
 #' @template dotdotdot
 #' @export
 print.icd9 <- function(x, verbose = FALSE, ...)
-  print_codes(x,
+  print_codes(
+    x,
     ifelse(is.icd9cm(x), "ICD-9-CM", "ICD-9"),
-    verbose = verbose, ...
+    ...
   )
 
 #' @rdname print.icd9
@@ -892,7 +893,7 @@ print.icd10 <- function(x, verbose = FALSE, ...) {
     icd10be_pc = "ICD-10-BE (Belgian Procedure Codes)",
     "ICD-10 Codes (Subtype not set)"
   )
-  print_codes(x, sub_class, verbose = verbose, ...)
+  print_codes(x, sub_class, ...)
 }
 
 print_codes <- function(x, code_str, verbose = FALSE, ...) {

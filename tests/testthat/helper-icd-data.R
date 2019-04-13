@@ -16,8 +16,9 @@ rtf_year_ok <- function(year, ...) {
 have_icd_data_resource <- function() {
   opt_ok <- !is.null(getOption("icd.data.resource", default = NULL))
   if (!opt_ok && dir.exists(.icd_data_default)) {
-    if (.verbose())
+    if (.verbose()) {
       message("have_icd_data_resource is setting data opt to default")
+    }
     options("icd.data.resource" = .icd_data_default)
     return(TRUE)
   }

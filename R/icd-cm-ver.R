@@ -55,12 +55,15 @@ get_icd10cm_version <- function(ver) {
   if (.verbose()) message("Trying package data env first for ", var_name)
   if (.exists_in_cache(var_name)) {
     cached_dat <- .get_from_cache(var_name)
-    if (!is.null(cached_dat))
-    return(cached_dat)
-    else
-      if (.verbose())
-        message("Cached data for ", sQuote(var_name), " is null!",
-                " Refreshing...")
+    if (!is.null(cached_dat)) {
+      return(cached_dat)
+    } else
+    if (.verbose()) {
+      message(
+        "Cached data for ", sQuote(var_name), " is null!",
+        " Refreshing..."
+      )
+    }
   }
   # for 2016 and 2019 (currently), we look in lazy data.
   if (.verbose()) message("Resorting to normal package data")
@@ -86,14 +89,11 @@ get_icd10cm_version <- function(ver) {
 get_icd10cm_active <- function() {
   ver <- get_icd10cm_active_year()
   ver_var <- .get_icd10cm_name(ver, TRUE)
-  if (.exists_in_ns_single(ver_var))
-    return(get(ver_var))
+  if (.exists_anywhere(ver_var)) {
+    return(.get_anywhere(ver_var))
+  }
   if (.verbose()) message("Getting active version: ", ver)
   .get_fetcher_fun(ver_var)()
-  # if (.exists_in_cache_single(ver_var))
-  #   return(.get_from_cache(ver_var))
-  # stop("Unable to get active version, which is currently ", sQuote(ver),
-  #      ". Check getOption(\"icd.data.icd10cm_active_year\").", call. = FALSE)
 }
 
 #' Get the ICD-10-CM versions available in this package

@@ -5,7 +5,8 @@ test_that("explain a large set of ICD-9 codes succinctly", {
     explain_code(children(as.icd9("391"), defined = FALSE, short_code = TRUE),
       condense = FALSE, short_code = TRUE
     ),
-    c(NA,
+    c(
+      NA,
       "Rheumatic fever with heart involvement", "Acute rheumatic pericarditis",
       "Acute rheumatic endocarditis", "Acute rheumatic myocarditis",
       "Other acute rheumatic heart disease",
@@ -28,7 +29,8 @@ test_that("explain a large set of ICD-9 codes succinctly, using factors", {
     )),
     condense = FALSE, short_code = TRUE
     ),
-    c(NA,
+    c(
+      NA,
       "Rheumatic fever with heart involvement", "Acute rheumatic pericarditis",
       "Acute rheumatic endocarditis", "Acute rheumatic myocarditis",
       "Other acute rheumatic heart disease",

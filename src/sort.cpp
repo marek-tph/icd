@@ -184,6 +184,16 @@ bool icd10cmCompareC(const char* xstr, const char* ystr) {
 #endif
     return i < 0;
   }
+  // we know the first char is different. If one isn't in the quirk list, we can
+  // return immediately
+  const char x1 = *xstr;
+  if (x1 != 'C' && x1 != 'D' && x1 != 'M' && x1 != 'Z') {
+    return strcmp(xstr, ystr) < 0;
+  }
+  const char y1 = *ystr;
+  if (y1 != 'C' && y1 != 'D' && y1 != 'M' && y1 != 'Z') {
+    return strcmp(xstr, ystr) < 0;
+  }
   TRACE("icd10cmCompareC found that first char equal for " << xstr << " and " << ystr);
   // in flat file, C4A is between 43 and 44. Definitive reference I am using is
   // the flat file with all the codes from CMS.

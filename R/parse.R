@@ -54,7 +54,6 @@
   icd9cm_leaf_v32 <- .parse_icd9cm_leaf_year(
     ver = "2014",
     save_data = TRUE,
-    verbose = verbose,
     ...
   )
   invisible(icd9cm_leaf_v32)
@@ -73,7 +72,6 @@
   f_info_short <- .unzip_to_data_raw(
     url = dat$url,
     file_name = fn_short_orig,
-    verbose = verbose,
     save_name = .get_versioned_raw_file_name(fn_short_orig,
       ver = year
     ),
@@ -83,7 +81,6 @@
     f_info_long <- .unzip_to_data_raw(
       url = dat$url,
       file_name = fn_long_orig,
-      verbose = verbose,
       save_name = .get_versioned_raw_file_name(fn_long_orig,
         ver = year
       ),
@@ -266,7 +263,7 @@
   x
 }
 
-.make_icd9cm_parse_leaf_fun <- function(year, verbose) {
+.make_icd9cm_parse_leaf_fun <- function(year) {
   # Must force, so that the values to the arguments are not promises which are
   # later evaluated in a different environment.
   force(year)
@@ -285,7 +282,7 @@
     # TODO: special case for 2011 / v32?
     parse_fun_name <- .get_parser_icd9cm_leaf_name(y)
     if (verbose) message("Making ICD-9-CM leaf parser: ", parse_fun_name)
-    parse_fun <- .make_icd9cm_parse_leaf_fun(y, verbose = verbose)
+    parse_fun <- .make_icd9cm_parse_leaf_fun(y)
     assign(parse_fun_name, parse_fun, envir = env)
   }
 }

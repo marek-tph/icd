@@ -94,7 +94,7 @@
   stopifnot(is.character(var_name))
   if (verbose > 1) message(".exists_in_cache trying icd_data_env environment")
   if (.exists(var_name)) {
-    if (verbose) message(sQuote(var_name), " found in cache.")
+    if (verbose) message(sQuote(var_name), " found in env.")
     return(TRUE)
   }
   fp <- .rds_path(var_name)
@@ -381,8 +381,12 @@ icd_data_dir <- function(path) {
   }
   o <- NULL
   if (dir.exists(.icd_data_default)) {
-    if (.verbose()) message("icd_data_dir: ",
-                            .icd_data_default, " found, so using it.")
+    if (.verbose()) {
+      message(
+        "icd_data_dir: ",
+        .icd_data_default, " found, so using it."
+      )
+    }
     o <- .icd_data_default
   }
   if (is.null(o)) o <- getOption("icd.data.resource", default = NULL)
@@ -392,13 +396,14 @@ icd_data_dir <- function(path) {
     }
     return(o)
   }
-  if (with_absent_action("silent", !.confirm_download()))
-  .absent_action_switch(
-    paste(
-      "The", sQuote("icd.data.resource"),
-      "option is not set. Use setup_icd_data() to get started."
+  if (with_absent_action("silent", !.confirm_download())) {
+    .absent_action_switch(
+      paste(
+        "The", sQuote("icd.data.resource"),
+        "option is not set. Use setup_icd_data() to get started."
+      )
     )
-  )
+  }
   NULL
 }
 
@@ -416,17 +421,20 @@ icd_data_dir_okay <- function() {
   if (!.offline()) {
     if (!.icd_data_dir_exists()) {
       ok <- dir.create(dir)
-      if (!ok)
+      if (!ok) {
         stop("Unable to create icd data cache directory at: ", sQuote(dir))
+      }
     }
     return(TRUE)
   }
   ok <- FALSE
   if (.interact()) {
-    message("icd needs to download and/or parse data.",
-            "It will be saved in ", sQuote(dir),
-            ", based on the default, or R option: ",
-            sQuote("icd.data.resource"))
+    message(
+      "icd needs to download and/or parse data.",
+      "It will be saved in ", sQuote(dir),
+      ", based on the default, or R option: ",
+      sQuote("icd.data.resource")
+    )
     if (!is.null(msg)) message(msg)
     ok <- isTRUE(
       askYesNo(

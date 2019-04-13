@@ -5,10 +5,10 @@
 
 .print_options <- function() {
   cat(paste(names(.show_options()),
-        .show_options(),
-        sep = "=",
-        collapse = ", ")
-  )
+    .show_options(),
+    sep = "=",
+    collapse = ", "
+  ))
 }
 
 #' Set initial options for the package
@@ -92,8 +92,8 @@ NULL
     return(isTRUE(v))
   }
   if ((is.logical(x) || is.numeric(x)) &&
-      length(x) == 1L &&
-      !is.na(x)) {
+    length(x) == 1L &&
+    !is.na(x)) {
     if (is.numeric(x)) x <- as.integer(x)
     options("icd.data.verbose" = x)
   } else {
@@ -101,10 +101,11 @@ NULL
     options("icd.data.verbose" = ev)
     if (ev) message("Reset verbose option to ICD_DATA_VERBOSE")
   }
-  if (getOption("icd.data.verbose") > 0)
+  if (getOption("icd.data.verbose") > 0) {
     getOption("icd.data.verbose")
-  else
+  } else {
     invisible(getOption("icd.data.verbose"))
+  }
 }
 
 .interact <- function(x) {
@@ -138,13 +139,13 @@ NULL
 }
 
 .absent_action <- function(x = c(
-  "stop",
-  "warning",
-  "message",
-  "silent",
-  "sysenv",
-  NA
-)) {
+                             "stop",
+                             "warning",
+                             "message",
+                             "silent",
+                             "sysenv",
+                             NA
+                           )) {
   if (!missing(x)) {
     x <- match.arg(x)
     if (is.na(x) || x == "sysenv") {
@@ -160,21 +161,21 @@ NULL
 
 .absent_action_switch <- function(msg, must_work = TRUE) {
   switch(.absent_action(),
-         "stop" = {
-           if (must_work) {
-             stop(msg, call. = FALSE)
-           } else {
-             message(msg, call. = FALSE)
-           }
-         },
-         "warning" = {
-           if (must_work) {
-             warning(msg, call. = FALSE)
-           } else {
-             message(msg, call. = FALSE)
-           }
-         },
-         "message" = message(msg)
+    "stop" = {
+      if (must_work) {
+        stop(msg, call. = FALSE)
+      } else {
+        message(msg, call. = FALSE)
+      }
+    },
+    "warning" = {
+      if (must_work) {
+        warning(msg, call. = FALSE)
+      } else {
+        message(msg, call. = FALSE)
+      }
+    },
+    "message" = message(msg)
   )
   invisible()
 }
@@ -223,12 +224,12 @@ with_interact <- function(interact, code) {
 }
 
 with_absent_action <- function(absent_action = c(
-  "message",
-  "stop",
-  "warning",
-  "silent"
-),
-code) {
+                                 "message",
+                                 "stop",
+                                 "warning",
+                                 "silent"
+                               ),
+                               code) {
   absent_action <- match.arg(absent_action)
   old <- options("icd.data.absent_action" = absent_action)
   on.exit(options(old))
@@ -272,13 +273,21 @@ setup_icd_data <- function(path = NULL) {
     message("Trying the default icd data cache: ", path)
   }
   if (is.null(path)) {
-    stop("Unable to find a path to use for icd data cache.")
+    stop("Unable to find a path to use for icd data cache. Try ", sQuote("setup_icd_data(\"/path/with/write/access\")"))
   }
   if (!dir.exists(path)) {
     created <- dir.create(path, showWarnings = TRUE)
     if (!created) stop("Unable to create directory at: ", path)
   }
   options("icd.data.resource" = path)
+  if (!.all_cached()) {
+    message(
+      "Not all available data is currently downloaded. ",
+      "You may use: ", sQuote("download_icd_data()"),
+      " to complete downloading all available data, or let this happen on demand."
+    )
+  }
+
   invisible(path)
 }
 
