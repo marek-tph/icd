@@ -33,6 +33,10 @@
   paste0(".parse_", paste0("icd9cm", ver))
 }
 
+.get_icd9cm_name <- function(year, leaf) {
+  paste0("icd9cm", year, ifelse(leaf, "_leaf", ""))
+}
+
 .get_icd10cm_name <- function(year, dx) {
   paste0("icd10cm", year, ifelse(dx, "", "_pc"))
 }
@@ -50,6 +54,7 @@
 }
 
 .get_fetcher_fun <- function(var_name) {
+  stopifnot(length(var_name) == 1L)
   match.fun(.get_fetcher_name(var_name))
 }
 
@@ -59,29 +64,37 @@
 }
 
 .get_data_dir <- function() {
-  if (.icd_data_dir_exists())
+  if (.icd_data_dir_exists()) {
     getOption("icd.data.resource", default = .icd_data_default)
-  else
+  } else {
     NULL
+  }
 }
 
-.exists_in_cache <- function(var_name) {
+.exists_in_cache <- function(var_name, ...) {
+  vapply(var_name, .exists_in_cache_single, logical(1), ...)
+}
+
+.exists_in_cache_single <- function(var_name) {
+  stopifnot(length(var_name) == 1L)
   verbose <- .verbose()
   if (verbose > 1) {
     message("Seeing if ", sQuote(var_name), " exists in cache env or dir")
   }
   if (!.icd_data_dir_exists()) {
     if (.verbose()) {
-      message("Don't even have the icd.data.resource option defined,",
-              " and default location of ", sQuote(.icd_data_default),
-              " is missing.")
+      message(
+        "Don't even have the icd.data.resource option defined,",
+        " and default location of ", sQuote(.icd_data_default),
+        " is missing."
+      )
     }
     return(FALSE)
   }
   stopifnot(is.character(var_name))
   if (verbose > 1) message(".exists_in_cache trying icd_data_env environment")
   if (.exists(var_name)) {
-    if (verbose) message(sQuote(var_name), " found in cache.")
+    if (verbose) message(sQuote(var_name), " found in env.")
     return(TRUE)
   }
   fp <- .rds_path(var_name)
@@ -207,23 +220,29 @@
 .make_fetcher <- function(var_name) {
   force(var_name)
   parse_fun_name <- .get_parser_name(var_name)
+  # Fetcher function (this is the get_ exported in NAMESPACE for the user)
   fetcher_fun <- function(alt = NULL,
                             must_work = is.null(alt),
                             msg = paste("Unable to find", var_name)) {
     verbose <- .verbose()
     if (verbose) message("Starting fetcher for ", var_name)
-    if (.exists_in_cache(var_name)) {
-      if (verbose) message("Found ", var_name, " in cache.")
-      return(.get_from_cache(var_name = var_name))
+    if (.exists_anywhere(var_name)) {
+      if (verbose) message("Found ", var_name, " in cache or package data.")
+      return(.get_anywhere(var_name = var_name))
     }
-    # strictly speaking, we could be offline and already have the raw data, but this is a weird corner case:
-    if (.offline()) {
+    # icd_data_dir_okay will find default dir if not set
+    if (!icd_data_dir_okay() && .offline()) {
       if (verbose) message("Offline and not in cache")
       .absent_action_switch(
         "Offline so not attempting to download or parse",
         must_work = must_work
       )
       return(alt)
+    }
+    # duplicated from above:
+    if (.exists_anywhere(var_name)) {
+      if (verbose) message("Found ", var_name, " in cache or package data.")
+      return(.get_anywhere(var_name = var_name))
     }
     if (verbose) {
       message(
@@ -353,37 +372,69 @@
 #' @export
 icd_data_dir <- function(path) {
   if (.verbose() > 1) {
-    message("icd_data_dir: ")
-    print(.show_options())
+    message("icd_data_dir: options are currently:")
+    .print_options()
   }
   if (!missing(path) && dir.exists(path)) {
     options("icd.data.resource" = path)
     return(path)
   }
-  o <- getOption("icd.data.resource", default = NULL)
+  o <- NULL
   if (dir.exists(.icd_data_default)) {
+    if (.verbose()) {
+      message(
+        "icd_data_dir: ",
+        .icd_data_default, " found, so using it."
+      )
+    }
     o <- .icd_data_default
   }
+  if (is.null(o)) o <- getOption("icd.data.resource", default = NULL)
   if (!is.null(o)) {
     if (.verbose() > 1 && regexec("tmp", o) != -1) {
-      message("Using a temporary directory")
+      warning("Using a temporary icd data cache directory: ", sQuote(o))
     }
     return(o)
   }
-  # TODO: if .icd.data already exists, then use it!
-  .absent_action_switch(
-    paste(
-      "The", sQuote("icd.data.resource"),
-      "option is not set. Use setup_icd_data() to get started."
+  if (with_absent_action("silent", !.confirm_download())) {
+    .absent_action_switch(
+      paste(
+        "The", sQuote("icd.data.resource"),
+        "option is not set. Use setup_icd_data() to get started."
+      )
+    )
+  }
+  NULL
+}
+
+icd_data_dir_okay <- function() {
+  !is.null(
+    with_absent_action(
+      absent_action = "silent",
+      icd_data_dir()
     )
   )
 }
 
 .confirm_download <- function(msg = NULL) {
-  if (!.offline()) return(TRUE)
+  dir <- getOption("icd.data.resource", .icd_data_default)
+  if (!.offline()) {
+    if (!.icd_data_dir_exists()) {
+      ok <- dir.create(dir)
+      if (!ok) {
+        stop("Unable to create icd data cache directory at: ", sQuote(dir))
+      }
+    }
+    return(TRUE)
+  }
   ok <- FALSE
   if (.interact()) {
-    message("icd needs to download and/or parse data.")
+    message(
+      "icd needs to download and/or parse data.",
+      "It will be saved in ", sQuote(dir),
+      ", based on the default, or R option: ",
+      sQuote("icd.data.resource")
+    )
     if (!is.null(msg)) message(msg)
     ok <- isTRUE(
       askYesNo(

@@ -181,7 +181,6 @@ icd9_parse_ahrq_ccs <- function(single = TRUE,
 #'   version number as shown on the website
 #' @param save_data logical whether to save the result in the source tree.
 #'   Defaults to \code{FALSE}.
-#' @template verbose
 #' @template offline
 #' @importFrom utils read.csv
 #' @examples
@@ -199,14 +198,11 @@ icd9_parse_ahrq_ccs <- function(single = TRUE,
 #' @keywords internal manip
 #' @noRd
 icd10_parse_ahrq_ccs <- function(version = "2018.1",
-                                 save_data = FALSE,
-                                 offline = TRUE,
-                                 verbose = TRUE) {
+                                 save_data = FALSE) {
   assert_character(version, pattern = "^20[0-9]{2}\\.[1-9]$")
   assert_flag(save_data)
-  assert_flag(offline)
   ahrq_ccs <-
-    icd10_fetch_ahrq_ccs(version = version, offline = offline)
+    icd10_fetch_ahrq_ccs(version = version)
   # simpler structure than icd9, all categories in one file
   ahrq_df <- read.csv(ahrq_ccs$file_path,
     quote = "'\"",
@@ -270,7 +266,6 @@ icd10_parse_ahrq_ccs <- function(version = "2018.1",
   # nolint start
   icd10_map_ccs <- sapply(icd10_map_ccs,
     apply_over_icd10cm_vers,
-    verbose = verbose,
     simplify = FALSE,
     USE.NAMES = TRUE
   )

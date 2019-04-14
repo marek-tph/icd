@@ -20,6 +20,8 @@ AC_INIT(icd)
 AC_COPYRIGHT(Copyright (C) 2014 - 2019  Jack O. Wasey)
 AC_CONFIG_SRCDIR([src])
 #AC_CONFIG_HEADERS([src/config.h:src/config.h.in])
+# just adding headers gives some empty includes for package metadata which I don't define here.
+#AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([src/Makevars])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_MACRO_DIR([inst/m4])
@@ -45,9 +47,9 @@ CFLAGS=`"${R_BIN}" CMD config CFLAGS`
 CPPFLAGS=`"${R_BIN}" CMD config CPPFLAGS`
 LIBS="${PKG_LIBS}"
 
-AC_REQUIRE_CPP
+# AC_REQUIRE_CPP
 
-# changes what R_OPENMP does:
+# changes what R_OPENMP and rest of script does:
 AC_LANG(C++)
 
 #AC_CHECK_HEADER([string.h])
@@ -92,7 +94,21 @@ if test "${ac_pkg_openmp}" = no; then
 else
   ICD_OPENMP_FLAG='$(SHLIB_OPENMP_CXXFLAGS)'
 fi
-# in Makevars.in:
-AC_SUBST(ICD_OPENMP_FLAG)
 
+ICD_MAKEVARS=""
+echo "home = $HOME"
+AC_MSG_CHECKING([$HOME/.R exists])
+if test -d "$HOME/.R"; then
+  AC_MSG_RESULT([yes])
+  AC_MSG_CHECKING([$HOME/.R/Makevars exists])
+  if test -e "$HOME/.R/Makevars"; then
+    AC_MSG_RESULT([yes])
+    echo 'unsigned char Makevars[[]] = {' > src/makevars.h
+    xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
+    # must NULL terminate
+    echo ", 0x00 };" >> src/makevars.h
+  fi
+fi
+
+AC_SUBST(ICD_OPENMP_FLAG)
 AC_OUTPUT

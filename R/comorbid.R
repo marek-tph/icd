@@ -74,20 +74,20 @@ poa_choices <- c("yes", "no", "notYes", "notNo")
 #' # get first few rows and columns of Charlson comorbidities using Quan/Deyo
 #' # mapping of ICD-9 or ICD-10 codes Charlson categories
 #' comorbid_quan_deyo(vermont_dx)[1:5, 1:14]
-#'
+#' 
 #' # Note that the comorbidity calculations automatically finds the ICD code
 #' # columns, and uses 'wide' or 'long' format data.
-#'
+#' 
 #' stopifnot(
 #'   identical(
 #'     comorbid_quan_deyo(vermont_dx),
 #'     comorbid_quan_deyo(wide_to_long(vermont_dx))
 #'   )
 #' )
-#'
+#' 
 #' # get summary AHRQ (based on Elixhauser) comorbidities for the Uranium data:
 #' summary(comorbid_ahrq(uranium_pathology))
-#'
+#' 
 #' pts <- icd_long_data(
 #'   visit_name = c("2", "1", "2", "3", "3"),
 #'   icd9 = c("39891", "40110", "09322", "41514", "39891")
@@ -101,10 +101,10 @@ poa_choices <- c("yes", "no", "notYes", "notNo")
 #'     "2011-01-04", "2011-01-04"
 #'   ))
 #' )
-#'
+#' 
 #' pt_hccs <- comorbid_hcc(pts, date_name = "date")
 #' head(pt_hccs)
-#'
+#' 
 #' pts10 <- icd_long_data(
 #'   visit_name = c("a", "b", "c", "d", "e"),
 #'   icd_name = c("I058", NA, "T82817A", "", "I69369"),
@@ -112,13 +112,13 @@ poa_choices <- c("yes", "no", "notYes", "notNo")
 #'     c("2011-01-01", "2011-01-02", "2011-01-03", "2011-01-03", "2011-01-03")
 #'   )
 #' )
-#'
+#' 
 #' icd10_comorbid(pts10, map = icd10_map_ahrq)
 #' # or if library(icd) hasn't been called first:
 #' icd::icd10_comorbid(pts10, map = icd::icd10_map_ahrq)
 #' # or most simply:
 #' icd::icd10_comorbid_ahrq(pts10)
-#'
+#' 
 #' # specify a simple custom comorbidity map:
 #' my_map <- list(
 #'   "malady" = c("100", "2000"),
@@ -635,9 +635,12 @@ cr <- function(x) {
 .icd10cm_get_nchars <- function(year) {
   year <- as.character(year)
   if (year %in% names(.lookup_chars_in_icd10cm)) {
-    return(.lookup_chars_in_icd10cm[[year]])
+    nc <- .lookup_chars_in_icd10cm[[year]]
+    if (!is.null(nc) && length(nc) > 0) {
+      return(nc)
+    }
   }
-  dat <- get_icd_data(paste0("icd10cm", year))
+  dat <- .get_fetcher_fun(.get_icd10cm_name(year, TRUE))()
   n <- nchar(dat$code)
   assign(year, n, envir = .lookup_chars_in_icd10cm)
   n

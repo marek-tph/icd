@@ -105,3 +105,35 @@ SEXP inFast(SEXP x, SEXP table) {
   return R_NilValue;
 }
 
+//' Get some information about how this DLL was compiled
+//' @keywords internal
+//' @noRd
+// [[Rcpp::export]]
+void build_info() {
+#ifdef __clang_version__
+  Rcpp::Rcout << "__clang_version__ is: " << __clang_version__ << std::endl;
+#endif
+#ifdef __OPTIMIZE__
+  Rcpp::Rcout << "__OPTIMIZE__ is set" << std::endl;
+#else
+  Rcpp::Rcout << "__OPTIMIZE__ unset" << std::endl;
+#endif
+  Rcpp::Rcout << "__VERSION__ is: " << __VERSION__ << std::endl;
+#ifdef __STDC_NO_THREADS__
+  Rcpp::Rcout << "__STDC_NO_THREADS__ is: " << __STDC_NO_THREADS__ << std::endl;
+#else
+  Rcpp::Rcout << "__STDC_NO_THREADS__ not defined, C++ STD not GNU?" << std::endl;
+#endif
+#ifdef __STDC_VERSION__
+  Rcpp::Rcout << "__STDC_VERSION__ is: " << __STDC_VERSION__ << std::endl;
+#endif
+#ifdef __GLIBCXX__
+  Rcpp::Rcout << "libstdc++ from GCC"  << std::endl;
+#endif
+
+#ifdef _LIBCPP_VERSION
+  Rcpp::Rcout << "libc++ from LLVM/clang)" << std::endl;
+#endif
+#include "makevars.h"
+  Rcpp::Rcout << Makevars << std::endl;
+}

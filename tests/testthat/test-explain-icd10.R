@@ -11,3 +11,14 @@ test_that("basic explain ICD-10 codes", {
     expect_identical(explain_code(as.icd10cm(n)), x)
   }
 })
+
+test_that("some majors seem to differ when generated on Mac vs Linux", {
+  expect_identical(
+    explain_code.icd10cm("K87", brief = TRUE),
+    "Disord of GB, biliary trac and pancreas in dis classd elswhr"
+  )
+  expect_identical(
+    explain_code.icd10cm("I79", brief = TRUE),
+    "Disord of art, arterioles and capilare in dis classd elswhr"
+  )
+})

@@ -8,8 +8,13 @@
 
 .onLoad <- function(libname, pkgname) {
   if (.icd_data_dir_exists()) {
-    .set("icd.data.resource" = .icd_data_default)
-    .set("icd.data.offline" = FALSE)
+    if (is.null(getOption("icd.data.resource"))) {
+      .set(resource = .icd_data_default)
+    }
+    .set(offline = FALSE)
+  }
+  if (getOption("icd.data.interact", default = TRUE) && interactive()) {
+    .set(interact = TRUE)
   }
 }
 
@@ -24,24 +29,15 @@
     ))
   }
   extra_msg <- if (system.file(package = "icd.data") != "") {
-    paste("The ", sQuote("icd.data"), "")
+    paste("The ", sQuote("icd.data"), " package is deprecated from 'icd' version 4.0")
   } else {
     ""
   }
-  if (interactive() && .interact()) {
+  if (interactive()) {
     packageStartupMessage(
-      "icd downloads and caches data when needed. Use
-setup_icd_data()
-    to initialize the cache and enable automated downloads. Use:
-download_icd_data()
-    to cache everything at once, or complete an interrupted download. ",
+      sQuote("icd"), " downloads data when needed.",
+      " Use setup_icd_data() to create cache directory. ",
       extra_msg
-    )
-  }
-  if (.interact() && !.all_cached()) {
-    packageStartupMessage(
-      "Not all the available ICD-9-CM data has been downloaded. To complete the download and parsing process use:
-download_icd_data()"
     )
   }
 }
@@ -71,8 +67,8 @@ release_questions <- function() {
     "Travis and appveyor?",
     "rhub::check_with_sanitizers()",
     "rhub::check_for_cran()",
-    "Have you checked on Windows, win_builder (if possible with configure script), Mac, Ubuntu, rhub::check_with_sanitizers() etc", #nolint
-    "Did you check with verbose, offline, interact, with undefined, TRUE and FALSE", #nolint
+    "Have you checked on Windows, win_builder (if possible with configure script), Mac, Ubuntu, rhub::check_with_sanitizers() etc", # nolint
+    "Did you check with verbose, offline, interact, with undefined, TRUE and FALSE", # nolint
     # final manual check:
     "Have all unnecessary files been ignored in built source package?"
   )

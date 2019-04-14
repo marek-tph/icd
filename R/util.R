@@ -407,6 +407,7 @@ get_raw_data_dir <- function() {
 }
 
 .stopifnot_year <- function(year) {
-  if (!all(grepl("^[[:digit:]]{4}$", as.character(year))))
+  if (!all(grepl("^[[:digit:]]{4}$", as.character(year)))) {
     stop(year, " is not a four-digit year.", call. = FALSE)
+  }
 }

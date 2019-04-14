@@ -3,6 +3,14 @@
   o[grepl("^icd\\.data", names(o))]
 }
 
+.print_options <- function() {
+  cat(paste(names(.show_options()),
+    .show_options(),
+    sep = "=",
+    collapse = ", "
+  ))
+}
+
 #' Set initial options for the package
 #'
 #' \code{icd.data.offline} - default is \code{TRUE}, unless the system
@@ -21,58 +29,13 @@
 #' \code{icd.data.absent_action} - what to do if data is missing, \sQuote{stop},
 #' \sQuote{warning}, \sQuote{message"}, or \sQuote{silent}.
 #'
-#' \code{icd.data.icd10cm_active_ver} - which ICD-10-CM version is currently
+#' \code{icd.data.icd10cm_active_year} - which ICD-10-CM version is currently
 #' active. Default is \sQuote{2019}.
 #'
 #' See also \code{.show_options} \code{.clear_options} \code{.set_dev_options}
 #' @keywords internal
 #' @noRd
-.set_init_options <- function() {
-  if (!("icd.data.verbose" %in% names(options()))) {
-    options("icd.data.verbose" = .env_var_is_true("ICD_DATA_VERBOSE"))
-  }
-  if (!("icd.data.offline" %in% names(options()))) {
-    options("icd.data.offline" = !.env_var_is_false("ICD_DATA_OFFLINE"))
-  }
-  if (!("icd.data.interact" %in% names(options()))) {
-    options(
-      "icd.data.interact" =
-        .env_var_is_true("ICD_DATA_INTERACT") ||
-          interactive()
-    )
-  }
-  # stop or message, anything else will silently continue, which we have to
-  # default to onLoad to avoid numerous R CMD check problems. For this reason
-  # also, don't check whether option already set, just to make sure we are
-  # really silent with CRAN.
-  if (!("icd.data.absent_action" %in% names(options()))) {
-    ev <- tolower(Sys.getenv("ICD_DATA_ABSENT_ACTION", unset = "stop"))
-    stopifnot(ev %in% c(
-      "message",
-      "stop",
-      "warning",
-      "silent"
-    ))
-    options("icd.data.absent_action" = ev)
-  }
-  # Which version of ICD-10-CM to use by default?
-  if (!("icd.data.icd10cm_active_ver" %in% names(options()))) {
-    set_icd10cm_active_ver("2019", check_exists = FALSE)
-  }
-  if (!("icd.data.resource" %in% names(options()))) {
-    for (trypath in c(
-      getOption("icd.data.resource", default = NA),
-      Sys.getenv("ICD_DATA_PATH", unset = NA),
-      file.path(Sys.getenv("HOME"), ".icd.data"),
-      path.expand(.icd_data_default)
-    )) {
-      if (!is.na(trypath) && dir.exists(trypath)) {
-        if (any(grepl("tmp", trypath))) warning("Using temporary directory.")
-        options("icd.data.resource" = trypath)
-      }
-    }
-  }
-}
+NULL
 
 .set <- function(..., overwrite = FALSE) {
   f <- list(...)
@@ -99,7 +62,7 @@
   f(
     offline = TRUE,
     absent_action = "stop",
-    icd10cm_active_ver = "2019",
+    icd10cm_active_year = "2019",
     resource = .icd_data_default,
     interact = interactive(),
     verbose = TRUE
@@ -128,20 +91,35 @@
     if (is.numeric(v)) return(as.integer(v))
     return(isTRUE(v))
   }
-  if (is.logical(x) && length(x) == 1L && !is.na(x)) {
-    options(icd.data.verbose = x)
+  if ((is.logical(x) || is.numeric(x)) &&
+    length(x) == 1L &&
+    !is.na(x)) {
+    if (is.numeric(x)) x <- as.integer(x)
+    options("icd.data.verbose" = x)
   } else {
-    options("icd.data.verbose" = .env_var_is_true("ICD_DATA_VERBOSE"))
+    ev <- .env_var_is_true("ICD_DATA_VERBOSE")
+    options("icd.data.verbose" = ev)
+    if (ev) message("Reset verbose option to ICD_DATA_VERBOSE")
   }
-  invisible(getOption("icd.data.verbose"))
+  if (getOption("icd.data.verbose") > 0) {
+    getOption("icd.data.verbose")
+  } else {
+    invisible(getOption("icd.data.verbose"))
+  }
 }
 
 .interact <- function(x) {
   if (missing(x)) {
-    return(isTRUE(getOption("icd.data.interact")))
+    opt <- getOption("icd.data.interact")
+    if (is.null(opt)) {
+      options("icd.data.interact" = interactive())
+      return(invisible(interactive()))
+    }
+    stopifnot(is.logical(opt))
+    return(opt)
   }
   if (is.logical(x) && length(x) == 1L && !is.na(x)) {
-    options(icd.data.interact = x)
+    options("icd.data.interact" = x)
   } else {
     options("icd.data.interact" = .env_var_is_true("ICD_DATA_INTERACT"))
   }
@@ -153,7 +131,7 @@
     return(isTRUE(getOption("icd.data.offline")))
   }
   if (is.logical(x) && length(x) == 1L && !is.na(x)) {
-    options(icd.data.offline = x)
+    options("icd.data.offline" = x)
   } else {
     options("icd.data.offline" = !.env_var_is_false("ICD_DATA_OFFLINE"))
   }
@@ -177,13 +155,8 @@
     }
     return(getOption("icd.data.absent_action"))
   }
-  a <- getOption("icd.data.absent_action")
-  # default to silent, as I think R check uses empty options for various parts of check, which ignore anything I might have wanted to set in .onLoad .
-  if (is.null(a)) {
-    "silent"
-  } else {
-    a
-  }
+  # default stop instead of silent now not using active bindings?
+  getOption("icd.data.absent_action", default = "stop")
 }
 
 .absent_action_switch <- function(msg, must_work = TRUE) {
@@ -300,13 +273,21 @@ setup_icd_data <- function(path = NULL) {
     message("Trying the default icd data cache: ", path)
   }
   if (is.null(path)) {
-    stop("Unable to find a path to use for icd data cache.")
+    stop("Unable to find a path to use for icd data cache. Try ", sQuote("setup_icd_data(\"/path/with/write/access\")"))
   }
   if (!dir.exists(path)) {
     created <- dir.create(path, showWarnings = TRUE)
     if (!created) stop("Unable to create directory at: ", path)
   }
   options("icd.data.resource" = path)
+  if (!.all_cached()) {
+    message(
+      "Not all available data is currently downloaded. ",
+      "You may use: ", sQuote("download_icd_data()"),
+      " to complete downloading all available data, or let this happen on demand."
+    )
+  }
+
   invisible(path)
 }
 

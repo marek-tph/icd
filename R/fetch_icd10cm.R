@@ -15,7 +15,6 @@
     # dx_leaf is same, just leaves
     file_name = y$dx_hier,
     save_name = .get_versioned_raw_file_name(y$dx_hier, year),
-    verbose = verbose,
     ...
   )
 }
@@ -38,7 +37,6 @@
       }
       .parse_icd10cm_year(year,
         dx = dx,
-        verbose = verbose,
         ...
       )
     }
@@ -123,7 +121,7 @@
                                   verbose = FALSE) {
   for (y in 2014:2019) {
     for (dx in c(TRUE, FALSE)) {
-      if (dx && (y %in% c(2016, 2019))) next
+      # could skip 2016 and 2019 here, but no harm done, and future proofs.
       parse_fun_name <- .get_parser_icd10cm_name(y, dx)
       parse_fun <- .make_icd10cm_parse_fun(y, dx, verbose)
       assign(parse_fun_name, parse_fun, envir = env)

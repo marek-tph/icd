@@ -104,7 +104,7 @@
 #' @param alt If the data cannot be found, this value is returned. Default is
 #'   \code{NULL}.
 #' @keywords internal
-#' @export
+#' @noRd
 get_icd_data <- function(data_name, alt = NULL) {
   if (!is.character(data_name)) {
     data_name <- deparse(substitute(data_name))
@@ -116,6 +116,11 @@ get_icd_data <- function(data_name, alt = NULL) {
 }
 
 .exists_in_ns <- function(name) {
+  all(vapply(name, .exists_in_ns_single, logical(1), USE.NAMES = FALSE))
+}
+
+.exists_in_ns_single <- function(name) {
+  stopifnot(length(name) == 1L)
   pkg_ns <- asNamespace("icd")
   lazy_env <- pkg_ns[[".__NAMESPACE__."]][["lazydata"]]
   exists(name, lazy_env) || exists(name, pkg_ns)

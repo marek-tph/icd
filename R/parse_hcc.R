@@ -91,7 +91,8 @@ icd10_parse_cc <- function(save_data = FALSE) {
   # Import raw CMS data for ICD-9
   icd10_map_cc <- lapply(
     list.files(hcc_icd10_dir,
-               full.names = TRUE),
+      full.names = TRUE
+    ),
     FUN = read.fwf,
     widths = c(7, 4),
     header = FALSE,

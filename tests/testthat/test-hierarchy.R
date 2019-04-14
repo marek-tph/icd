@@ -5,9 +5,10 @@ context("icd9cm_hierarchy was parsed as expected")
 
 test_that("icd9cm_hierarchy as saved in data can be recreated as expected", {
   # avoid encoding problems by just doing this on Linux.
-  skip_on_os(c("windows", "mac", "solaris"))
-  skip_flat_icd9_avail()
+  # skip_on_os(c("windows", "mac", "solaris"))
+  skip_flat_icd9_avail(year = "2011")
   skip_on_no_rtf("2011")
+  skip_slow()
   cmh_headings <- c(
     "code",
     "short_desc",
@@ -17,10 +18,7 @@ test_that("icd9cm_hierarchy as saved in data can be recreated as expected", {
     "sub_chapter",
     "chapter"
   )
-  cmh <- .parse_icd9cm_hierarchy_rtf(
-    save_pkg_data = FALSE,
-    verbose = FALSE
-  )
+  cmh <- .parse_icd9cm_rtf_year("2014", save_pkg_data = FALSE)
   for (h in cmh_headings)
     expect_equal(cmh[[h]],
       icd9cm_hierarchy[[h]],
@@ -36,7 +34,7 @@ test_that("no NA or zero-length values", {
   expect_false(any(nchar(unlist(icd9cm_hierarchy)) == 0))
 })
 
-test_that("factors are in the right place", {
+test_that("factors are in the right place and ordered", {
   expect_is(
     icd9cm_hierarchy[["code"]],
     c("icd9cm", "icd9", "character")
@@ -47,6 +45,9 @@ test_that("factors are in the right place", {
   expect_is(icd9cm_hierarchy$major, "factor")
   expect_is(icd9cm_hierarchy$sub_chapter, "factor")
   expect_is(icd9cm_hierarchy$chapter, "factor")
+  expect_false(is.unsorted(icd9cm_hierarchy$three_digit))
+  expect_false(is.unsorted(icd9cm_hierarchy$sub_chapter))
+  expect_false(is.unsorted(icd9cm_hierarchy$chapter))
 })
 
 test_that("codes and descriptions are valid and unique", {

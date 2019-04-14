@@ -66,11 +66,11 @@ There is an initial beta-quality mechanism for selecting a particular version of
 
 ```{r getset}
   # get the active version string
-  get_icd10cm_active_ver()
+  get_icd10cm_active_year()
   # get the data itself:
   devnull <- get_icd10cm_active()
   #set the active version, and check it is the one we expected
-  set_icd10cm_active_ver("2015")
+  set_icd10cm_active_year("2015")
   identical(get_icd10cm_active(), get_icd10cm2015())
 ```
 

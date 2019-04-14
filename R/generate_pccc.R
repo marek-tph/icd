@@ -232,7 +232,7 @@ icd9_generate_map_pccc_pcs <- function(save_data = TRUE) {
 #' ICD-10 generate_maps_pccc
 #' @keywords internal
 #' @noRd
-icd10_generate_map_pccc_dx <- function(save_data, verbose = TRUE) {
+icd10_generate_map_pccc_dx <- function(save_data) {
   icd10_map_pccc_orig_dx <- list(
     neuromusc = c(
       "E75", "F71", "F72", "F73", "F842", "G111", "G112", "G114",
@@ -381,12 +381,8 @@ icd10_generate_map_pccc_dx <- function(save_data, verbose = TRUE) {
       "T86851", "T86859", "T865", "T8690", "T8691", "T8692", "T8699"
     )
   )
-  icd10_map_pccc_dx <- apply_over_icd10cm_vers(icd10_map_pccc_orig_dx,
-    verbose = verbose
-  )
-  icd10_map_pccc_dx <- apply_over_icd10who_vers(icd10_map_pccc_orig_dx,
-    verbose = verbose
-  )
+  icd10_map_pccc_dx <- apply_over_icd10cm_vers(icd10_map_pccc_orig_dx)
+  icd10_map_pccc_dx <- apply_over_icd10who_vers(icd10_map_pccc_orig_dx)
   # add the fixed code, per JAMA Pediatrics Letter
   icd10_map_pccc_dx[["neuromusc"]] <-
     c(icd10_map_pccc_dx[["neuromusc"]], "G80")

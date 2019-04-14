@@ -56,13 +56,13 @@
 #'   (although not necessarily genuine ICD diagnoses). In contrast,
 #'   \code{\link{is_defined}} checks whether ICD-9 codes correspond to defined
 #'   diagnoses or diagnostic groups in the hierarchy of ICD codes.
-#'   \code{link{is_leaf}} (and for the US, \code{link{is_billable}}) determine
+#'   \code{\link{is_leaf}} (and for the US, \code{\link{is_billable}}) determine
 #'   whether given codes are leaves in the hierarchy, or not. \pkg{icd} may need
 #'   to download data due to package size or copyright restrictions on
 #'   redistributing data, and needs a cache directory and your permission to do
-#'   this. Use \code{setup_icd_data()} to do this, or \code{download_icd_data()}
-#'   to download everything at once, which will take a few minutes on a
-#'   broadband connection.
+#'   this. Use \code{\link{setup_icd_data}} to do this, or
+#'   \code{\link{download_icd_data}} to download everything at once, which will
+#'   take a few minutes on a broadband connection.
 #'
 #'   Validation depends on the class of code, and is different if the code is
 #'   from France, Belgium, the USA, or the World Health Organization (WHO). Use

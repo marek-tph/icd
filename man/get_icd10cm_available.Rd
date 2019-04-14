@@ -4,15 +4,17 @@
 \alias{get_icd10cm_available}
 \title{Get the ICD-10-CM versions available in this package}
 \usage{
-get_icd10cm_available(pc = FALSE, return_year = FALSE)
+get_icd10cm_available(dx = TRUE, return_year = FALSE)
 }
 \arguments{
-\item{pc}{Logical, if \code{TRUE}, will return names of procedure code data
-frames. Default is \code{FALSE} which will return the names of the
-diagnostic code data frames.}
+\item{dx}{Single logical value, if \code{TRUE} the default, diagnostic codes will be retrieved and processed. If \code{FALSE}, procedure codes will be used. Note that most ICD-10 schemes around the world do not add procedure codes. The US uses them extensively, and these form the basis of the Belgian version of ICD-10.}
 
 \item{return_year}{Logical, which, if \code{TRUE}, will result in only a
 character vector of year (or year-like version) being returned.}
+}
+\value{
+By default, the names of all the data available, for diagnostic
+  ICD-10-CM codes, e.g. \code{icd10cm2019}.
 }
 \description{
 Get the ICD-10-CM versions available in this package
@@ -20,6 +22,10 @@ Get the ICD-10-CM versions available in this package
 \examples{
 # Diagnostic codes:
 get_icd10cm_available()
-# Just get the years avaiable for English language procedure codes
-get_icd10cm_available(pc = TRUE, return_year = TRUE)
+# Just get the years avaiable for ICD-10-CM procedure codes
+get_icd10cm_available(dx = FALSE, return_year = TRUE)
+# How to use the data name - most are not package data, due to severe CRAN
+# package size limitations, so they are retrieved and cached as needed.
+# The latest ICD-10-CM is included.
+tail(get_icd10cm_available(), n = 1)
 }
