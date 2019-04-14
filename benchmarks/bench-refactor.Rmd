@@ -8,31 +8,37 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(icd)
-library(microbenchmark)
 library(bench)
-library(stringr)
+requireNamespace("stringr")
+
+# lower this number for testing
+bign <- 179
 ```
 
 ## match with Rcpp
 
 ```{r}
-n = 1e7
-random_short_icd10_codes <- sample(unlist(icd::icd10_map_elix),
-                                   replace = TRUE, size = n)
+n <- bign
+random_short_icd10_codes <- unname(
+  sample(
+    unlist(icd::icd10_map_elix),
+    replace = TRUE, size = n
+  )
+)
 lookup <- unique(unname(unlist(icd10_map_quan_deyo)))
-microbenchmark(match(random_short_icd10_codes, lookup),
-               icd:::match_rcpp(random_short_icd10_codes, lookup),
-               times = 10)
+bench::mark(
+  match(random_short_icd10_codes, lookup),
+  icd:::match_rcpp(random_short_icd10_codes, lookup)
+)
 ```
 
 ## benchmarking factor generation with known levels and no sorting: getting unique levels is fast, 0.1 seconds for 1e7 codes
 ```{r}
 system.time(lvls <- unique(random_short_icd10_codes))
-microbenchmark::microbenchmark(
+bench::mark(
   icd:::factor_nosort_rcpp(random_short_icd10_codes, lvls),
   icd:::factor_nosort(random_short_icd10_codes, lvls),
-  factor(random_short_icd10_codes, lvls),
-  times = 5
+  factor(random_short_icd10_codes, lvls)
 )
 ```
 
@@ -50,80 +56,98 @@ icd:::factor_nosort(x, levels = c("a", "z"))
 f <- factor(c("a", "b", "b", "c"))
 g <- icd:::factor_nosort(f, levels = c("a", "c", "b"))
 stopifnot(g[4] == "c")
-pts <- icd:::generate_random_unordered_pts(1e6)
+pts <- icd:::generate_random_unordered_pts(bign)
 u <- unique.default(pts$code)
 ```
 
 ## stringr::str_sort vs base R sort
 
 ```{r}
-microbenchmark::microbenchmark(sort(u), str_sort(u))
+bench::mark(
+  base::sort(u),
+  stringr::str_sort(u)
+)
 ```
 
 ## refactor
 
+The first test can't compare results fully because we deliberately don't sort.
 ```{r}
-microbenchmark::microbenchmark(factor(pts$code),
-                               icd:::factor_nosort(pts$code),
-                               icd:::factor_nosort_rcpp(pts$code),
-                               times = 25)
+bench::mark(
+  icd:::factor_nosort(pts$code),
+  icd:::factor_nosort_rcpp(pts$code),
+  base::factor(pts$code),
+  check = FALSE
+)
+bench::mark(
+  icd:::factor_nosort(pts$code),
+  icd:::factor_nosort_rcpp(pts$code)
+)
 ```
 
 ## refactor complex
 
 ```{r test_refactor_complex}
 # test various combos with NAs and mis-matches
-n = 1e6
-nl = n %/% 50L
-times = 5
+n <- bign
+nl <- as.integer(log(n)) # %/% 50L
 set.seed(1441)
 v1 <- icd:::generate_random_short_icd9(n)
 v2 <- v1
-v2[1] <- "INVALID"
+v2[1] <- "@999INVALID"
 l1 <- sample(v1, size = nl)
 l2 <- c(NA_character_, l1)
 l3 <- c(l1, NA_character_)
 l4 <- c(l1, "XXX")
 l5 <- unique(icd:::generate_random_short_icd9(n * 2))
-test_cases <- expand.grid(
-  list(v1, v2),
-  list(l1, l2, l3, l4, l5),
-  list(l1, l2, l3, l4, l5))
-# get empty mb to build
-mb <- microbenchmark(NULL, times = 1)
-mb <- mb[-1,]
-for (tc in seq_along(test_cases[[1]])) {
-  m <- test_cases[tc, 1][[1]]
-  nl <- unique(test_cases[tc, 2][[1]])
-  pl <- unique(test_cases[tc, 3][[1]])
-  f <- factor(m, levels = pl)
-  mb <- rbind(mb, microbenchmark(
-    refactor(f, nl),
-    factor(f, levels = nl),
-    times = times
-  ))
-  mb <- rbind(mb, microbenchmark(
-    refactor(f, nl, na.rm = FALSE, exclude_na = FALSE),
-    factor(f, levels = nl, exclude = NULL),
-    times = times
-  ))
-}
-print(mb)
+bnona <- bench::press(
+  lm = list(v1, v2),
+  lnl = list(l1, l2, l3, l4, l5),
+  lpl = list(l1, l2, l3, l4, l5),
+  {
+    m <- unlist(lm)
+    nl <- unique(unlist(lnl))
+    pl <- unique(unlist(lpl))
+    f <- factor(m, levels = pl)
+    bench::mark(
+      icd:::refactor(f, nl),
+      base::factor(f, levels = nl)
+    )
+  }
+)
+plot(bnona)
+lm <- list(v1, v2)
+lnl <- lapply(list(l1, l2, l3, l4, l5), unique)
+lpl <- lapply(list(l1, l2, l3, l4, l5), unique)
+bwithna <- bench::press(
+  lmi = seq_along(lm),
+  lnli = seq_along(lnl),
+  lpli = seq_along(lpl),
+  {
+    f <- factor(lm[[lmi]], levels = lpl[[lpli]])
+    nl <- lnl[[lnli]]
+    bench::mark(
+      icd:::refactor(f, levels = nl, na.rm = FALSE, exclude_na = FALSE),
+      base::factor(f, levels = nl, exclude = NULL)
+    )
+  }
+)
+plot(bwithna)
 ```
 
 ## test one huge factor
 
 ```{r huge_factor}
-n = 1e8
-nl = n %/% 50L
-times = 5
+n <- bign * 100
+nl <- n %/% 50L
 set.seed(1441)
 v1 <- icd:::generate_random_short_icd9(n)
 l1 <- unique(sample(v1, size = nl))
 l2 <- unique(sample(v1, size = nl))
 f <- factor(v1, l1)
-microbenchmark(
-  refactor(f, l2),
-  factor(f, levels = l2),
-  times = times)
+bhugefactor <- bench::mark(
+  icd:::refactor(f, l2),
+  base::factor(f, levels = l2)
+)
+plot(bhugefactor)
 ```

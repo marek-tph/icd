@@ -1,3 +1,4 @@
+**/*.un~
 *.bak
 *.dll
 *.gcno
@@ -61,3 +62,4 @@ tests/testthat-split-*.R
 tests/testthat/Rplots.pdf
 testthat-disabled.R
 todo
+bench-refactor.html
