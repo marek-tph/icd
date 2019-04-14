@@ -46,27 +46,41 @@ testthat_restore <- function(base_name = "testthat") {
   invisible()
 }
 
-check_split_tests <- function(
-  base_name = "testthat", # testthat is default from usethis_testthat
-  valgrind = FALSE,
-  torture = FALSE,
-  filter = ".*",
-  check_args = c("--ignore-vignettes",
-                 "--no-vignettes",
-                 "--no-build-vignettes",
-                 "--no-manual",
-                 "--timings",
-                 "--no-codoc")) {
-  if (!requireNamespace("rcmdcheck")) install.packages("rcmdcheck")
-  if (!requireNamespace("rhub")) install.packages("rhub")
-  testthat_split(base_name = base_name,
-                 filter = filter)
-  if (valgrind) {
-    rhub::check_with_valgrind(check_args = check_args)
-  } else if (torture) {
-    rcmdcheck::rcmdcheck(args = c("--use-gct", check_args))
-  } else {
-    message("Neither valgrind or gctorture selected. Restoring testthat.R")
-  }
-  testthat_restore(base_name = base_name)
+with_split_tests <- function(code, ...,
+                             base_name = "testthat",
+                             filter = ".*") {
+  testthat_split(base_name = base_name, filter = filter)
+  on.exit(testthat_restore(base_name = base_name), add = TRUE)
+  force(code)
+}
+
+check_local_gctorture <- function(filter = ".*") {
+  with_split_tests(
+      rcmdcheck::rcmdcheck(args = c("--use-gct", check_args))
+  )
+}
+
+check_rhub_quiet <- function(
+  fun = rhub::check_with_valgrind,
+  filter = ".*") {
+  shutup <-
+    paste0(
+      "CXX11FLAGS=",
+      paste0(
+    "-Wno-",
+    c(
+      "unused-parameter",
+      "unused-variable",
+      "ignored-attributes",
+      "cast-function-type",
+      "unknown-pragmas",
+      "unknown-warning-option",
+      "unknown-warning"
+    ),
+    collapse = " "
+      )
+    )
+  with_split_tests(
+    fun(check_args = paste0("--install-args='--configure-vars=\"", shutup, "\"'"))
+  )
 }

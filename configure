@@ -1785,9 +1785,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-#AC_CONFIG_HEADERS([src/config.h:src/config.h.in])
-# just adding headers gives some empty includes for package metadata which I don't define here.
-#AC_CONFIG_HEADERS([src/config.h])
 ac_config_files="$ac_config_files src/Makevars"
 
 
@@ -1804,14 +1801,49 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${R_HOME}" >&5
 $as_echo "${R_HOME}" >&6; }
 R_BIN="${R_HOME}/bin/R"
-CC=`"${R_BIN}" CMD config CC`
-CXX11=`"${R_HOME}/bin/R" CMD config CXX11`
-CXX11STD=`"${R_HOME}/bin/R" CMD config CXX11STD`
-# not sure if i need to enforce next step: R should do this itself, but for configure okay?
-# CXX="${CXX11} ${CXX11STD}"
-CXX=`"${R_HOME}/bin/R" CMD config CXX`
-CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXX11FLAGS`
-CXXSTD="$${CXX11STD}"
+
+# Get R's C++11 preferred compiler, flags, std, and use these for C++, and C++11
+# but if --configure-vars is set, we want to let this override R's choice, e.g.
+# so r-hub can be instructed to skip massive Eigen warning spam!
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking R CXX11" >&5
+$as_echo_n "checking R CXX11... " >&6; }
+if test -z "$CXX11"; then
+  CXX11=`"${R_HOME}/bin/R" CMD config CXX11`
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Setting ${CXX11}" >&5
+$as_echo "Setting ${CXX11}" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using pre-set ${CXX11}" >&5
+$as_echo "Using pre-set ${CXX11}" >&6; }
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking R CXX11STD" >&5
+$as_echo_n "checking R CXX11STD... " >&6; }
+if test -z "$CXX11STD"; then
+  CXX11STD=`"${R_HOME}/bin/R" CMD config CXX11STD`
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Setting R ${CXX11STD}" >&5
+$as_echo "Setting R ${CXX11STD}" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using existing ${CXX11STD}" >&5
+$as_echo "Using existing ${CXX11STD}" >&6; }
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking R CXX11FLAGS" >&5
+$as_echo_n "checking R CXX11FLAGS... " >&6; }
+if test -z "$CXX11FLAGS"; then
+  CXX11FLAGS=`"${R_HOME}/bin/R" CMD config CXX11FLAGS`
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Setting R ${CXX11FLAGS}" >&5
+$as_echo "Setting R ${CXX11FLAGS}" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: Using existing ${CXX11FLAGS}" >&5
+$as_echo "Using existing ${CXX11FLAGS}" >&6; }
+fi
+
+# We enforce at least C++11
+CXX=${CXX11}
+CXXFLAGS=${CXX11FLAGS}
+CXXSTD="${CXX11STD}"
+
 CPP=`"${R_BIN}" CMD config CPP`
 CFLAGS=`"${R_BIN}" CMD config CFLAGS`
 CPPFLAGS=`"${R_BIN}" CMD config CPPFLAGS`
@@ -1827,15 +1859,7 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-#AC_CHECK_HEADER([string.h])
-#AC_CHECK_HEADER_STDBOOL
-#AC_PROG_CC
-#AC_PROG_CXX
-#AC_TYPE_SIZE_T
-#AC_C_INLINE
-
 # https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/Generic-Compiler-Characteristics.html
-
 
 # this macro is borrowed from R-devel source, and included in the icd/tools/m4 directory
 ac_ext=cpp
@@ -2414,11 +2438,6 @@ $as_echo "$ac_cv_prog_cxx_openmp" >&6; }
 #  fi
 
 
-#set
-
-# the R openmp macro defines OPENMP_CFLAGS? but not OPENMP_CXXFLAGS? Maybe depends on current AC language?
-
-# now the R openmp macro has already substituted/set OPENMP_CFLAGS, so can't do that again?
 
 # since some systems have broken OMP libraries
 # we also check that the actual package will work
@@ -2474,9 +2493,14 @@ $as_echo "yes" >&6; }
     xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
     # must NULL terminate
     echo ", 0x00 };" >> src/makevars.h
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+    touch src/makevars.h
   fi
 fi
 
+# put the flag in Makevars
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
