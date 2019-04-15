@@ -60,6 +60,7 @@ check_local_gctorture <- function(filter = ".*") {
   )
 }
 
+# THIS DOESN'T WORK! Eigen spews out warnings when RcppEigen itself is installed, not when icd is installed.
 check_rhub_quiet <- function(
   fun = rhub::check_with_valgrind,
   filter = ".*") {
@@ -81,6 +82,6 @@ check_rhub_quiet <- function(
       )
     )
   with_split_tests(
-    fun(check_args = paste0("--install-args='--configure-vars=\"", shutup, "\"'"))
+    fun(check_args = paste0("--no-vignettes --no-build-vignettes --ignore-vignettes --install-args='--configure-vars=\"", shutup, "\"'"))
   )
 }

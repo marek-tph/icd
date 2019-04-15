@@ -105,24 +105,41 @@ else
   ICD_OPENMP_FLAG='$(SHLIB_OPENMP_CXXFLAGS)'
 fi
 
-ICD_MAKEVARS=""
-echo "home = $HOME"
-AC_MSG_CHECKING([$HOME/.R exists])
-if test -d "$HOME/.R"; then
-  AC_MSG_RESULT([yes])
-  AC_MSG_CHECKING([$HOME/.R/Makevars exists])
-  if test -e "$HOME/.R/Makevars"; then
-    AC_MSG_RESULT([yes])
-    echo 'unsigned char Makevars[[]] = {' > src/makevars.h
-    xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
-    # must NULL terminate
-    echo ", 0x00 };" >> src/makevars.h
-  else
-    AC_MSG_RESULT([no])
-    touch src/makevars.h
-  fi
-fi
+dnl Always write the stub as default to not include Makevars content:
+echo "unsigned char Makevars[[]] = { 0x00 };" > src/makevars.h
 
+AC_ARG_ENABLE([makevars],
+    AS_HELP_STRING([--enable-makevars],
+      [keep ~/.R/Makevars contents in binary for debugging (default is no)]),
+    [
+    dnl also check that user didn't write --enable-makevars=no
+    AS_IF([test "x$enable_makevars" = "xyes"],
+    [
+      AC_MSG_NOTICE([Enabling Makevars inclusion for debugging])
+      AC_MSG_CHECKING([$HOME/.R exists])
+      if test -d "$HOME/.R"; then
+        AC_MSG_RESULT([yes])
+        AC_MSG_CHECKING([$HOME/.R/Makevars exists])
+        if test -e "$HOME/.R/Makevars"; then
+          AC_MSG_RESULT([yes])
+          echo 'unsigned char Makevars[[]] = {' > src/makevars.h
+          xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
+          # must NULL terminate
+          echo ", 0x00 };" >> src/makevars.h
+        else
+          AC_MSG_RESULT([no])
+        fi
+      else
+        AC_MSG_RESULT([no])
+      fi
+    ], [
+      AC_MSG_NOTICE([Not enabling Makevars inclusion due to --enable-makevars=!yes])
+    ])
+  ],
+  [
+    AC_MSG_NOTICE([Not enabling Makevars inclusion])
+  ]
+)
 # put the flag in Makevars
 AC_SUBST(ICD_OPENMP_FLAG)
 AC_OUTPUT

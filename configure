@@ -638,6 +638,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_openmp
+enable_makevars
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1256,6 +1257,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-openmp        do not use OpenMP
+  --enable-makevars       keep ~/.R/Makevars contents in binary for debugging
+                          (default is no)
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -2477,27 +2480,51 @@ else
   ICD_OPENMP_FLAG='$(SHLIB_OPENMP_CXXFLAGS)'
 fi
 
-ICD_MAKEVARS=""
-echo "home = $HOME"
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking $HOME/.R exists" >&5
+echo "unsigned char Makevars[] = { 0x00 };" > src/makevars.h
+
+# Check whether --enable-makevars was given.
+if test "${enable_makevars+set}" = set; then :
+  enableval=$enable_makevars;
+        if test "x$enable_makevars" = "xyes"; then :
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: Enabling Makevars inclusion for debugging" >&5
+$as_echo "$as_me: Enabling Makevars inclusion for debugging" >&6;}
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking $HOME/.R exists" >&5
 $as_echo_n "checking $HOME/.R exists... " >&6; }
-if test -d "$HOME/.R"; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+      if test -d "$HOME/.R"; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-  { $as_echo "$as_me:${as_lineno-$LINENO}: checking $HOME/.R/Makevars exists" >&5
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking $HOME/.R/Makevars exists" >&5
 $as_echo_n "checking $HOME/.R/Makevars exists... " >&6; }
-  if test -e "$HOME/.R/Makevars"; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+        if test -e "$HOME/.R/Makevars"; then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-    echo 'unsigned char Makevars[] = {' > src/makevars.h
-    xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
-    # must NULL terminate
-    echo ", 0x00 };" >> src/makevars.h
-  else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+          echo 'unsigned char Makevars[] = {' > src/makevars.h
+          xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
+          # must NULL terminate
+          echo ", 0x00 };" >> src/makevars.h
+        else
+          { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-    touch src/makevars.h
-  fi
+        fi
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+      fi
+
+else
+
+      { $as_echo "$as_me:${as_lineno-$LINENO}: Not enabling Makevars inclusion due to --enable-makevars=!yes" >&5
+$as_echo "$as_me: Not enabling Makevars inclusion due to --enable-makevars=!yes" >&6;}
+
+fi
+
+else
+
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Not enabling Makevars inclusion" >&5
+$as_echo "$as_me: Not enabling Makevars inclusion" >&6;}
+
+
 fi
 
 # put the flag in Makevars
