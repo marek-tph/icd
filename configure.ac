@@ -19,9 +19,6 @@ AC_PREREQ([2.62])
 AC_INIT(icd)
 AC_COPYRIGHT(Copyright (C) 2014 - 2019  Jack O. Wasey)
 AC_CONFIG_SRCDIR([src])
-#AC_CONFIG_HEADERS([src/config.h:src/config.h.in])
-# just adding headers gives some empty includes for package metadata which I don't define here.
-#AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([src/Makevars])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_MACRO_DIR([inst/m4])
@@ -34,14 +31,40 @@ if test -z "${R_HOME}"; then
 fi
 AC_MSG_RESULT([${R_HOME}])
 R_BIN="${R_HOME}/bin/R"
-CC=`"${R_BIN}" CMD config CC`
-CXX11=`"${R_HOME}/bin/R" CMD config CXX11`
-CXX11STD=`"${R_HOME}/bin/R" CMD config CXX11STD`
-# not sure if i need to enforce next step: R should do this itself, but for configure okay?
-# CXX="${CXX11} ${CXX11STD}"
-CXX=`"${R_HOME}/bin/R" CMD config CXX`
-CXXFLAGS=`"${R_HOME}/bin/R" CMD config CXX11FLAGS`
-CXXSTD="$${CXX11STD}"
+
+# Get R's C++11 preferred compiler, flags, std, and use these for C++, and C++11
+# but if --configure-vars is set, we want to let this override R's choice, e.g.
+# so r-hub can be instructed to skip massive Eigen warning spam!
+
+AC_MSG_CHECKING([R CXX11])
+if test -z "$CXX11"; then
+  CXX11=`"${R_HOME}/bin/R" CMD config CXX11`
+  AC_MSG_RESULT([Setting ${CXX11}])
+else
+  AC_MSG_RESULT([Using pre-set ${CXX11}])
+fi
+
+AC_MSG_CHECKING([R CXX11STD])
+if test -z "$CXX11STD"; then
+  CXX11STD=`"${R_HOME}/bin/R" CMD config CXX11STD`
+  AC_MSG_RESULT([Setting R ${CXX11STD}])
+else
+  AC_MSG_RESULT([Using existing ${CXX11STD}])
+fi
+
+AC_MSG_CHECKING([R CXX11FLAGS])
+if test -z "$CXX11FLAGS"; then
+  CXX11FLAGS=`"${R_HOME}/bin/R" CMD config CXX11FLAGS`
+  AC_MSG_RESULT([Setting R ${CXX11FLAGS}])
+else
+  AC_MSG_RESULT([Using existing ${CXX11FLAGS}])
+fi
+
+# We enforce at least C++11
+CXX=${CXX11}
+CXXFLAGS=${CXX11FLAGS}
+CXXSTD="${CXX11STD}"
+
 CPP=`"${R_BIN}" CMD config CPP`
 CFLAGS=`"${R_BIN}" CMD config CFLAGS`
 CPPFLAGS=`"${R_BIN}" CMD config CPPFLAGS`
@@ -52,23 +75,10 @@ LIBS="${PKG_LIBS}"
 # changes what R_OPENMP and rest of script does:
 AC_LANG(C++)
 
-#AC_CHECK_HEADER([string.h])
-#AC_CHECK_HEADER_STDBOOL
-#AC_PROG_CC
-#AC_PROG_CXX
-#AC_TYPE_SIZE_T
-#AC_C_INLINE
-
 # https://www.gnu.org/software/autoconf/manual/autoconf-2.67/html_node/Generic-Compiler-Characteristics.html
-
 
 # this macro is borrowed from R-devel source, and included in the icd/tools/m4 directory
 R_OPENMP
-#set
-
-# the R openmp macro defines OPENMP_CFLAGS? but not OPENMP_CXXFLAGS? Maybe depends on current AC language?
-
-# now the R openmp macro has already substituted/set OPENMP_CFLAGS, so can't do that again?
 
 # since some systems have broken OMP libraries
 # we also check that the actual package will work
@@ -95,20 +105,41 @@ else
   ICD_OPENMP_FLAG='$(SHLIB_OPENMP_CXXFLAGS)'
 fi
 
-ICD_MAKEVARS=""
-echo "home = $HOME"
-AC_MSG_CHECKING([$HOME/.R exists])
-if test -d "$HOME/.R"; then
-  AC_MSG_RESULT([yes])
-  AC_MSG_CHECKING([$HOME/.R/Makevars exists])
-  if test -e "$HOME/.R/Makevars"; then
-    AC_MSG_RESULT([yes])
-    echo 'unsigned char Makevars[[]] = {' > src/makevars.h
-    xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
-    # must NULL terminate
-    echo ", 0x00 };" >> src/makevars.h
-  fi
-fi
+dnl Always write the stub as default to not include Makevars content:
+echo "unsigned char Makevars[[]] = { 0x00 };" > src/makevars.h
 
+AC_ARG_ENABLE([makevars],
+    AS_HELP_STRING([--enable-makevars],
+      [keep ~/.R/Makevars contents in binary for debugging (default is no)]),
+    [
+    dnl also check that user didn't write --enable-makevars=no
+    AS_IF([test "x$enable_makevars" = "xyes"],
+    [
+      AC_MSG_NOTICE([Enabling Makevars inclusion for debugging])
+      AC_MSG_CHECKING([$HOME/.R exists])
+      if test -d "$HOME/.R"; then
+        AC_MSG_RESULT([yes])
+        AC_MSG_CHECKING([$HOME/.R/Makevars exists])
+        if test -e "$HOME/.R/Makevars"; then
+          AC_MSG_RESULT([yes])
+          echo 'unsigned char Makevars[[]] = {' > src/makevars.h
+          xxd -i < "$HOME/.R/Makevars" >> src/makevars.h
+          # must NULL terminate
+          echo ", 0x00 };" >> src/makevars.h
+        else
+          AC_MSG_RESULT([no])
+        fi
+      else
+        AC_MSG_RESULT([no])
+      fi
+    ], [
+      AC_MSG_NOTICE([Not enabling Makevars inclusion due to --enable-makevars=!yes])
+    ])
+  ],
+  [
+    AC_MSG_NOTICE([Not enabling Makevars inclusion])
+  ]
+)
+# put the flag in Makevars
 AC_SUBST(ICD_OPENMP_FLAG)
 AC_OUTPUT
