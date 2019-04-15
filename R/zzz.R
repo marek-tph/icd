@@ -28,17 +28,20 @@
       "strongly recommended to run the command: remove.packages(\"icd9\")"
     ))
   }
-  extra_msg <- if (system.file(package = "icd.data") != "") {
-    paste("The ", sQuote("icd.data"), " package is deprecated from 'icd' version 4.0")
-  } else {
-    ""
-  }
   if (interactive()) {
     packageStartupMessage(
       sQuote("icd"), " downloads data when needed.",
-      " Use setup_icd_data() to create cache directory. ",
-      extra_msg
+      " Use setup_icd_data() to create cache directory. "
     )
+    if (system.file(package = "icd.data") != "") {
+      packageStartupMessage(
+        "N.b. the ", sQuote("icd.data"),
+        " package is deprecated from ",
+        sQuote("icd"), " version 4.0"
+      )
+    } else {
+      ""
+    }
   }
 }
 
