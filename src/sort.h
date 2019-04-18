@@ -3,7 +3,10 @@
 
 #include "icd_types.h"
 #include "local.h"
-#include <utility> // for pair
+#include <string.h>
+#include <utility> // std::pair
+#include <algorithm> // std::sort
+#include <functional>
 using namespace Rcpp;
 
 typedef std::pair<std::string, std::size_t> pas_std;
@@ -23,9 +26,9 @@ std::pair<bool, bool> icd10cmCompareQuirk(const char* x,
                                           const char *afterQuirk,
                                           const char *beforeBeforeQuirk,
                                           const char *afterAfterQuirk);
-bool icd10cmCompare(const String& x, const String& y);
+// inline in cpp: bool icd10cmCompare(const String& x, const String& y);
 CharacterVector icd10cmSort(const Rcpp::CharacterVector &x);
 // disable until std and rcpp implemented fully VecStr icd10cmSortStd(const std::vector<std::string> &x);
 //Rcpp::IntegerVector icd10cmOrder(const Rcpp::CharacterVector &x);
-std::vector<std::size_t> icd10cmOrderStd(const std::vector<std::string> &x);
+//std::vector<std::size_t> icd10cmOrderStd(const std::vector<std::string> &x);
 #endif /* SORT_H_ */

@@ -20,8 +20,8 @@ set_icd10cm_active_year <- function(ver, check_exists = TRUE) {
 #' @rdname set_icd10cm_active_year
 #' @export
 get_icd10cm_active_year <- function() {
-  ver <- getOption("icd.data.icd10cm_active_year", default = "2019")
-  if (.verbose()) {
+  ver <- .get_opt("icd10cm_active_year", default = "2019")
+  if (.verbose() > 1) {
     message("getting icd.data.icd10cm_active_year: ", ver)
   }
   ver <- as.character(ver)

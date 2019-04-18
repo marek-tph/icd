@@ -8,7 +8,7 @@
 #' @template parse-template
 #' @keywords internal
 #' @noRd
-icd9_generate_map_elix <- function(save_data = TRUE) {
+icd9_generate_map_elix <- function(save_pkg_data = TRUE) {
   icd9_map_elix <- list(
     chf = c(
       "398.91", "402.11", "402.91", "404.11", "404.13", "404.91",
@@ -101,7 +101,7 @@ icd9_generate_map_elix <- function(save_data = TRUE) {
   )
   names(icd9_map_elix) <- icd::names_elix_htn_abbrev
   icd9_map_elix <- as.comorbidity_map(icd9_map_elix)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd9_map_elix)
   }
   invisible(icd9_map_elix)
@@ -110,7 +110,7 @@ icd9_generate_map_elix <- function(save_data = TRUE) {
 #' @rdname icd9_generate_map_elix
 #' @keywords internal
 #' @noRd
-icd10_generate_map_elix <- function(save_data = TRUE, verbose = FALSE) {
+icd10_generate_map_elix <- function(save_pkg_data = TRUE, verbose = FALSE) {
   icd10_map_elix <- list(
     chf = c(
       "I099", "I110", "I130", "I132", "I255", "I420", "I425", "I426",
@@ -234,15 +234,15 @@ icd10_generate_map_elix <- function(save_data = TRUE, verbose = FALSE) {
     )
   )
   names(icd10_map_elix) <- icd::names_elix_htn_abbrev
-  icd10_map_elix <- apply_over_icd10who_vers(icd10_map_elix)
-  icd10_map_elix <- apply_over_icd10cm_vers(icd10_map_elix)
+  icd10_map_elix <- .apply_over_icd10who_vers(icd10_map_elix)
+  icd10_map_elix <- .apply_over_icd10cm_vers(icd10_map_elix)
   if (verbose) message("applied ICD-10-CM and WHO versions")
   icd10_map_elix <- lapply(icd10_map_elix, as.short_diag)
   if (verbose) message("applied as.short_diag")
   icd10_map_elix <- lapply(icd10_map_elix, as.icd10)
   if (verbose) message("applied as.icd10")
   icd10_map_elix <- as.comorbidity_map(icd10_map_elix)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd10_map_elix)
   }
   invisible(icd10_map_elix)
@@ -255,7 +255,7 @@ icd10_generate_map_elix <- function(save_data = TRUE, verbose = FALSE) {
 #' @template parse-template
 #' @keywords internal
 #' @noRd
-icd9_generate_map_quan_elix <- function(save_data = TRUE) {
+icd9_generate_map_quan_elix <- function(save_pkg_data = TRUE) {
   icd9_map_quan_elix <- list(
     chf = c(
       "398.91", "402.01", "402.11", "402.91", "404.01", "404.03",
@@ -343,7 +343,7 @@ icd9_generate_map_quan_elix <- function(save_data = TRUE) {
   )
   names(icd9_map_quan_elix) <- icd::names_quan_elix_htn_abbrev
   icd9_map_quan_elix <- as.comorbidity_map(icd9_map_quan_elix)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd9_map_quan_elix)
   }
   invisible(icd9_map_quan_elix)
@@ -357,7 +357,7 @@ icd9_generate_map_quan_elix <- function(save_data = TRUE) {
 #' @template parse-template
 #' @keywords internal
 #' @noRd
-icd10_generate_map_quan_elix <- function(save_data = TRUE, verbose = FALSE) {
+icd10_generate_map_quan_elix <- function(save_pkg_data = TRUE, verbose = FALSE) {
   quan_elix_raw <- list(
     c(
       "I099", "I110", "I130", "I132", "I255", "I420", "I425", "I426", "I427",
@@ -470,12 +470,12 @@ icd10_generate_map_quan_elix <- function(save_data = TRUE, verbose = FALSE) {
   # It does appear that there are numerous codes in the Quan Elixhauser scheme
   # which are not present (?anymore) in the ICD-10-CM 2016 list. In particular,
   # see C43 in Tumor.
-  icd10_map_quan_elix <- apply_over_icd10cm_vers(quan_elix_raw)
-  icd10_map_quan_elix <- apply_over_icd10who_vers(icd10_map_quan_elix)
+  icd10_map_quan_elix <- .apply_over_icd10cm_vers(quan_elix_raw)
+  icd10_map_quan_elix <- .apply_over_icd10who_vers(icd10_map_quan_elix)
   icd10_map_quan_elix <- lapply(icd10_map_quan_elix, as.short_diag)
   icd10_map_quan_elix <- lapply(icd10_map_quan_elix, as.icd10)
   icd10_map_quan_elix <- as.comorbidity_map(icd10_map_quan_elix)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd10_map_quan_elix)
   }
   invisible(icd10_map_quan_elix)
@@ -487,7 +487,7 @@ icd10_generate_map_quan_elix <- function(save_data = TRUE, verbose = FALSE) {
 #' @template parse-template
 #' @keywords internal
 #' @noRd
-icd10_generate_map_quan_deyo <- function(save_data = TRUE, verbose = FALSE) {
+icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE, verbose = FALSE) {
   quan_charl_raw <- list(
     mi = c("I21", "I22", "I252"),
     chf = c(
@@ -574,15 +574,15 @@ icd10_generate_map_quan_deyo <- function(save_data = TRUE, verbose = FALSE) {
   # children will likely be needed. Maybe generating a huge structure is still
   # worth it, even for ICD-10-CM, because I do end up cutting it back down to
   # size based on the input data before comorbidity matching.
-  icd10_map_quan_deyo <- apply_over_icd10cm_vers(quan_charl_raw)
-  icd10_map_quan_deyo <- apply_over_icd10who_vers(icd10_map_quan_deyo)
+  icd10_map_quan_deyo <- .apply_over_icd10cm_vers(quan_charl_raw)
+  icd10_map_quan_deyo <- .apply_over_icd10who_vers(icd10_map_quan_deyo)
   icd10_map_quan_deyo <- lapply(icd10_map_quan_deyo, as.short_diag)
   icd10_map_quan_deyo <- lapply(icd10_map_quan_deyo, as.icd10)
   icd10_map_quan_deyo <- as.comorbidity_map(icd10_map_quan_deyo)
   icd10_map_charlson <- icd10_map_quan_deyo
   # It does appear that there are numerous codes in the Quan Elixhauser scheme
   # which are not present (?anymore) in the ICD-10-CM 2016 list.
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd10_map_quan_deyo)
     .save_in_data_dir(icd10_map_charlson)
   }
@@ -590,43 +590,43 @@ icd10_generate_map_quan_deyo <- function(save_data = TRUE, verbose = FALSE) {
 }
 # nocov end
 
-.apply_over_ver_worker <- function(x,
-                                   inner_fun = children_defined.icd10cm,
-                                   ...) {
+.apply_over_ver_worker <- function(x, inner_fun, ...) {
   y <- inner_fun(x, short_code = TRUE, ...)
   unclass(c(x, y))
 }
 
-apply_over_icd10cm_vers <- function(raw) {
-  verbose <- .verbose()
+.apply_over_ver_updater <- function(out, upd) {
+  for (cmb in seq_along(out)) {
+    only_prev <- setdiff(out[[cmb]], upd[[cmb]])
+    only_this <- setdiff(upd[[cmb]], out[[cmb]])
+    if (length(only_prev)) {
+      message("Only in previous for item ", cmb)
+      print(only_prev)
+      stop("Not going to make a map smaller without manual review.")
+    }
+    if (length(only_this) && .verbose() > 1) {
+      message("Found new items for ", cmb)
+      print(only_this)
+    }
+    out[[cmb]] <- sort(union(out[[cmb]], upd[[cmb]]))
+  }
+  out
+}
+
+.apply_over_icd10cm_vers <- function(raw) {
   out <- raw
   for (yr in 2014:2019) {
-    if (verbose) message("applying ICD-10-CM year: ", yr)
+    if (.verbose()) message("Applying ICD-10-CM year: ", yr)
     with_icd10cm_version(
       as.character(yr),
       code = {
         upd <- sapply(out,
-          FUN = .apply_over_ver_worker,
-          simplify = FALSE,
-          USE.NAMES = TRUE
+                      FUN = .apply_over_ver_worker,
+                      inner_fun = children_defined.icd10cm,
+                      simplify = FALSE,
+                      USE.NAMES = TRUE
         )
-        for (cmb in seq_along(out)) {
-          if (verbose) {
-            only_prev <- setdiff(out[[cmb]], upd[[cmb]])
-            only_this <- setdiff(upd[[cmb]], out[[cmb]])
-            if (length(only_prev)) {
-              if (verbose) message("Year/version = ", yr)
-              message("Only in previous for item ", cmb)
-              print(only_prev)
-            }
-            if (length(only_this)) {
-              if (verbose) message("Year/version = ", yr)
-              message("Only in new for item ", cmb)
-              print(only_this)
-            }
-          }
-          out[[cmb]] <- sort(union(out[[cmb]], upd[[cmb]]))
-        }
+        out <- .apply_over_ver_updater(out, upd)
       }
     ) # end of with active version
   } # end year loop
@@ -642,11 +642,10 @@ apply_over_icd10cm_vers <- function(raw) {
 #' }
 #' @keywords internal
 #' @noRd
-apply_over_icd10who_vers <- function(raw) {
-  verbose <- .verbose()
+.apply_over_icd10who_vers <- function(raw) {
   out <- raw
   for (who_ver in c("icd10who2016", "icd10who2008fr")) {
-    if (verbose) message("Working on ", who_ver)
+    if (.verbose()) message("Working on ", who_ver)
     upd <- sapply(out,
       FUN = .apply_over_ver_worker,
       inner_fun = children_defined.icd10who,
@@ -654,21 +653,7 @@ apply_over_icd10who_vers <- function(raw) {
       simplify = FALSE,
       USE.NAMES = TRUE
     )
-    for (cmb in seq_along(out)) {
-      if (verbose) {
-        only_prev <- setdiff(out[[cmb]], upd[[cmb]])
-        only_this <- setdiff(upd[[cmb]], out[[cmb]])
-        if (length(only_prev)) {
-          message("Only in previous for item ", cmb)
-          print(only_prev)
-        }
-        if (length(only_this)) {
-          message("Only in new for item ", cmb)
-          print(only_this)
-        }
-      }
-      out[[cmb]] <- sort(unique(union(out[[cmb]], upd[[cmb]])))
-    }
+    .apply_over_ver_updater(out, upd)
   }
   out
 }

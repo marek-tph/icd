@@ -54,10 +54,6 @@ test_that("compare icd10", {
   expect_false(icd10cm_compare_rcpp("A190", "A100"))
   expect_true(icd10cm_compare_rcpp("A100", NA_character_))
   expect_false(icd10cm_compare_rcpp(NA_character_, "A100"))
-  # std
-  expect_false(icd10cm_compare_std("A100", "A100"))
-  expect_true(icd10cm_compare_std("A100", "A200"))
-  expect_false(icd10cm_compare_std("A190", "A100"))
 })
 
 test_that("sort icd10", {

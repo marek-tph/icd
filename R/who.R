@@ -21,7 +21,7 @@
     httr_retry <- memoise::memoise(
       httr_retry,
       cache = memoise::cache_filesystem(
-        file.path(icd_data_dir(), "memoise")
+        file.path(get_icd_data_dir(), "memoise")
       )
     )
   }

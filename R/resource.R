@@ -58,57 +58,44 @@
   match.fun(.get_fetcher_name(var_name))
 }
 
-.icd_data_dir_exists <- function() {
-  path <- getOption("icd.data.resource", default = .icd_data_default)
-  dir.exists(path)
-}
-
-.get_data_dir <- function() {
-  if (.icd_data_dir_exists()) {
-    getOption("icd.data.resource", default = .icd_data_default)
-  } else {
-    NULL
-  }
-}
-
 .exists_in_cache <- function(var_name, ...) {
   vapply(var_name, .exists_in_cache_single, logical(1), ...)
 }
 
 .exists_in_cache_single <- function(var_name) {
   stopifnot(length(var_name) == 1L)
-  verbose <- .verbose()
-  if (verbose > 1) {
+  verbose <- .verbose() > 1
+  if (verbose) {
     message("Seeing if ", sQuote(var_name), " exists in cache env or dir")
   }
-  if (!.icd_data_dir_exists()) {
+  if (!.exists_icd_data_dir()) {
     if (.verbose()) {
       message(
         "Don't even have the icd.data.resource option defined,",
-        " and default location of ", sQuote(.icd_data_default),
+        " and default location of ", sQuote(.default_icd_data_dir()),
         " is missing."
       )
     }
     return(FALSE)
   }
   stopifnot(is.character(var_name))
-  if (verbose > 1) message(".exists_in_cache trying icd_data_env environment")
+  if (verbose) message(".exists_in_cache trying icd_data_env environment")
   if (.exists(var_name)) {
     if (verbose) message(sQuote(var_name), " found in env.")
     return(TRUE)
   }
   fp <- .rds_path(var_name)
-  if (verbose > 1) message("Checking if we have file path for exists")
+  if (verbose) message("Checking if we have file path for exists")
   if (is.null(fp)) return(FALSE)
-  if (verbose > 1) message("Trying file at: ", fp)
+  if (verbose) message("Trying file at: ", fp)
   return(file.exists(fp))
-  if (verbose > 1) message(var_name, " not seen in cache env or dir.")
+  if (verbose) message(var_name, " not seen in cache env or dir.")
   FALSE
 }
 
 .get_from_cache <- function(var_name,
                             must_work = TRUE) {
-  verbose <- .verbose()
+  verbose <- .verbose() > 1
   if (verbose) {
     message(
       "Trying to get ", sQuote(var_name), " from cache env or dir"
@@ -134,7 +121,7 @@
 }
 
 .all_cached <- function() {
-  if (is.null(getOption("icd.data.resource", default = NULL))) return(FALSE)
+  if (is.null(.get_opt("resource"))) return(FALSE)
   all(
     vapply(.data_names, .exists_in_cache, logical(1))
   )
@@ -142,42 +129,6 @@
 
 .clean_env <- function() {
   rm(list = ls(.icd_data_env, all.names = TRUE), envir = .icd_data_env)
-}
-
-.clean_resource_dir <- function(rds = FALSE,
-                                memoise = FALSE,
-                                raw = FALSE,
-                                destroy = FALSE) {
-  if (destroy) {
-    askYesNo("Destroy entire resource directory?")
-    unlink(icd_data_dir(), recursive = TRUE)
-    return(invisible())
-  }
-  if (memoise) {
-    message("deleting memoise directory")
-    unlink(
-      file.path(icd_data_dir(), "memoise"),
-      recursive = TRUE
-    )
-  }
-  if (raw) {
-    raw_files <- list.files(icd_data_dir(),
-      pattern = "(\\.txt$)|(\\.xlsx$)",
-      ignore.case = TRUE,
-      full.names = TRUE
-    )
-    message("Deleting:")
-    print(raw_files)
-    unlink(raw_files, recursive = FALSE)
-  }
-  if (rds) {
-    rds_files <- list.files(icd_data_dir(), ".*\\.rds", full.names = TRUE)
-    message("Deleting:")
-    print(rds_files)
-    unlink(rds_files,
-      recursive = FALSE
-    )
-  }
 }
 
 .make_getter <- function(var_name) {
@@ -230,9 +181,8 @@
       if (verbose) message("Found ", var_name, " in cache or package data.")
       return(.get_anywhere(var_name = var_name))
     }
-    # icd_data_dir_okay will find default dir if not set
-    if (!icd_data_dir_okay() && .offline()) {
-      if (verbose) message("Offline and not in cache")
+    if (!.icd_data_dir_okay() && .offline()) {
+      if (verbose) message("Offline and/or no cache")
       .absent_action_switch(
         "Offline so not attempting to download or parse",
         must_work = must_work
@@ -355,75 +305,133 @@
   )
 }
 
-.icd_data_default <- file.path("~", ".icd.data")
-
-.set_icd_data_dir <- function(path = .icd_data_default) {
-  if (is.null(path) || !dir.exists(path)) {
-    if (!dir.create(path)) stop("Could not create directory at: ", path)
-  }
-  .set_hard(icd.data.resource = path)
-  invisible(path)
+.exists_icd_data_dir <- function() {
+  path <- .get_opt("resource")
+  !is.null(path) && dir.exists(path)
 }
 
-#' @describeIn setup_icd_data Return the currently active data directory. If
-#'   missing, it will return \code{NULL} and, depending on
-#'   \code{getOption("icd.data.absent_action")}, will stop, give a message, or
-#'   do nothing.
-#' @export
-icd_data_dir <- function(path) {
+.set_icd_data_dir <- function(path) {
   if (.verbose() > 1) {
     message("icd_data_dir: options are currently:")
     .print_options()
   }
-  if (!missing(path) && dir.exists(path)) {
-    options("icd.data.resource" = path)
-    return(path)
+  if (missing(path)) path <- .default_icd_data_dir()
+  if (!dir.exists(path)) {
+    if (!dir.create(path, recursive = TRUE, showWarnings = FALSE))
+      stop("Could not create directory at: ", sQuote(path))
   }
-  o <- NULL
-  if (dir.exists(.icd_data_default)) {
-    if (.verbose()) {
-      message(
-        "icd_data_dir: ",
-        .icd_data_default, " found, so using it."
-      )
-    }
-    o <- .icd_data_default
+  if (file.access(path, 2) != 0) {
+    stop("icd default data path ", sQuote(path), " is not writable")
   }
-  if (is.null(o)) o <- getOption("icd.data.resource", default = NULL)
-  if (!is.null(o)) {
-    if (.verbose() > 1 && regexec("tmp", o) != -1) {
-      warning("Using a temporary icd data cache directory: ", sQuote(o))
-    }
-    return(o)
-  }
-  if (with_absent_action("silent", !.confirm_download())) {
-    .absent_action_switch(
-      paste(
-        "The", sQuote("icd.data.resource"),
-        "option is not set. Use setup_icd_data() to get started."
-      )
-    )
-  }
-  NULL
+  options("icd.data.resource" = path)
+  invisible(path)
 }
 
-icd_data_dir_okay <- function() {
-  !is.null(
-    with_absent_action(
-      absent_action = "silent",
-      icd_data_dir()
-    )
+.default_icd_data_dir <- function() {
+  rappdirs::user_data_dir(appname = "icd")
+  # version = utils::packageVersion("icd")
+}
+
+.dir_writable <- function(path) {
+  !dir.exists(path) || !file.access(path, 2)
+}
+#' @describeIn set_icd_data_dir Get the currently active data directory, and check it exists and is writable.
+#' @export
+get_icd_data_dir <- function(must_work = TRUE) {
+  get_started <- paste(
+    "Use set_icd_data_dir() to get started. ",
+    "(The", sQuote("icd.data.resource"),
+    "option is not set, and the default OS-dependent icd data directory",
+    "does not exist yet. You may also use ",
+    sQuote("set_icd_data_dir(\"/path/of/your/choice\")"), "."
   )
+  o <- .get_opt("resource")
+  if (!is.null(o)) {
+    if (.verbose() > 1) message(
+      "icd.data.resource options set to: ", o, ", so using it."
+    )
+    if (!.dir_writable(o)) {
+      msg <- paste("icd.data.resource option set to:", o,
+                   "but the location is not writable or doesn't exist.",
+                   get_started)
+            if (must_work) {
+        stop(msg)
+      } else {
+        if (.verbose()) message(msg)
+        return(NA_character_)
+      }
+    }
+  } else {
+    o <- .default_icd_data_dir()
+    if (dir.exists(o) && .dir_writable(o)) {
+      if (.verbose() > 1) message(
+        "icd.data.resource option not set, but default path: ",
+        sQuote(o), " exists, so using it and setting option."
+      )
+      .set_opt("resource" = o)
+    } else {
+      msg <- paste("icd.data.resource not set and default location",
+                   sQuote(o), "is not writable or doesn't exist.",
+                   get_started)
+      if (must_work) {
+        stop(msg)
+      } else {
+        if (.verbose()) message(msg)
+        return(NA_character_)
+      }
+    }
+  }
+  o
+}
+
+.icd_data_dir_okay <- function() {
+  dir <- with_absent_action(
+    absent_action = "silent",
+    get_icd_data_dir(must_work = FALSE)
+  )
+  !is.null(dir) && !is.na(dir)
+}
+
+.clean_data_dir <- function(rds = FALSE,
+                            memoise = FALSE,
+                            raw = FALSE,
+                            destroy = FALSE) {
+  if (destroy) {
+    if (askYesNo("Destroy entire resource directory?"))
+      unlink(get_icd_data_dir(), recursive = TRUE)
+    return(invisible())
+  }
+  if (memoise) {
+    message("deleting memoise directory")
+    unlink(
+      file.path(get_icd_data_dir(), "memoise"),
+      recursive = TRUE
+    )
+  }
+  if (raw) {
+    raw_files <- list.files(get_icd_data_dir(),
+                            pattern = "(\\.txt$)|(\\.xlsx$)",
+                            ignore.case = TRUE,
+                            full.names = TRUE
+    )
+    message("Deleting:")
+    print(raw_files)
+    unlink(raw_files, recursive = FALSE)
+  }
+  if (rds) {
+    rds_files <- list.files(get_icd_data_dir(), ".*\\.rds", full.names = TRUE)
+    message("Deleting:")
+    print(rds_files)
+    unlink(rds_files,
+           recursive = FALSE
+    )
+  }
 }
 
 .confirm_download <- function(msg = NULL) {
-  dir <- getOption("icd.data.resource", .icd_data_default)
   if (!.offline()) {
-    if (!.icd_data_dir_exists()) {
-      ok <- dir.create(dir)
-      if (!ok) {
-        stop("Unable to create icd data cache directory at: ", sQuote(dir))
-      }
+    if (!.exists_icd_data_dir()) {
+      set_icd_data_dir()
     }
     return(TRUE)
   }
@@ -431,25 +439,23 @@ icd_data_dir_okay <- function() {
   if (.interact()) {
     message(
       "icd needs to download and/or parse data.",
-      "It will be saved in ", sQuote(dir),
-      ", based on the default, or R option: ",
-      sQuote("icd.data.resource")
+      "It will be saved in an OS-specific data directory, ",
+      "or according to the R option: ", sQuote("icd.data.resource")
     )
     if (!is.null(msg)) message(msg)
     ok <- isTRUE(
       askYesNo(
         "May I download and cache a few MB per ICD edition as needed?"
-      ) # nolint
+      )
     )
   }
   options("icd.data.offline" = !ok)
-  msg <- "Unable to get permission to download data."
-  if (!ok) .absent_action_switch(msg)
+  if (!ok) .absent_action_switch("Unable to get permission to download data.")
   ok
 }
 
 .rds_path <- function(var_name) {
-  fp <- file.path(icd_data_dir(), paste0(var_name, ".rds"))
+  fp <- file.path(get_icd_data_dir(), paste0(var_name, ".rds"))
   if (length(fp) == 0) {
     NULL
   } else {

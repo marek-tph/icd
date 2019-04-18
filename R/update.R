@@ -18,8 +18,11 @@ update_everything <- function() {
     year = "2014",
     save_pkg_data = TRUE
   )
-  # TODO: just need to save icd10cm2016 and icd10cm2019 in data, and have
-  # special getter functions for them.
+
+  .print_options()
+  .set_icd_data_dir()
+  .print_options()
+
   .icd10cm_extract_sub_chapters(.icd10cm_extract_sub_chapters = TRUE)
   #  icd9cm_billable <- list()
   #  icd9cm_billable[["32"]] <- get_icd9cm2014_leaf(must_work = TRUE)
@@ -37,15 +40,15 @@ update_everything <- function() {
   icd9_parse_ahrq_ccs(single = TRUE, save_data = TRUE)
   icd9_parse_ahrq_ccs(single = FALSE, save_data = TRUE)
   icd10_parse_ahrq_ccs(version = "2018.1", save_data = TRUE)
-  icd9_generate_map_quan_elix(save_data = TRUE)
-  icd9_generate_map_elix(save_data = TRUE)
+  icd9_generate_map_quan_elix(save_pkg_data = TRUE)
+  icd9_generate_map_elix(save_pkg_data = TRUE)
   # ICD 10
   .parse_icd10cm_all(save_pkg_data = TRUE)
   icd10_parse_ahrq_sas(save_data = TRUE)
   icd10_parse_cc(save_data = TRUE)
-  icd10_generate_map_quan_elix(save_data = TRUE)
-  icd10_generate_map_quan_deyo(save_data = TRUE)
-  icd10_generate_map_elix(save_data = TRUE)
+  icd10_generate_map_quan_elix(save_pkg_data = TRUE)
+  icd10_generate_map_quan_deyo(save_pkg_data = TRUE)
+  icd10_generate_map_elix(save_pkg_data = TRUE)
   generate_maps_pccc(save_data = TRUE)
   icd10_parse_map_ahrq_pc(save_pkg_data = TRUE)
   icd_parse_cc_hierarchy(save_data = TRUE)
@@ -53,9 +56,9 @@ update_everything <- function() {
   icd9cm2014_leaf <- get_icd9cm2014_leaf()
   .save_in_data_dir(icd9cm2014_leaf)
   # TODO: deprecate and remove icd10cm2016 in icd 4.1 or 4.2
-  icd10cm2016 <- .parse_icd10cm2016()
+  icd10cm2016 <- .get_from_cache(var_name = "icd10cm2016", must_work = TRUE)
   .save_in_data_dir(icd10cm2016)
-  icd10cm2019 <- .parse_icd10cm2019()
+  icd10cm2019 <- .get_from_cache(var_name = "icd10cm2019", must_work = TRUE)
   .save_in_data_dir(icd10cm2019)
   icd9cm_hierarchy <- get_icd9cm2014()
   names(icd9cm_hierarchy)[names(icd9cm_hierarchy) == "leaf"] <- "billable"

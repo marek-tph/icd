@@ -60,7 +60,9 @@
 #'   whether given codes are leaves in the hierarchy, or not. \pkg{icd} may need
 #'   to download data due to package size or copyright restrictions on
 #'   redistributing data, and needs a cache directory and your permission to do
-#'   this. Use \code{\link{setup_icd_data}} to do this, or
+#'   this. Use \code{\link{set_icd_data_dir}} to do this, e.g.,
+#'   \code{set_icd_data_dir()} for a default location in a suitable place for
+#'   your OS, e.g. \code{~/.local/icd/icd-ver-num} on Linux. Use
 #'   \code{\link{download_icd_data}} to download everything at once, which will
 #'   take a few minutes on a broadband connection.
 #'

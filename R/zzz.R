@@ -7,40 +7,39 @@
 .lookup_chars_in_icd10cm <- new.env(parent = emptyenv())
 
 .onLoad <- function(libname, pkgname) {
-  if (.icd_data_dir_exists()) {
-    if (is.null(getOption("icd.data.resource"))) {
-      .set(resource = .icd_data_default)
-    }
-    .set(offline = FALSE)
-  }
-  if (getOption("icd.data.interact", default = TRUE) && interactive()) {
-    .set(interact = TRUE)
+  if (.icd_data_dir_okay()) {
+   .set_opt(offline = FALSE, overwrite = FALSE)
   }
 }
 
 .onAttach <- function(libname, pkgname) {
   if (system.file(package = "icd9") != "") {
     packageStartupMessage(paste(
-      "The 'icd9' package is now deprecated, and should be removed to avoid",
-      "conflicts with 'icd'. The 'icd' package up to version 2.1 contains",
+      "The", sQuote("icd9"), "package is now deprecated, and should be removed to avoid",
+      "conflicts with ", sQuote("icd"), ". The", sQuote("icd"),
+      "package up to version 2.1 contains",
       "tested versions of all the deprecated function names which overlap with",
-      "those in the old 'icd9' package, e.g. 'icd9ComorbidAhrq'. It is",
+      "those in the old", sQuote("icd9"), "package, e.g., 'icd9ComorbidAhrq'. It is",
       "strongly recommended to run the command: remove.packages(\"icd9\")"
     ))
   }
   if (interactive()) {
-    packageStartupMessage(
-      sQuote("icd"), " downloads data when needed.",
-      " Use setup_icd_data() to create cache directory. "
-    )
+    if (!.exists_icd_data_dir()) {
+      packageStartupMessage(
+        sQuote("icd"), " downloads data when needed. ",
+        "set_icd_data_dir() creates a data directory. ")
+      packageStartupMessage(
+        "Default location is: ", sQuote(.default_icd_data_dir())
+      )
+    }
     if (system.file(package = "icd.data") != "") {
       packageStartupMessage(
         "N.b. the ", sQuote("icd.data"),
         " package is deprecated from ",
-        sQuote("icd"), " version 4.0"
+        sQuote("icd"), " version 4.0. ",
+        "The content from ", sQuote("icd.data"),
+        " is now available via ", sQuote("icd"), "."
       )
-    } else {
-      ""
     }
   }
 }

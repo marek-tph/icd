@@ -64,3 +64,4 @@ tests/testthat/Rplots.pdf
 testthat-disabled.R
 todo
 bench-refactor.html
+.gdb_history

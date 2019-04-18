@@ -102,7 +102,7 @@
   }
   class(dat$code) <- c("icd10cm", "icd10", "character")
   class(dat$three_digit) <- c("icd10cm", "icd10", "factor")
-  if (.verbose()) message("Correcting order")
+  if (.verbose()) message("Correcting order of ", nrow(dat), " codes")
   dat <- dat[order.icd10cm(dat$code), ]
   row.names(dat) <- NULL
   if (.verbose()) message("Saving in resource dir")

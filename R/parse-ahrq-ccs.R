@@ -263,13 +263,11 @@ icd10_parse_ahrq_ccs <- function(version = "2018.1",
     lkp_chr[!duplicated(names(lkp_chr))]
   }
   icd10_names_ccs <- lapply(icd10_map_def, ccs_lvl_name)
-  # nolint start
   icd10_map_ccs <- sapply(icd10_map_ccs,
-    apply_over_icd10cm_vers,
-    simplify = FALSE,
-    USE.NAMES = TRUE
+                          .apply_over_icd10cm_vers,
+                          simplify = FALSE,
+                          USE.NAMES = TRUE
   )
-  # nolint end
   # not applying over WHO codes because CCS is a US-oriented classification.
   if (save_data) {
     .save_in_data_dir(icd10_map_ccs)

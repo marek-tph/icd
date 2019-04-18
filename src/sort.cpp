@@ -1,18 +1,24 @@
 #include <Rcpp.h>
 #include "sort.h"
-#include <string.h>
 using namespace Rcpp;
 
-// add one because R indexes from 1, not 0
-inline std::size_t
-  getSecondPlusOneStd(const std::pair<std::string, std::size_t> &p) {
-    return p.second + 1;
-  }
-
-inline std::size_t
-  getSecondPlusOne(const std::pair<String, R_xlen_t> &p) {
-    return p.second + 1;
-  }
+IntegerVector orderWorker(
+    const CharacterVector& x,
+    std::function <bool (String, String)> f
+) {
+  IntegerVector index =  Rcpp::no_init_vector(x.size());
+  // R indexed
+  std::iota(index.begin(), index.end(), 1);
+  std::stable_sort(
+    index.begin(),
+    index.end(),
+    [&](R_xlen_t a,
+        R_xlen_t b) {
+      return f(x[a - 1], x[b - 1]);
+    }
+  );
+  return index;
+}
 
 // [[Rcpp::export(icd9_compare_rcpp)]]
 bool icd9Compare(String a, String b) {
@@ -37,33 +43,6 @@ bool icd9Compare(String a, String b) {
   return strcmp(acs, bcs) < 0;
 }
 
-// [[Rcpp::export(icd9_compare_std)]]
-bool icd9CompareStd(std::string a, std::string b) {
-  const char *acs = a.c_str();
-  const char *bcs = b.c_str();
-  // most common is numeric, so deal with that first:
-  if (*acs < 'A') return strcmp(acs, bcs) < 0;
-  // if the second char is now  a number, then we can immediately return false
-  if (*bcs < 'A') return false;
-  // V vs E as first or both characters is next
-  if (*acs == 'V' && *bcs == 'E') return true;
-  if (*acs == 'E' && *bcs == 'V') return false;
-  // now cover both V codes or both E codes
-  return strcmp(acs, bcs) < 0;
-}
-
-bool icd9ComparePairStd(const pas_std& a, const pas_std& b) {
-  std::string af = a.first;
-  std::string bf = b.first;
-  return icd9CompareStd(af, bf);
-}
-
-bool icd9ComparePairRcpp(const pas_rcpp& a, const pas_rcpp& b) {
-  String af = a.first;
-  String bf = b.first;
-  return icd9Compare(af, bf);
-}
-
 // [[Rcpp::export(icd9_sort_rcpp)]]
 CharacterVector icd9Sort(const CharacterVector &x) {
   CharacterVector y = clone(x);
@@ -73,36 +52,7 @@ CharacterVector icd9Sort(const CharacterVector &x) {
 
 // [[Rcpp::export(icd9_order_rcpp)]]
 IntegerVector icd9Order(const CharacterVector& x) {
-  std::vector<pas_rcpp> vp;
-  IntegerVector out; //(x.size());
-  vp.reserve(x.size());
-  for (R_xlen_t i = 0; i != x.size(); ++i)
-    vp.push_back(std::make_pair(x[i], i));
-  std::sort(vp.begin(), vp.end(), icd9ComparePairRcpp);
-  for (auto p : vp) {
-    out.push_back(p.second + 1);
-  }
-  // std::transform(vp.begin(),
-  //                vp.end(),
-  //                std::back_inserter(out),
-  //                getSecondPlusOne);
-  return out;
-}
-
-// [[Rcpp::export(icd9_order_std)]]
-std::vector<std::size_t> icd9OrderStd(const VecStr& x) {
-  std::vector<std::pair<std::string, std::size_t>> vp;
-  std::vector<std::size_t> out;
-  out.reserve(x.size());
-  vp.reserve(x.size());
-  for (std::size_t i = 0; i != x.size(); ++i)
-    vp.push_back(std::make_pair(x[i], i));
-  std::sort(vp.begin(), vp.end(), icd9ComparePairStd);
-  std::transform(vp.begin(),
-                 vp.end(),
-                 std::back_inserter(out),
-                 getSecondPlusOneStd);
-  return out;
+  return orderWorker(x, icd9Compare);
 }
 
 std::vector<std::string> qx  = {"C4A", "D3A", "M1A", "Z3A", "C7A", "C7B"};
@@ -115,13 +65,15 @@ std::vector<std::string> qaa = {"C44", "D37", "M10", "Z37", "C76", "C76"};
 // ICD-10 //
 ////////////
 
-std::pair<bool, bool> icd10cmCompareQuirk(const char* xstr,
-                                          const char* ystr,
-                                          const char *quirk,
-                                          const char *beforeQuirk,
-                                          const char *afterQuirk,
-                                          const char *beforeBeforeQuirk,
-                                          const char *afterAfterQuirk) {
+std::pair<bool, bool> icd10cmCompareQuirk(
+    const char* xstr,
+    const char* ystr,
+    const char *quirk,
+    const char *beforeQuirk,
+    const char *afterQuirk,
+    const char *beforeBeforeQuirk,
+    const char *afterAfterQuirk
+  ) {
   bool mx          = (xstr == quirk || strncmp(xstr, quirk, 3) == 0);
   bool my          = (ystr == quirk || strncmp(ystr, quirk, 3) == 0);
   if (!mx && !my) return std::pair<bool, bool>(false, false);
@@ -140,7 +92,6 @@ std::pair<bool, bool> icd10cmCompareQuirk(const char* xstr,
                      << ", afterQuirk = " << afterQuirk
                      << ", beforeBeforeQuirk = " << beforeBeforeQuirk
                      << ", afterAfterQuirk = " << afterAfterQuirk);
-
     if (strcmp(beforeQuirk, beforeBeforeQuirk)) {
       return icd10cmCompareQuirk(xstr,
                                  ystr,
@@ -218,38 +169,15 @@ bool icd10cmCompare(const String& x, const String& y) {
   // only return TRUE if x definitely comes before y (i.e. not equal and less)
   if (y == NA_STRING) {
     // even if x is also NA, we still return true
-    TRACE("icd10cmOrder y is NA");
+    TRACE("icd10cmCompare y is NA");
     return true;
   }
   if (x == NA_STRING) {
-    TRACE("icd10cmOrder x is NA");
+    TRACE("icd10cmCompare x is NA");
     // y is NOT NA, so x must go after, and is not equal
     return false;
   }
-  const char *xstr = x.get_cstring();
-  const char *ystr = y.get_cstring();
-  return icd10cmCompareC(xstr, ystr);
-}
-
-// [[Rcpp::export(icd10cm_compare_std)]]
-bool icd10cmCompareStd(const std::string& x, const std::string& y) {
-  const char *xstr = x.c_str();
-  const char *ystr = y.c_str();
-  return icd10cmCompareC(xstr, ystr);
-}
-
-bool icd10cmComparePair(pas_rcpp a, pas_rcpp b) {
-  TRACE("icd10cmComparePair a = " << a.first.get_cstring() << ", " << a.second);
-  TRACE("icd10cmComparePair b = " << b.first.get_cstring() << ", " << b.second);
-  String af = a.first;
-  String bf = b.first;
-  return icd10cmCompare(af, bf);
-}
-
-bool icd10cmComparePairStd(pas_std a, pas_std b) {
-  std::string af = a.first;
-  std::string bf = b.first;
-  return icd10cmCompareStd(af, bf);
+  return icd10cmCompareC(x.get_cstring(), y.get_cstring());
 }
 
 // [[Rcpp::export(icd10cm_sort_rcpp)]]
@@ -259,51 +187,13 @@ CharacterVector icd10cmSort(const CharacterVector &x) {
   return y;
 }
 
-// [[Rcpp::export(icd10cm_sort_std)]]
-VecStr icd10cmSortStd(const std::vector<std::string> &x) {
-  std::vector<std::string> y = x;
-  std::sort(y.begin(), y.end(), icd10cmCompareStd);
-  return y;
-}
-
 //' @title Order ICD-10-CM codes
 //' @description Currently required for C7A, C7B (which fall after C80), and
 //'   D3A, which falls after D48. C4A M1A Z3A are also problems within
 //'   sub-chapters.
 //' @keywords internal
 //' @noRd
-
-
 // [[Rcpp::export(icd10cm_order_rcpp)]]
 IntegerVector icd10cmOrder(const CharacterVector& x) {
-  std::vector<pas_rcpp> vp;
-  IntegerVector out; //(x.size());
-  vp.reserve(x.size());
-  for (R_xlen_t i = 0; i != x.size(); ++i) {
-    TRACE("icd10cmOrder Making pair " << x[i] << ", " << i);
-    vp.push_back(std::make_pair(x[i], i));
-  }
-  std::sort(vp.begin(), vp.end(), icd10cmComparePair);
-  for (auto p : vp) {
-    TRACE("icd10cmOrder Pushing back " << p.second + 1);
-    out.push_back(p.second + 1);
-  }
-  return out;
-}
-
-// [[Rcpp::export(icd10cm_order_std)]]
-std::vector<std::size_t> icd10cmOrderStd(const VecStr& x) {
-  std::vector<pas_std> vp;
-  std::vector<std::size_t> out;
-  out.reserve(x.size());
-  vp.reserve(x.size());
-  for (std::size_t i = 0; i != x.size(); ++i) {
-    vp.push_back(std::make_pair(x[i], i));
-  }
-  std::sort(vp.begin(), vp.end(), icd10cmComparePairStd);
-  std::transform(vp.begin(),
-                 vp.end(),
-                 std::back_inserter(out),
-                 getSecondPlusOneStd);
-  return out;
+  return orderWorker(x, icd10cmCompare);
 }

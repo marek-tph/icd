@@ -20,7 +20,7 @@
 .unzip_to_data_raw <- function(..., # force explicit naming
                                url,
                                file_name,
-                               data_raw_path = icd_data_dir(),
+                               data_raw_path = get_icd_data_dir(),
                                save_name = file_name,
                                dl_msg = NULL) {
   stopifnot(is.character(url), length(url) == 1)
@@ -68,7 +68,7 @@
 .download_to_data_raw <-
   function(url,
              file_name = NULL,
-             data_raw_path = icd_data_dir(),
+             data_raw_path = get_icd_data_dir(),
              dl_msg = NULL,
              ...) {
     if (is.null(file_name)) {

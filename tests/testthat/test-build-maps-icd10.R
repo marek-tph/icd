@@ -1,18 +1,17 @@
 context("build icd10 maps")
 
 skip_multi <- function() {
+  skip_slow()
   skip_on_appveyor()
   skip_on_travis()
   skip_on_cran()
-  if (isTRUE(getOption("icd.data.offline", default = TRUE))) {
-    skip("Offline")
-  }
-  if (!icd_data_dir_okay()) {
+  skip_if_offline() # also skips if not interactive
+  if (!.icd_data_dir_okay()) {
     skip("Don't have icd data cache directory.")
   }
   # TODO: should probably let the functions download automatically
   if (!.all_cached()) {
-    skip("Don't have all data cached.")
+    skip("Don't have all data cached, yet.")
   }
 }
 

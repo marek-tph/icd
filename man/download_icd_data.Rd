@@ -15,10 +15,10 @@ the package data.
 }
 \examples{
 \dontrun{
-setup_icd_data()
+set_icd_data_dir()
 download_icd_data()
 }
 }
 \seealso{
-\code{\link{setup_icd_data}}
+\code{\link{set_icd_data_dir}}
 }

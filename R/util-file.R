@@ -33,10 +33,10 @@
                               x = NULL,
                               compress = "gzip",
                               envir = parent.frame()) {
-  message("Saving to data dir: save to user's resource directory instead?")
   if (!is.character(var_name)) {
     var_name <- as.character(substitute(var_name))
   }
+  message("Asked to save ", var_name, " to PACKAGE data dir")
   stopifnot(is.character(var_name))
   if (is.null(x)) {
     stopifnot(exists(var_name, envir = envir))
@@ -52,7 +52,7 @@
     paste0(var_name, ".rda")
   )
   # check diff before overwrite:
-  load(file = out_file, envir = tenv <- new.env(emptyenv()))
+  load(file = out_file, envir = (tenv <- new.env(emptyenv())))
   oldx <- tenv[[var_name]]
   if (!identical(x, oldx)) {
     warning("Data for ", sQuote(var_name), " is being updated.")
@@ -64,7 +64,7 @@
     )
     saveRDS(oldx, old_file)
     saveRDS(x, new_file)
-    if (!askYesNo("Yes to proceed, no to debug?", default = FALSE)) {
+    if (!askYesNo("Proceed?", default = FALSE)) {
       message(
         "Examine differences. Consider:",
         "testthat::compare(x, oldx), ",
@@ -73,12 +73,10 @@
         "arsenal::comparedf may have details but summary superficial, ",
         "base::setdiff not so helpful"
       )
-      browser()
       if (!askYesNo("Continue saving?", default = FALSE)) {
         stop("Not saved in package data.")
       }
     }
-  }
   save(
     list = var_name,
     envir = envir,
@@ -86,7 +84,10 @@
     compress = compress
   )
   message("Now reload package to enable updated/new data: ", var_name)
-  invisible(get(var_name, envir = envir))
+  } else {
+    message("No change in data, so not re-saving.")
+  }
+  invisible(x)
 }
 
 .save_in_resource_dir <- function(var_name,

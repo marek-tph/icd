@@ -476,18 +476,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// icd9CompareStd
-bool icd9CompareStd(std::string a, std::string b);
-RcppExport SEXP _icd_icd9CompareStd(SEXP aSEXP, SEXP bSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< std::string >::type a(aSEXP);
-    Rcpp::traits::input_parameter< std::string >::type b(bSEXP);
-    rcpp_result_gen = Rcpp::wrap(icd9CompareStd(a, b));
-    return rcpp_result_gen;
-END_RCPP
-}
 // icd9Sort
 CharacterVector icd9Sort(const CharacterVector& x);
 RcppExport SEXP _icd_icd9Sort(SEXP xSEXP) {
@@ -507,17 +495,6 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const CharacterVector& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(icd9Order(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// icd9OrderStd
-std::vector<std::size_t> icd9OrderStd(const VecStr& x);
-RcppExport SEXP _icd_icd9OrderStd(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const VecStr& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(icd9OrderStd(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -545,18 +522,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// icd10cmCompareStd
-bool icd10cmCompareStd(const std::string& x, const std::string& y);
-RcppExport SEXP _icd_icd10cmCompareStd(SEXP xSEXP, SEXP ySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::string& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const std::string& >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(icd10cmCompareStd(x, y));
-    return rcpp_result_gen;
-END_RCPP
-}
 // icd10cmSort
 CharacterVector icd10cmSort(const CharacterVector& x);
 RcppExport SEXP _icd_icd10cmSort(SEXP xSEXP) {
@@ -568,17 +533,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// icd10cmSortStd
-VecStr icd10cmSortStd(const std::vector<std::string>& x);
-RcppExport SEXP _icd_icd10cmSortStd(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const std::vector<std::string>& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(icd10cmSortStd(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // icd10cmOrder
 IntegerVector icd10cmOrder(const CharacterVector& x);
 RcppExport SEXP _icd_icd10cmOrder(SEXP xSEXP) {
@@ -587,17 +541,6 @@ BEGIN_RCPP
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const CharacterVector& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(icd10cmOrder(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// icd10cmOrderStd
-std::vector<std::size_t> icd10cmOrderStd(const VecStr& x);
-RcppExport SEXP _icd_icd10cmOrderStd(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const VecStr& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(icd10cmOrderStd(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -729,17 +672,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_icd_refactor_narm", (DL_FUNC) &_icd_refactor_narm, 3},
     {"_icd_factorIsValid", (DL_FUNC) &_icd_factorIsValid, 1},
     {"_icd_icd9Compare", (DL_FUNC) &_icd_icd9Compare, 2},
-    {"_icd_icd9CompareStd", (DL_FUNC) &_icd_icd9CompareStd, 2},
     {"_icd_icd9Sort", (DL_FUNC) &_icd_icd9Sort, 1},
     {"_icd_icd9Order", (DL_FUNC) &_icd_icd9Order, 1},
-    {"_icd_icd9OrderStd", (DL_FUNC) &_icd_icd9OrderStd, 1},
     {"_icd_icd10cmCompareC", (DL_FUNC) &_icd_icd10cmCompareC, 2},
     {"_icd_icd10cmCompare", (DL_FUNC) &_icd_icd10cmCompare, 2},
-    {"_icd_icd10cmCompareStd", (DL_FUNC) &_icd_icd10cmCompareStd, 2},
     {"_icd_icd10cmSort", (DL_FUNC) &_icd_icd10cmSort, 1},
-    {"_icd_icd10cmSortStd", (DL_FUNC) &_icd_icd10cmSortStd, 1},
     {"_icd_icd10cmOrder", (DL_FUNC) &_icd_icd10cmOrder, 1},
-    {"_icd_icd10cmOrderStd", (DL_FUNC) &_icd_icd10cmOrderStd, 1},
     {"_icd_trimLeftCpp", (DL_FUNC) &_icd_trimLeftCpp, 1},
     {"_icd_strimCpp", (DL_FUNC) &_icd_strimCpp, 1},
     {"_icd_trimCpp", (DL_FUNC) &_icd_trimCpp, 1},

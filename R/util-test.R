@@ -263,14 +263,9 @@ skip_missing_icd10fr <- function() {
   }
 }
 
-.test_slow <- function(slow = TRUE) {
-  Sys.setenv("ICD_TEST_SLOW" = slow)
-  options(icd.data.test_slow = slow)
-}
-
 skip_slow <- function(msg = "Skipping slow test") {
   testthat::skip_on_cran()
-  if (!getOption("icd.data.test_slow", default = FALSE)) {
+  if (!.get_opt("test_slow", default = FALSE)) {
     testthat::skip(msg)
   }
 }
