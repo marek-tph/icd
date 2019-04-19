@@ -2,6 +2,7 @@
 # different filter:
 library("icd")
 library("testthat", warn.conflicts = FALSE, quietly = TRUE)
+icd:::.show_options()
 # Definitely don't download data on CRAN
 if (!icd:::.env_var_is_true("NOT_CRAN")) {
   old_offline <- options("icd.data.offline" = TRUE)
@@ -19,4 +20,6 @@ on.exit(options(old_interact), add = TRUE)
 writeLines(paste(as.character(icd:::.show_options()), collapse = ", "),
   con = "~/icddebug.txt"
 )
+icd:::.show_options()
 testthat::test_check("icd")
+icd:::.show_options()

@@ -333,8 +333,9 @@
 }
 
 .dir_writable <- function(path) {
-  !dir.exists(path) || !file.access(path, 2)
+  dir.exists(path) && file.access(path, 2) == 0
 }
+
 #' @describeIn set_icd_data_dir Get the currently active data directory, and check it exists and is writable.
 #' @export
 get_icd_data_dir <- function(must_work = TRUE) {
@@ -389,7 +390,8 @@ get_icd_data_dir <- function(must_work = TRUE) {
     absent_action = "silent",
     get_icd_data_dir(must_work = FALSE)
   )
-  !is.null(dir) && !is.na(dir)
+
+  !is.null(dir) && !is.na(dir) && .dir_writable(dir)
 }
 
 .clean_data_dir <- function(rds = FALSE,

@@ -322,11 +322,11 @@ expect_equal_no_icd <- function(object, expected, ...) {
 #' @param lang Language, currently either 'en' or 'fr'
 skip_missing_icd10who <- function(ver = "2016", lang = "en") {
   if (ver == "2016" && lang == "en") {
-    if (is.null(.get_icd10who2016(must_work = FALSE))) {
+    if (!.exists_in_cache("icd10who2016")) {
       testthat::skip("English WHO ICD-10 not available")
     }
   } else if (ver == "2008" && lang == "fr") {
-    if (is.null(.get_icd10who2008fr(must_work = FALSE))) {
+    if (!.exists_in_cache("icd10who2008fr")) {
       testthat::skip("French WHO ICD-10 not available")
     }
   } else {
