@@ -100,11 +100,7 @@ NULL
     options("icd.data.verbose" = ev)
     if (ev) message("Reset verbose option to ICD_DATA_VERBOSE")
   }
-  if (.get_opt("verbose") > 0) {
-    .get_opt("verbose")
-  } else {
-    invisible(.get_opt("verbose"))
-  }
+  invisible(.get_opt("verbose"))
 }
 
 .interact <- function(x) {

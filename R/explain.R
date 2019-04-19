@@ -27,6 +27,11 @@
 #' explain_code(icd9_map_ahrq$CHF[1:3], brief = TRUE)
 #' # The first three in the ICD-10 equivalent are a little different:
 #' explain_code(icd10_map_ahrq$CHF[1:3], brief = TRUE)
+#' \dontrun{
+#' # these may need to download the WHO data first:
+#' explain_code(as.icd10who("B219"), lang="fr")
+#' explain_code(as.icd10who("B219"))
+#' }
 #' @return data frame, or list of data frames, with fields for ICD-9 code, name
 #'   and description. There is no guarantee on the order of the returned
 #'   descriptions. \code{explain_table} is designed to provide results in a
@@ -189,6 +194,8 @@ explain_code.icd10who <- function(x,
   stopifnot(is.logical(short_code), length(short_code) == 1)
   lang <- match.arg(lang)
   if (!missing(condense)) {
+    # minimally condense by dropping duplicates
+    x <- unique(x)
     .NotYetUsed("condense", error = FALSE)
   }
   if (!missing(warn)) {
@@ -198,14 +205,14 @@ explain_code.icd10who <- function(x,
     x <- decimal_to_short.icd10(x)
   }
   # this is a slow linear lookup, but usually only
-  # "explaining" one or a few codes at a time.
+  # "explaining" one or a few codes at a time. Can use a hashed algorithm if this becomes a problem, maybe when used for explain_table on bigger data?
   i <- if (lang == "fr") {
     get_icd10who2008fr()
   } else {
     get_icd10who2016()
   }
   i[
-    i[["code"]] %in% unique(as_char_no_warn(x)),
+    i[["code"]] %in% as_char_no_warn(x),
     "desc"
   ]
 }

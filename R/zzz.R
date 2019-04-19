@@ -10,6 +10,8 @@
   if (.icd_data_dir_okay()) {
    .set_opt(offline = FALSE, overwrite = FALSE)
   }
+  if (is.null(getOption("icd.data.who_url")))
+    options("icd.data.who_url" = "https://icd.who.int/browse10")
 }
 
 .onAttach <- function(libname, pkgname) {

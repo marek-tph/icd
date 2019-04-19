@@ -1,11 +1,5 @@
-#' Functions to get the WHO ICD-10 2016 data
-#'
-#' This is likely to be not exported in the future, as it is designed for the
-#' transition to icd.data version 1.1 or its removal. The user may use
-#' \code{\link{get_icd10who2016}} as if it is a variable. In some situations, it may be
-#' preferable to call this function.
+#' Functions to get the WHO ICD-10 English 2016 and French 2008 data
 #' @param resource Fragment of URL with specific ICD-10 resource requested
-#' @param edition icd10
 #' @param year Four-digit year as integer or character
 #' @template lang
 #' @return
@@ -13,7 +7,6 @@
 #' @keywords internal datasets
 #' @noRd
 .who_api <- function(resource,
-                     edition = "icd10",
                      year = 2016,
                      lang = "en") {
   httr_retry <- httr::RETRY
@@ -25,10 +18,11 @@
       )
     )
   }
-  edition <- match.arg(edition)
-  who_base <- "https://apps.who.int/classifications"
-  json_url <- paste(who_base, edition, "browse", year, lang, resource, sep = "/")
-  # TODO: this stops us using the memoised data, even if available. Seems an unlikely situation, except maybe for local testing. memoise::has_cache(f, ...) lets us test whether a memoise call is cached already.
+  # WHO changed the URL from https://apps.who.int/classifications to
+  # https://icd.who.int/browse10 . Nothing complicated: I set this (if unset) in
+  # zzz.R on package load. If there is another change, the user can update this
+  # with a package update.
+  json_url <- paste(getOption("icd.data.who_url"), year, lang, resource, sep = "/")
   if (.offline() && !.interact()) {
     msg <- "Offline and not interactive, so not attempting WHO data download."
     .absent_action_switch(msg)
@@ -37,8 +31,20 @@
   if (.verbose() > 1) message("Getting WHO data with JSON: ", json_url)
   http_response <- httr_retry("GET", json_url)
   if (hs <- http_response$status_code >= 400) {
-    warning("Unable to fetch resource: ", json_url, " has HTTP status, ", hs)
-    return()
+    if (memoise::has_cache(httr_retry)("GET", json_url)) {
+      if (.verbose() > 1) message("trying again without memoise")
+      http_response <- httr::RETRY()
+      if (hs <- http_response$status_code >= 400) {
+        stop("Still unable to fetch resource: ", json_url,
+                " with HTTP status, ", hs, ". Check your internet connection, ",
+                "retry later, then file an issue at: ",
+                "https://github.com/jackwasey/icd/issues .")
+      }
+      if (.verbose())
+        message("Memoise has cached a failed HTTP request. ",
+                "Consider cleaning the memoise cache.")
+    }
+    # return()
   }
   json_data <- rawToChar(http_response$content)
   jsonlite::fromJSON(json_data)
