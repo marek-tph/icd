@@ -115,6 +115,11 @@ explain_code(icd9_map_ahrq$CHF[1:3], brief = TRUE)
 # The first three in the ICD-10 equivalent are a little different:
 explain_code(icd10_map_ahrq$CHF[1:3], brief = TRUE)
 \dontrun{
+# these may need to download the WHO data first:
+explain_code(as.icd10who("B219"), lang="fr")
+explain_code(as.icd10who("B219"))
+}
+\dontrun{
 # Belgian ICD-10 has three languages available
 explain_code(as.icd10be("C20"))
 # [1] "Malignant neoplasm of rectum"

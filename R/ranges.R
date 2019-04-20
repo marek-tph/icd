@@ -232,17 +232,16 @@ expand_range.icd9 <- function(start, end,
   }
 }
 
-#' expand range worker
+#' Expand range worker
 #'
 #' Expands a range of short ICD-9 codes, dropping ambiguous codes in the middle
 #' of ranges
-#'
 #' @section Ambiguous terminal parent codes: At the end of the output, we may
 #'   not want any higher-level codes at the end which would have children beyond
 #'   the specified range. There could be lots of lower level codes at the end,
 #'   so we actually have to search the whole list to be sure. One parent code
-#'   could have maximum of 110 child codes, so we just search the last 110
-#'   (TODO). This means that even if trying to preserve the ambiguous start,
+#'   could have maximum of 110 child codes, so we could just search the last
+#'   110? This means that even if trying to preserve the ambiguous start,
 #'   setting \code{ex_ambig_end} will have to kill it, if it spills over.
 #' @section Ambiguous starting parent codes: Excluding ambiguous parent codes
 #'   from the start is easier than those near the end of the result. Just remove
@@ -292,7 +291,7 @@ icd9_expand_range_worker <- function(start,
   # end code
   out_env <- vec_to_env_true(lookup$vec[start_index:end_index])
   # do not want to check a load of leaf nodes for children, since they have
-  # none. # TODO: pre-calculate
+  # none.
   leaf_codes <- icd_data_icd9cm_leaf_v32()[["code"]]
   leaf_env <- vec_to_env_true(leaf_codes)
   is_parent <- function(x, defined) {
@@ -318,7 +317,6 @@ icd9_expand_range_worker <- function(start,
     }
     suppressWarnings(rm(list = x, envir = out_env))
   }
-
   if (ex_ambig_end) {
     lapply(ls(out_env), exclude_ambiguous_parent, defined)
   }

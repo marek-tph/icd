@@ -621,10 +621,10 @@ icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE, verbose = FALSE) 
       as.character(yr),
       code = {
         upd <- sapply(out,
-                      FUN = .apply_over_ver_worker,
-                      inner_fun = children_defined.icd10cm,
-                      simplify = FALSE,
-                      USE.NAMES = TRUE
+          FUN = .apply_over_ver_worker,
+          inner_fun = children_defined.icd10cm,
+          simplify = FALSE,
+          USE.NAMES = TRUE
         )
         out <- .apply_over_ver_updater(out, upd)
       }

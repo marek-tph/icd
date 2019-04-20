@@ -104,7 +104,7 @@ simplify_map_lex <- function(pt_codes, map) {
 #' \url{https://eigen.tuxfamily.org/dox/TopicMultiThreading.html}
 #' @keywords internal array algebra
 #' @noRd
-comorbidMatMulWide <- function(data, map, id_name, code_names, validate) {
+comorbid_mat_mul_wide_rcpp <- function(data, map, id_name, code_names, validate) {
     .Call(`_icd_comorbidMatMulWide`, data, map, id_name, code_names, validate)
 }
 
@@ -282,18 +282,21 @@ factor_nosort_rcpp_worker <- function(x, levels, na_rm) {
 #'   e.g. when a level is not available, but NA level is available, NA is
 #'   inserted into the integer vector, not an index to the NA level.
 #' @keywords internal manip
+#' @noRd
 refactor_worker <- function(x, new_levels, exclude_na, validate) {
     .Call(`_icd_refactor`, x, new_levels, exclude_na, validate)
 }
 
 #' @describeIn refactor_worker Drop all \code{NA} values from levels and values
 #' @keywords internal
+#' @noRd
 refactor_narm_worker <- function(x, new_levels, validate) {
     .Call(`_icd_refactor_narm`, x, new_levels, validate)
 }
 
 #' @title Check a factor structure is valid
 #' @keywords internal
+#' @noRd
 factor_is_valid <- function(f) {
     .Call(`_icd_factorIsValid`, f)
 }

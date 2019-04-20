@@ -8,10 +8,11 @@
 
 .onLoad <- function(libname, pkgname) {
   if (.icd_data_dir_okay()) {
-   .set_opt(offline = FALSE, overwrite = FALSE)
+    .set_opt(offline = FALSE, overwrite = FALSE)
   }
-  if (is.null(getOption("icd.data.who_url")))
+  if (is.null(getOption("icd.data.who_url"))) {
     options("icd.data.who_url" = "https://icd.who.int/browse10")
+  }
 }
 
 .onAttach <- function(libname, pkgname) {
@@ -29,7 +30,8 @@
     if (!.exists_icd_data_dir()) {
       packageStartupMessage(
         sQuote("icd"), " downloads data when needed. ",
-        "set_icd_data_dir() creates a data directory. ")
+        "set_icd_data_dir() creates a data directory. "
+      )
       packageStartupMessage(
         "Default location is: ", sQuote(.default_icd_data_dir())
       )
@@ -54,7 +56,7 @@ release_questions <- function() {
   c( # vignette
     "manual rebuild of efficiency and country-lang-vers vignettes",
     # commands:
-    "update_everything() on linux",
+    "update_everything() on linux and mac - should be no diff",
     "aspell_package_Rd_files('.')",
     # documentation:
     "Check all TODO comments, make into github issues",

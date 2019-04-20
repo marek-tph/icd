@@ -29,7 +29,7 @@
 #' explain_code(icd10_map_ahrq$CHF[1:3], brief = TRUE)
 #' \dontrun{
 #' # these may need to download the WHO data first:
-#' explain_code(as.icd10who("B219"), lang="fr")
+#' explain_code(as.icd10who("B219"), lang = "fr")
 #' explain_code(as.icd10who("B219"))
 #' }
 #' @return data frame, or list of data frames, with fields for ICD-9 code, name

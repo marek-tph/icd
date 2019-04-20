@@ -114,8 +114,6 @@ CV icd9ChildrenShort(CV icd9Short, const VecStr &icd9cmReal, bool onlyReal) {
   return rcppOut;
 }
 
-// TODO: icd9ChildrenShortUnordered no NA version
-
 // [[Rcpp::export]]
 CV icd9ChildrenShortUnordered(const CV &icd9Short,
                               const VecStr &icd9cmReal,

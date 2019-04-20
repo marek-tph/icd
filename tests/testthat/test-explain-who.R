@@ -35,14 +35,15 @@ test_that("some codes not in ICD-10-CM", {
     "B20", "B21", "B22", "B23", "B24",
     "B21.9", "B22.7", "B238", "Z21"
   )) {
-    expect_error(regexp = NA,
-                 length(x <- explain_code(as.icd10who(hiv), lang = "fr")) > 0,
-                 info = paste("VIH (HIV) code: ", hiv)
+    expect_error(
+      regexp = NA,
+      length(x <- explain_code(as.icd10who(hiv), lang = "fr")) > 0,
+      info = paste("VIH (HIV) code: ", hiv)
     )
     # workaround https://github.com/r-lib/testthat/issues/867
     expect_true(length(x) &&
-                  all(grepl("VIH", x)),
-                info = paste("VIH (HIV) code: ", hiv)
+      all(grepl("VIH", x)),
+    info = paste("VIH (HIV) code: ", hiv)
     )
     # expect_match(x,
     #   regexp = "VIH",

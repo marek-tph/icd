@@ -59,7 +59,7 @@ poa_choices <- c("yes", "no", "notYes", "notNo")
 #' @template hierarchy
 #' @template return_df
 #' @template return_binary
-#' @template dotdotdot
+#' @param ... Arguments passed through to \code{comorbid}
 #' @param categorize_fun Internal. Function used for the categorization problem.
 #' @param comorbid_fun Internal. Function used inside categorization.
 #' @inheritParams categorize restore_id_order
@@ -131,20 +131,23 @@ poa_choices <- c("yes", "no", "notYes", "notNo")
 #' )
 #' comorbid(two_pts, map = my_map)
 #' @export
-comorbid <- function(x, map,
+comorbid <- function(x,
+                     map,
                      visit_name = NULL,
                      icd_name = NULL,
                      short_code = guess_short(x, icd_name = icd_name),
                      short_map = guess_short(map),
-                     return_df = FALSE, return_binary = FALSE,
+                     return_df = FALSE,
+                     return_binary = FALSE,
                      categorize_fun = categorize_simple,
-                     ...)
+                     ...) {
   switch_ver_cmb(x,
     funs = list(icd9 = icd9_comorbid, icd10 = icd10_comorbid),
     map = map, visit_name = visit_name, icd_name = icd_name,
     short_code = short_code, return_df = return_df,
     return_binary = return_binary, ...
   )
+}
 
 #' @describeIn comorbid ICD-10 comorbidities
 #' @param icd10_comorbid_fun Internal function Default will be fast and

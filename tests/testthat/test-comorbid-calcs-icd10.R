@@ -51,9 +51,11 @@ test_that("ahrq comorbidities found for test data", {
     icd10_all_ahrq_one_pt$icd10_code,
     random_string(nrow(test_three), max_chars = 5)
   )
-  td <- list(icd10_all_ahrq_one_pt = icd10_all_ahrq_one_pt,
-                   test_two = test_two,
-                   test_three = test_three)
+  td <- list(
+    icd10_all_ahrq_one_pt = icd10_all_ahrq_one_pt,
+    test_two = test_two,
+    test_three = test_three
+  )
   for (test_name in names(td)) {
     expect_error(res <- comorbid(td[[test_name]], map = icd10_map_ahrq), regexp = NA, info = test_name)
     for (n in colnames(res))

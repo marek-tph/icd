@@ -35,14 +35,19 @@
       if (.verbose() > 1) message("trying again without memoise")
       http_response <- httr::RETRY()
       if (hs <- http_response$status_code >= 400) {
-        stop("Still unable to fetch resource: ", json_url,
-                " with HTTP status, ", hs, ". Check your internet connection, ",
-                "retry later, then file an issue at: ",
-                "https://github.com/jackwasey/icd/issues .")
+        stop(
+          "Still unable to fetch resource: ", json_url,
+          " with HTTP status, ", hs, ". Check your internet connection, ",
+          "retry later, then file an issue at: ",
+          "https://github.com/jackwasey/icd/issues ."
+        )
       }
-      if (.verbose())
-        message("Memoise has cached a failed HTTP request. ",
-                "Consider cleaning the memoise cache.")
+      if (.verbose()) {
+        message(
+          "Memoise has cached a failed HTTP request. ",
+          "Consider cleaning the memoise cache."
+        )
+      }
     }
     # return()
   }
@@ -153,7 +158,6 @@
       three_digit <- hier_code[hier_three_digit_idx]
       major <- hier_desc[hier_three_digit_idx]
       if (!this_child_up_hier && !is.na(three_digit)) {
-        # TODO: consider add the chapter, subchapter codes
         new_item <- data.frame(
           code = child_code,
           leaf = is_leaf,

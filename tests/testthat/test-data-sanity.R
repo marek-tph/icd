@@ -1,13 +1,9 @@
 context("data sanity")
 
-pkg_ns <- asNamespace("icd")
-lazy_env <- pkg_ns$.__NAMESPACE__.$lazydata
-
 test_that("row numbers and factors are sequential for data frames", {
   skip_slow()
-  # TODO: also for cached data in ~/.icd.data
-  for (data_name in ls(envir = lazy_env)) {
-    d <- get(data_name, envir = lazy_env)
+  for (data_name in c(.ls_lazy(), .ls())) {
+    d <- .get_anywhere(data_name)
     if (!is.data.frame(d) || grepl("map", data_name)) next
     expect_gt(nrow(d), 1)
     expect_gt(ncol(d), 1)

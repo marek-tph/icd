@@ -77,13 +77,13 @@
         stop("Not saved in package data.")
       }
     }
-  save(
-    list = var_name,
-    envir = envir,
-    file = out_file,
-    compress = compress
-  )
-  message("Now reload package to enable updated/new data: ", var_name)
+    save(
+      list = var_name,
+      envir = envir,
+      file = out_file,
+      compress = compress
+    )
+    message("Now reload package to enable updated/new data: ", var_name)
   } else {
     message("No change in data, so not re-saving.")
   }

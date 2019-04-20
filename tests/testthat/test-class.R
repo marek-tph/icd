@@ -47,7 +47,6 @@ test_that("well ordered class lists short/decimal ICD combos are created", {
 })
 
 test_that("is short or decimal code", {
-  # todo, somehow clarify that this is not the same is is_valid...
   expect_true(is.short_diag(as.short_diag("1234")))
   expect_true(is.decimal_diag(as.decimal_diag("12.34")))
   expect_true(is.short_diag(as.short_diag("1234")))

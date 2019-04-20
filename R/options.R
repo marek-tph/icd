@@ -1,9 +1,11 @@
-.opt_names <- c("verbose",
-                "resource",
-                "icd10cm_active_year",
-                "offline",
-                "test_slow",
-                "interact")
+.opt_names <- c(
+  "verbose",
+  "resource",
+  "icd10cm_active_year",
+  "offline",
+  "test_slow",
+  "interact"
+)
 
 .opt_full_name <- function(opt_name) paste0("icd.data.", opt_name)
 
@@ -20,7 +22,8 @@
       sep = "=",
       collapse = ", "
     ),
-    fill = TRUE)
+    fill = TRUE
+  )
 }
 
 #' Set initial options for the package
@@ -62,10 +65,12 @@ NULL
           stop("Option ", sQuote(o), " is not a valid icd option.")
         }
         if (overwrite || is.null(.get_opt(o))) {
-          if (.verbose() > 1)
+          if (.verbose() > 1) {
             message("Writing option ", sQuote(o))
-          if (overwrite && .verbose() > 1)
+          }
+          if (overwrite && .verbose() > 1) {
             message("overwriting the previous value: ", getOption(o))
+          }
           args <- list(f[[o]])
           names(args) <- .opt_full_name(o)
           do.call(options, args = args)
@@ -106,7 +111,7 @@ NULL
 .interact <- function(x) {
   if (missing(x)) {
     if (is.na(.get_opt("interact", default = NA)) &&
-        !is.na(Sys.getenv("ICD_DATA_INTERACT", unset = NA))) {
+      !is.na(Sys.getenv("ICD_DATA_INTERACT", unset = NA))) {
       if (.verbose() > 1) message("Setting interactivity with env var")
       .set_opt("interact" = .env_var_is_true("ICD_DATA_INTERACT"))
     }
@@ -131,16 +136,16 @@ NULL
     .set_opt("offline" = x, overwrite = TRUE)
   } else {
     stop("offline() requires a single logical value, or a missing value.")
-    #options("icd.data.offline" = !.env_var_is_false("ICD_DATA_OFFLINE"))
+    # options("icd.data.offline" = !.env_var_is_false("ICD_DATA_OFFLINE"))
   }
   invisible(.get_opt("offline"))
 }
 
 .test_slow <- function(x) {
   if (missing(x)) {
-    return(.get_opt("test_slow"))
+    return(.get_opt("test_slow", default = FALSE))
   }
-  stopifnot(is.logical(x))
+  stopifnot(is.logical(x) && length(x) == 1)
   Sys.setenv("ICD_TEST_SLOW" = x)
   options("icd.data.test_slow" = x)
   invisible(x)
@@ -283,8 +288,10 @@ set_icd_data_dir <- function(path = NULL) {
     message("Trying the default icd data cache: ", path)
   }
   if (is.null(path)) {
-    stop("Unable to find a path to use for icd data cache. Try ",
-         sQuote("set_icd_data_dir(\"/path/with/write/access\")"))
+    stop(
+      "Unable to find a path to use for icd data cache. Try ",
+      sQuote("set_icd_data_dir(\"/path/with/write/access\")")
+    )
   }
   if (!dir.exists(path)) {
     created <- dir.create(path, showWarnings = TRUE)

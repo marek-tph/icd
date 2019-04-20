@@ -303,8 +303,9 @@
   }
   if (missing(path)) path <- .default_icd_data_dir()
   if (!dir.exists(path)) {
-    if (!dir.create(path, recursive = TRUE, showWarnings = FALSE))
+    if (!dir.create(path, recursive = TRUE, showWarnings = FALSE)) {
       stop("Could not create directory at: ", sQuote(path))
+    }
   }
   if (file.access(path, 2) != 0) {
     stop("icd default data path ", sQuote(path), " is not writable")
@@ -334,14 +335,18 @@ get_icd_data_dir <- function(must_work = TRUE) {
   )
   o <- .get_opt("resource")
   if (!is.null(o)) {
-    if (.verbose() > 1) message(
-      "icd.data.resource options set to: ", o, ", so using it."
-    )
+    if (.verbose() > 1) {
+      message(
+        "icd.data.resource options set to: ", o, ", so using it."
+      )
+    }
     if (!.dir_writable(o)) {
-      msg <- paste("icd.data.resource option set to:", o,
-                   "but the location is not writable or doesn't exist.",
-                   get_started)
-            if (must_work) {
+      msg <- paste(
+        "icd.data.resource option set to:", o,
+        "but the location is not writable or doesn't exist.",
+        get_started
+      )
+      if (must_work) {
         stop(msg)
       } else {
         if (.verbose()) message(msg)
@@ -351,15 +356,19 @@ get_icd_data_dir <- function(must_work = TRUE) {
   } else {
     o <- .default_icd_data_dir()
     if (dir.exists(o) && .dir_writable(o)) {
-      if (.verbose() > 1) message(
-        "icd.data.resource option not set, but default path: ",
-        sQuote(o), " exists, so using it and setting option."
-      )
+      if (.verbose() > 1) {
+        message(
+          "icd.data.resource option not set, but default path: ",
+          sQuote(o), " exists, so using it and setting option."
+        )
+      }
       .set_opt("resource" = o)
     } else {
-      msg <- paste("icd.data.resource not set and default location",
-                   sQuote(o), "is not writable or doesn't exist.",
-                   get_started)
+      msg <- paste(
+        "icd.data.resource not set and default location",
+        sQuote(o), "is not writable or doesn't exist.",
+        get_started
+      )
       if (must_work) {
         stop(msg)
       } else {
@@ -385,8 +394,9 @@ get_icd_data_dir <- function(must_work = TRUE) {
                             raw = FALSE,
                             destroy = FALSE) {
   if (destroy) {
-    if (askYesNo("Destroy entire resource directory?"))
+    if (askYesNo("Destroy entire resource directory?")) {
       unlink(get_icd_data_dir(), recursive = TRUE)
+    }
     return(invisible())
   }
   if (memoise) {
@@ -398,9 +408,9 @@ get_icd_data_dir <- function(must_work = TRUE) {
   }
   if (raw) {
     raw_files <- list.files(get_icd_data_dir(),
-                            pattern = "(\\.txt$)|(\\.xlsx$)",
-                            ignore.case = TRUE,
-                            full.names = TRUE
+      pattern = "(\\.txt$)|(\\.xlsx$)",
+      ignore.case = TRUE,
+      full.names = TRUE
     )
     message("Deleting:")
     print(raw_files)
@@ -411,7 +421,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
     message("Deleting:")
     print(rds_files)
     unlink(rds_files,
-           recursive = FALSE
+      recursive = FALSE
     )
   }
 }
@@ -504,5 +514,4 @@ get_icd_data_dir <- function(must_work = TRUE) {
   } else {
     stop("neither or both directories exist")
   }
-
 }

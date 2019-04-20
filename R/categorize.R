@@ -126,12 +126,13 @@ comorbid_common <- function(...,
   )
 }
 
+# need to wrap just for validate default option
 comorbid_mat_mul_wide <- function(data,
                                   map,
                                   id_name,
                                   code_name,
                                   validate = FALSE) {
-  comorbidMatMulWide(
+  comorbid_mat_mul_wide_rcpp(
     data = data,
     map = map,
     id_name = id_name,
