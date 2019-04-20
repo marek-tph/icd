@@ -127,7 +127,7 @@ matrix:
     compiler: gcc
     # ?have to reinstall Rcpp with compiler and libc++ -> libstdc++ change
     env:
-      - MATRIX_EVAL="command -v g++-8 >/dev/null 2>&1 && { brew install gcc && echo 'CC=gcc-8' >> ~/.R/Makevars && echo 'CXX=g++-8' >> ~/.R/Makevars && echo 'CXX11=g++-8' >> ~/.R/Makevars && Rscript -e 'install.packages(\"Rcpp\", type = \"source\")'; }"
+      - MATRIX_EVAL="command -v g++-8 >/dev/null 2>&1 || brew install gcc && echo 'CC=gcc-8' >> ~/.R/Makevars && echo 'CXX=g++-8' >> ~/.R/Makevars && echo 'CXX11=g++-8' >> ~/.R/Makevars && Rscript -e 'install.packages(\"Rcpp\", type = \"source\")'"
       - ICD_MINI_BENCH=true
   # r-devel currently failing to download for macos, so release for now.
   # also see https://docs.travis-ci.com/user/reference/osx
@@ -136,7 +136,7 @@ matrix:
     osx_image: xcode10.2
     compiler: gcc
     env:
-      - MATRIX_EVAL="brew install gcc && echo 'CC=gcc-8' >> ~/.R/Makevars && echo 'CXX=g++-8' >> ~/.R/Makevars && echo 'CXX11=g++-8' >> ~/.R/Makevars && Rscript -e 'install.packages(\"Rcpp\", type = \"source\")'"
+      - MATRIX_EVAL="command -v g++-8 >/dev/null 2>&1 || brew install gcc && echo 'CC=gcc-8' >> ~/.R/Makevars && echo 'CXX=g++-8' >> ~/.R/Makevars && echo 'CXX11=g++-8' >> ~/.R/Makevars && Rscript -e 'install.packages(\"Rcpp\", type = \"source\")'"
   - r: release
     os: osx
     # as of April 2019, default osx image is 9.4
