@@ -291,20 +291,6 @@
   }
 }
 
-.available <- function(var_name, ...) {
-  with_absent_action(
-    absent_action = "silent",
-    with_offline(offline = TRUE, {
-      !is.null(
-        .fetch(
-          var_name = var_name,
-          ...
-        )
-      )
-    })
-  )
-}
-
 .exists_icd_data_dir <- function() {
   path <- .get_opt("resource")
   !is.null(path) && dir.exists(path)
@@ -503,4 +489,20 @@ get_icd_data_dir <- function(must_work = TRUE) {
 #' @noRd
 .ls_icd_data <- function() {
   utils::data(package = "icd")$results[, "Item"]
+}
+
+.hide_resource_dir <- function() {
+  dir <- get_icd_data_dir(must_work = FALSE)
+  if (is.na(dir)) dir <- .default_icd_data_dir()
+  hidden_dir <- paste0(dir, ".hidden")
+  if (dir.exists(dir) && !dir.exists(hidden_dir)) {
+    file.rename(dir, hidden_dir)
+    message("hidden")
+  } else if (dir.exists(hidden_dir) && !dir.exists(dir)) {
+    file.rename(hidden_dir, dir)
+    message("replaced")
+  } else {
+    stop("neither or both directories exist")
+  }
+
 }
