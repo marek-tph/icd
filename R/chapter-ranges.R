@@ -12,56 +12,59 @@
   )
 }
 
-.icd9_generate_chap_lookup <-
-  function(chapters = icd9_chapters,
-             prefix = "chap") {
-    stopifnot(is.list(chapters), is.character(prefix))
-    df_rows <- lapply(
-      names(chapters),
-      function(nm) {
-        chap <- chapters[[nm]]
-        data.frame(
-          .erm9(
-            as.icd9cm(chap["start"]),
-            as.icd9cm(chap["end"]),
-            defined = FALSE
-          ),
-          nm
-        )
-      }
-    )
-    chap_lookup <- do.call(rbind, df_rows)
-    names(chap_lookup) <- c(
-      paste0(prefix, "_major"),
-      paste0(prefix, "_desc")
-    )
-    chap_lookup
-  }
+.icd9_generate_chap_lookup <- function(chapters = icd9_chapters,
+                                       prefix = "chap") {
+  stopifnot(is.list(chapters), is.character(prefix))
+  df_rows <- lapply(
+    names(chapters),
+    function(nm) {
+      chap <- chapters[[nm]]
+      data.frame(
+        .memoised$erm9(
+          as.icd9cm(chap["start"]),
+          as.icd9cm(chap["end"]),
+          defined = FALSE
+        ),
+        nm
+      )
+    }
+  )
+  chap_lookup <- do.call(rbind, df_rows)
+  names(chap_lookup) <- c(
+    paste0(prefix, "_major"),
+    paste0(prefix, "_desc")
+  )
+  chap_lookup
+}
 
-.icd10_generate_chap_lookup <-
-  function(chapters = icd10_chapters,
-             prefix = "chap") {
-    stopifnot(is.list(chapters), is.character(prefix))
-    df_rows <- lapply(
-      names(chapters),
-      function(nm) {
-        chap <- chapters[[nm]]
-        data.frame(
-          .erm10(
-            as.icd10cm(chap["start"]),
-            as.icd10cm(chap["end"]),
-            defined = FALSE
-          ),
-          nm
-        )
-        # ICD-10 is not in leixcographic order. E.g., C7A is not in the same group
-        # as C76-C80
-      }
-    )
-    chap_lookup <- do.call(rbind, df_rows)
-    names(chap_lookup) <- c(
-      paste0(prefix, "_major"),
-      paste0(prefix, "_desc")
-    )
-    chap_lookup
-  }
+.icd10_generate_chap_lookup <- function(chapters = icd10_chapters,
+                                        prefix = "chap") {
+  #browser()
+  verbose <- .verbose()
+  stopifnot(is.list(chapters), is.character(prefix))
+  df_rows <- lapply(
+    names(chapters),
+    function(nm) {
+      chap <- chapters[[nm]]
+      if (verbose > 3)
+        message("icd10 chap lookup: ", paste(chap, collapse = ", "))
+      data.frame(
+        # .memoised$erm10
+        expand_range_major.icd10cm(
+          as.icd10cm(unname(chap["start"])),
+          as.icd10cm(unname(chap["end"])),
+          defined = FALSE
+        ),
+        nm
+      )
+      # TODO: ICD-10 is not in leixcographic order. E.g., C7A is not in the same group
+      # as C76-C80. Sort here?
+    }
+  )
+  chap_lookup <- do.call(rbind, df_rows)
+  names(chap_lookup) <- c(
+    paste0(prefix, "_major"),
+    paste0(prefix, "_desc")
+  )
+  chap_lookup
+}

@@ -127,10 +127,6 @@
   )
 }
 
-.clean_env <- function() {
-  rm(list = ls(.icd_data_env, all.names = TRUE), envir = .icd_data_env)
-}
-
 .make_getter <- function(var_name) {
   force(var_name)
   getter_fun <- function(alt = NULL,
@@ -389,10 +385,14 @@ get_icd_data_dir <- function(must_work = TRUE) {
   !is.null(dir) && !is.na(dir) && .dir_writable(dir)
 }
 
-.clean_data_dir <- function(rds = FALSE,
-                            memoise = FALSE,
-                            raw = FALSE,
-                            destroy = FALSE) {
+.clean <- function(env = TRUE,
+                   rds = FALSE,
+                   memoise = FALSE,
+                   raw = FALSE,
+                   destroy = FALSE) {
+  if (env) {
+        rm(list = ls(.icd_data_env, all.names = TRUE), envir = .icd_data_env)
+  }
   if (destroy) {
     if (askYesNo("Destroy entire resource directory?")) {
       unlink(get_icd_data_dir(), recursive = TRUE)

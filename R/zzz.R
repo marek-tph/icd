@@ -5,6 +5,58 @@
 .make_getters_and_fetchers()
 # Set up an environment to cache chars_in_icd10cm
 .lookup_chars_in_icd10cm <- new.env(parent = emptyenv())
+# env just to hold a function we create on the fly, but don't want to do multiple times
+.memoised <- new.env(parent = emptyenv())
+
+.make_httr_retry <- function() {
+  if (.have_memoise()) {
+    memoise::memoise(
+      httr::RETRY,
+      cache = memoise::cache_filesystem(
+        file.path(
+          get_icd_data_dir(),
+          "memoise")
+      )
+    )
+  } else {
+    httr::RETRY
+  }
+}
+
+.make_make_memoised <- function() {
+  assign("httr_retry", .make_httr_retry(), .memoised)
+  assign("erm9", .make_erm9(), .memoised)
+  assign("erm10", .make_erm10(), .memoised)
+}
+
+# if I generate memoise function each time, it crashes Rstudio, but not R, when
+# called! Maybe something to do with memory size creating a huge number of new
+# memoised functions, which is not what I intended, anyway.
+.make_erm9 <- function() {
+  if (requireNamespace("memoise", quietly = TRUE)) {
+    memoise::memoise(
+      expand_range_major.icd9,
+      cache = memoise::cache_filesystem(
+        file.path(get_icd_data_dir(), "memoise")
+      )
+    )
+  } else {
+    expand_range_major.icd9
+  }
+}
+
+.make_erm10 <- function() {
+  if (requireNamespace("memoise", quietly = TRUE)) {
+    memoise::memoise(
+      expand_range_major.icd10cm
+      # cache = memoise::cache_filesystem(
+      #   file.path(get_icd_data_dir(), "memoise")
+      # )
+    )
+  } else {
+    expand_range_major.icd10cm
+  }
+}
 
 .onLoad <- function(libname, pkgname) {
   if (.icd_data_dir_okay()) {
@@ -13,6 +65,11 @@
   if (is.null(getOption("icd.data.who_url"))) {
     options("icd.data.who_url" = "https://icd.who.int/browse10")
   }
+  # need to make these functions at time of package loading: if memoise is
+  # present, we use it. We cannot keep recreating the same memoised function
+  # multiple times, as it seems to cause Rstudio (but no obviously plain R) to
+  # crash.
+  .make_make_memoised()
 }
 
 .onAttach <- function(libname, pkgname) {

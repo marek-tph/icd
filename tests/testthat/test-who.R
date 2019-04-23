@@ -26,3 +26,8 @@ test_that("No ranges or NA in code section of WHO data", {
     expect_true(!anyDuplicated(i$code), info = nm)
   }
 })
+
+test_that("HIV is problematic for some reason", {
+  b21 <- .who_api_children("B21")
+  expect_match(b21$ID, "^B21\\.[0-9]$")
+})

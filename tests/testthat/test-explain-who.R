@@ -5,14 +5,25 @@ test_that("some codes not in ICD-10-CM", {
   skip_missing_icd10who()
   for (hiv in c(
     "B20", "B21", "B22", "B23", "B24",
-    "B21.9", "B22.7", "B238", "Z21"
+    "B211",
+    "B21.1",
+    "B219",
+    "B21.9",
+    "B22.7", "B238", "Z21"
   )) {
-    expect_match(x <- explain_code(as.icd10who(hiv)),
-      "HIV",
-      info = paste("HIV code: ", hiv)
+    info <- paste("HIV code: ", hiv)
+    expect_error(
+      regexp = NA,
+      x <- explain_code(as.icd10who(hiv), lang = "en"),
+      info = info
     )
-    expect_identical(x, explain_code(as.icd10who(hiv)))
-    expect_length(x, 1)
+    expect_true(length(x) == 1, info = info)
+    # workaround https://github.com/r-lib/testthat/issues/867
+    expect_true(
+      all(
+        grepl("HIV", x)),
+      info = info
+    )
   }
 })
 
@@ -26,7 +37,7 @@ test_that("hand-picked WHO-only codes okay", {
 
 context("explain WHO French codes")
 
-test_that("some codes not in ICD-10-CM", {
+test_that("some WHO codes are not in ICD-10-CM", {
   # For testing when icd.data may be wrong version:
   skip_missing_icd10who()
   # https://icd.who.int/browse10/2008/fr#/Z21
@@ -37,7 +48,7 @@ test_that("some codes not in ICD-10-CM", {
   )) {
     expect_error(
       regexp = NA,
-      length(x <- explain_code(as.icd10who(hiv), lang = "fr")) > 0,
+      x <- explain_code(as.icd10who(hiv), lang = "fr"),
       info = paste("VIH (HIV) code: ", hiv)
     )
     # workaround https://github.com/r-lib/testthat/issues/867

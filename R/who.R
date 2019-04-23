@@ -9,31 +9,26 @@
 .who_api <- function(resource,
                      year = 2016,
                      lang = "en") {
-  httr_retry <- httr::RETRY
-  if (.have_memoise()) {
-    httr_retry <- memoise::memoise(
-      httr_retry,
-      cache = memoise::cache_filesystem(
-        file.path(get_icd_data_dir(), "memoise")
-      )
-    )
-  }
   # WHO changed the URL from https://apps.who.int/classifications to
   # https://icd.who.int/browse10 . Nothing complicated: I set this (if unset) in
   # zzz.R on package load. If there is another change, the user can update this
   # with a package update.
-  json_url <- paste(getOption("icd.data.who_url"), year, lang, resource, sep = "/")
+  json_url <- paste(
+    getOption("icd.data.who_url"),
+    year,
+    lang,
+    resource,
+    sep = "/")
   if (.offline() && !.interact()) {
     msg <- "Offline and not interactive, so not attempting WHO data download."
     .absent_action_switch(msg)
     return(NULL)
   }
   if (.verbose() > 1) message("Getting WHO data with JSON: ", json_url)
-  http_response <- httr_retry("GET", json_url)
+  http_response <- .memoised$httr_retry("GET", json_url)
   if (hs <- http_response$status_code >= 400) {
-    if (memoise::has_cache(httr_retry)("GET", json_url)) {
-      if (.verbose() > 1) message("trying again without memoise")
-      http_response <- httr::RETRY()
+      if (.verbose() > 1) message("trying once more (without memoise)")
+      http_response <- httr::RETRY("GET", json_url)
       if (hs <- http_response$status_code >= 400) {
         stop(
           "Still unable to fetch resource: ", json_url,
@@ -48,9 +43,7 @@
           "Consider cleaning the memoise cache."
         )
       }
-    }
-    # return()
-  }
+  } # end 400+
   json_data <- rawToChar(http_response$content)
   jsonlite::fromJSON(json_data)
 }
@@ -71,18 +64,31 @@
   )[["label"]]
 }
 
+#' Get the children of a concept (ICD-10 chapter, code or range)
+#' @param concept_id NULl for root, concept string for any leaf or intermediate.
+#' @examples
+#' .who_api_children("XXII")
+#' .who_api_children("U84")
+#' # U85 is a leaf node, returns no children as empty list
+#' .who_api_children("U82-U85")
+#' # https://icd.who.int/browse10/2016/en#/U85
+#' .who_api_children("U85")
+#' # https://icd.who.int/browse10/2016/en#/P90
+#' .who_api_children("P90-P96")
+#' .who_api_children("P90")
+#' @keywords internal
+#' @noRd
 .who_api_children <- function(concept_id = NULL, ...) {
-  if (is.null(concept_id)) {
-    .who_api(resource = "JsonGetRootConcepts?useHtml=false", ...)
+  resource <- if (is.null(concept_id)) {
+    "JsonGetRootConcepts?useHtml=false"
   } else {
-    .who_api(
-      resource = paste0(
-        "JsonGetChildrenConcepts?ConceptId=",
-        concept_id,
-        "&useHtml=false"
-      ), ...
+    paste0(
+      "JsonGetChildrenConcepts?ConceptId=",
+      concept_id,
+      "&useHtml=false"
     )
   }
+  .who_api(resource = resource, ...)
 }
 
 #' Use public interface to fetch ICD-10 WHO data for a given version
@@ -95,6 +101,9 @@
 #' @param year integer 4-digit year
 #' @param lang Currently it seems only 'en' works
 #' @param ... further arguments passed to self recursively, or \code{.who_api}
+#' @examples
+#' .make_make_httr_retry()
+#' .dl_icd10who(year = 2016, lang = "en", concept_id = "B20-B24")
 #' @keywords internal
 #' @noRd
 .dl_icd10who <- function(concept_id = NULL,
@@ -103,10 +112,24 @@
                          progress = TRUE,
                          hier_code = character(),
                          hier_desc = character(),
+                         parallel = TRUE,
                          ...) {
   verbose <- .verbose()
-  if (verbose > 1) print(hier_code)
-  if (verbose > 1) message(".who_api_tree with concept_id = ", concept_id)
+  if (parallel) {
+    progress <- FALSE
+    if (verbose > 1) {
+      message("Parallel WHO processing disabled with this verbosity level")
+      parallel <- FALSE
+    } else if (verbose)
+      message("Parallel WHO prevents messages in child processes")
+
+  }
+  if (verbose > 1) {
+    message(".who_api with concept_id = ",
+            ifelse(is.null(concept_id), "NULL", concept_id)
+    )
+  }
+  if (verbose > 1) message(paste(hier_code, collapse = " -> "))
   if (.offline()) {
     if (verbose) message("Returning NULL because offline")
     return()
@@ -128,7 +151,8 @@
   new_hier <- length(hier_code) + 1
   # parallel mcapply is about 2-3x as fast, but may get throttled for multiple
   # connections. It seems to get up to about 10-15, which is reasonable.
-  all_new_rows <- parallel::mclapply(
+  ap <- if (parallel) parallel::mclapply else lapply
+  all_new_rows <- ap(
     seq_len(nrow(tree_json)),
     function(branch) {
       new_rows <- data.frame(
@@ -150,7 +174,7 @@
       hier_desc[new_hier] <- child_desc
       sub_sub_chapter <- NA
       hier_three_digit_idx <- which(nchar(hier_code) == 3 &
-        !grepl("[XVI-]", hier_code))
+                                      !grepl("[XVI-]", hier_code))
       if (length(hier_code) >= 3 && nchar(hier_code[3]) > 3) {
         sub_sub_chapter <- hier_desc[3]
       }
@@ -173,7 +197,8 @@
         new_rows <- rbind(new_rows, new_item)
       }
       if (!is_leaf) {
-        if (verbose > 1) message("Not a leaf, so recursing")
+        if (verbose > 1) message(paste(new_rows$code, collapse = ", "),
+                                 " not a leaf, so recursing")
         if (progress) cat(".")
         recursed_rows <- .dl_icd10who(
           concept_id = child_code,
@@ -188,14 +213,19 @@
       } # not leaf
       new_rows
     }
-  ) # loop
+  ) # lapply loop
   if (verbose > 1) {
     message(
       "leaving recursion with length(all_new_rows) = ",
       length(all_new_rows)
     )
+    if (verbose > 2 && length(all_new_rows$code)) {
+      print(paste(all_new_rows$code, collapse = ", "))
+    }
   }
-  # just return the rows (we are recursing so can't save anything in this function). Parser can do this.
+  # just return the rows (we are recursing so can't save anything in this
+  # function). Parser can do this.
+  if (progress) cat(fill = TRUE)
   do.call(rbind, all_new_rows)
 }
 

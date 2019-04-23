@@ -175,7 +175,7 @@ explain_code.icd10cm <- function(x,
   ]
 }
 
-#' @describeIn explain_code WHO ICD-10 explanation
+#' @describeIn explain_code WHO ICD-10 explanation in French or English
 #' @export
 explain_code.icd10who <- function(x,
                                   short_code = guess_short(x),

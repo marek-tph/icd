@@ -71,7 +71,7 @@ conversion can also be done by the internal functions
 \code{icd:::logical_to_binary} and \code{icd:::binary_to_logical}, or using
 other tools, e.g. \code{apply(x, 2, as.integer)}}
 
-\item{...}{arguments passed on to other functions}
+\item{...}{Arguments passed through to \code{comorbid}}
 
 \item{abbrev_names}{single logical value that defaults to \code{TRUE}, in
 which case the shorter human-readable names stored in e.g.

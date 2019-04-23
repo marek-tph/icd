@@ -116,7 +116,7 @@ explain_code(icd9_map_ahrq$CHF[1:3], brief = TRUE)
 explain_code(icd10_map_ahrq$CHF[1:3], brief = TRUE)
 \dontrun{
 # these may need to download the WHO data first:
-explain_code(as.icd10who("B219"), lang="fr")
+explain_code(as.icd10who("B219"), lang = "fr")
 explain_code(as.icd10who("B219"))
 }
 \dontrun{

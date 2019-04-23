@@ -16,9 +16,17 @@ icd_data_icd9cm_leaf_v32 <- function() {
 }
 
 .get_anywhere <- function(var_name, fetch = FALSE) {
-  ns <- asNamespace("icd")
+  if (.verbose()) {
+    message(".get_anywhere: ", var_name)
+    if (.exists_in_lazy(var_name)) message("lazy")
+    if (.exists_in_cache(var_name)) message("cache")
+    ns <- asNamespace("icd")
+    if (exists(var_name, ns)) message("from package namespace itself")
+    if (fetch) message("will try to fetch") else message("not going to fetch")
+    }
   if (.exists_in_lazy(var_name)) return(.get_lazy(var_name))
   if (.exists_in_cache(var_name)) return(.get_from_cache(var_name))
+  ns <- asNamespace("icd")
   if (exists(var_name, ns)) return(get(var_name, ns))
   if (fetch && exists(.get_fetcher_name(var_name), ns, mode = "function")) {
     return(.get_fetcher_fun(var_name)())
