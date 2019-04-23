@@ -96,7 +96,7 @@ ICD version
 \item \code{icd10cm}: ICD-10-CM explanation, current a minimal
 implementation
 
-\item \code{icd10who}: WHO ICD-10 explanation
+\item \code{icd10who}: WHO ICD-10 explanation in French or English
 
 \item \code{icd10fr}: ICD-10-FR explanation, initial implementation, subject to change
 

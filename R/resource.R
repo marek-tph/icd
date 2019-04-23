@@ -391,7 +391,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
                    raw = FALSE,
                    destroy = FALSE) {
   if (env) {
-        rm(list = ls(.icd_data_env, all.names = TRUE), envir = .icd_data_env)
+    rm(list = ls(.icd_data_env, all.names = TRUE), envir = .icd_data_env)
   }
   if (destroy) {
     if (askYesNo("Destroy entire resource directory?")) {
@@ -440,7 +440,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
       "It will be saved in an OS-specific data directory, ",
       "or according to the R option: ", sQuote("icd.data.resource")
     )
-    if (!is.null(msg)) message(msg)
+    if (.verbose() && !is.null(msg)) message(msg)
     ok <- isTRUE(
       askYesNo(
         "May I download and cache a few MB per ICD edition as needed?"

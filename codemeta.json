@@ -141,18 +141,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "memoise",
-      "name": "memoise",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=memoise"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "nhds",
       "name": "nhds",
       "provider": {
@@ -308,5 +296,5 @@
     "https://www.repostatus.org/#active"
   ],
   "relatedLink": "https://CRAN.R-project.org/package=icd",
-  "fileSize": "5014.318KB"
+  "fileSize": "5037.061KB"
 }

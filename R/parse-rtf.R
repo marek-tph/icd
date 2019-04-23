@@ -555,33 +555,40 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
     if (d == "730.95" && .verbose() > 4) browser()
     dupe_rows <- which(names(out) == d)
     if (all(out[dupe_rows[1]] == out[dupe_rows[-1]])) {
-      if (.verbose() > 3)
+      if (.verbose() > 3) {
         message("dropping simple dupes, d = ", d)
+      }
       out <- out[-dupe_rows[-1]]
       if (.verbose() > 3) message("next d")
       next
-      ;
     }
     if (.verbose() > 2) message("about to get nchar dupe descs")
     desclengths <- nchar(out[dupe_rows])
     max_len <- max(desclengths)
     if (.verbose()) {
-      message("removing differing duplicates: ",
-              paste(unique(names(out[dupe_rows])), collapse = ", "),
-              ", with values: ",
-              paste(out[dupe_rows])
+      message(
+        "removing differing duplicates: ",
+        paste(unique(names(out[dupe_rows])), collapse = ", "),
+        ", with values: ",
+        paste(out[dupe_rows])
       )
       if (.verbose() > 2) {
         if (.verbose() > 9) browser()
         message("desclengths: ", paste(desclengths, collapse = ", "))
         message("max_len: ", max_len)
-        message("which(desclengths != max_len): ",
-                which(desclengths != max_len))
+        message(
+          "which(desclengths != max_len): ",
+          which(desclengths != max_len)
+        )
         message("dupe_rows: ", paste(dupe_rows, collapse = ", "))
-        message("dupe_rows[-which(desclengths != max_len)]: ",
-                dupe_rows[-which(desclengths != max_len)])
-        message("out[-dupe_rows[-which(desclengths != max_len)]]",
-                out[dupe_rows[-which(desclengths != max_len)]])
+        message(
+          "dupe_rows[-which(desclengths != max_len)]: ",
+          dupe_rows[-which(desclengths != max_len)]
+        )
+        message(
+          "out[-dupe_rows[-which(desclengths != max_len)]]",
+          out[dupe_rows[-which(desclengths != max_len)]]
+        )
       }
     }
     out <- out[-dupe_rows[-which(desclengths != max_len)]]

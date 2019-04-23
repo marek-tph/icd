@@ -23,7 +23,7 @@ icd_data_icd9cm_leaf_v32 <- function() {
     ns <- asNamespace("icd")
     if (exists(var_name, ns)) message("from package namespace itself")
     if (fetch) message("will try to fetch") else message("not going to fetch")
-    }
+  }
   if (.exists_in_lazy(var_name)) return(.get_lazy(var_name))
   if (.exists_in_cache(var_name)) return(.get_from_cache(var_name))
   ns <- asNamespace("icd")

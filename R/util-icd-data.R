@@ -1,5 +1,4 @@
-
-#' swap names and values of a vector
+#' Swap names and values of a vector
 #'
 #' Swap names and values of a vector. Non-character values are implicitly
 #' converted to names.
@@ -136,16 +135,4 @@ get_icd_data <- function(data_name, alt = NULL) {
 .ls_in_ns <- function(all.names = TRUE, ...) {
   pkg_ns <- asNamespace("icd")
   ls(pkg_ns, all.names = all.names)
-}
-
-.have_memoise <- function() {
-  have_memoise <- requireNamespace("memoise", quietly = TRUE)
-  if (!have_memoise) {
-    message(
-      "Consider installing 'memoise' from CRAN using:\n",
-      'install.packages("memoise")\n',
-      "This will allow the WHO data download to resume if interrupted."
-    )
-  }
-  have_memoise
 }

@@ -153,7 +153,6 @@ expand_range_major.default <- function(start, end, defined = TRUE) {
   }
 }
 
-
 # Expand range of all (currently) possible ICD-10 major, three-digit part of
 # codes.
 .icd10cm_get_majors_possible <- function(s, e) {

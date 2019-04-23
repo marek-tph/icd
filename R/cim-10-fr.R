@@ -9,7 +9,7 @@
       "telecharger/gratuit/11616/456"
     ),
     file_name = "LIBCIM10MULTI.TXT",
-    dl_msg = "Downloading ICD-10-FR (CIM-10-FR)",
+    dl_msg = "Working on ICD-10-FR (CIM-10-FR)",
     ...
   )
 }

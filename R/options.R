@@ -85,8 +85,7 @@ NULL
 # only get options we know about, to avoid typo giving a NULL
 .get_opt <- function(x, default = NULL) {
   o <- as.character(substitute(x))
-  stopifnot(length(x) == 1, x %in% .opt_names)
-  getOption(.opt_full_name(x), default = default)
+  getOption(.opt_full_name(o), default = default)
 }
 
 .verbose <- function(x) {

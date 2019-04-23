@@ -18,31 +18,26 @@
     year,
     lang,
     resource,
-    sep = "/")
+    sep = "/"
+  )
   if (.offline() && !.interact()) {
     msg <- "Offline and not interactive, so not attempting WHO data download."
     .absent_action_switch(msg)
     return(NULL)
   }
   if (.verbose() > 1) message("Getting WHO data with JSON: ", json_url)
-  http_response <- .memoised$httr_retry("GET", json_url)
+  http_response <- httr::RETRY("GET", json_url)
   if (hs <- http_response$status_code >= 400) {
-      if (.verbose() > 1) message("trying once more (without memoise)")
-      http_response <- httr::RETRY("GET", json_url)
-      if (hs <- http_response$status_code >= 400) {
-        stop(
-          "Still unable to fetch resource: ", json_url,
-          " with HTTP status, ", hs, ". Check your internet connection, ",
-          "retry later, then file an issue at: ",
-          "https://github.com/jackwasey/icd/issues ."
-        )
-      }
-      if (.verbose()) {
-        message(
-          "Memoise has cached a failed HTTP request. ",
-          "Consider cleaning the memoise cache."
-        )
-      }
+    if (.verbose() > 1) message("trying once more")
+    http_response <- httr::RETRY("GET", json_url)
+    if (hs <- http_response$status_code >= 400) {
+      stop(
+        "Unable to fetch resource: ", json_url,
+        " with HTTP status, ", hs, ". Check your internet connection, ",
+        "retry later, then file an issue at: ",
+        "https://github.com/jackwasey/icd/issues ."
+      )
+    }
   } # end 400+
   json_data <- rawToChar(http_response$content)
   jsonlite::fromJSON(json_data)
@@ -120,13 +115,14 @@
     if (verbose > 1) {
       message("Parallel WHO processing disabled with this verbosity level")
       parallel <- FALSE
-    } else if (verbose)
+    } else if (verbose) {
       message("Parallel WHO prevents messages in child processes")
-
+    }
   }
   if (verbose > 1) {
-    message(".who_api with concept_id = ",
-            ifelse(is.null(concept_id), "NULL", concept_id)
+    message(
+      ".who_api with concept_id = ",
+      ifelse(is.null(concept_id), "NULL", concept_id)
     )
   }
   if (verbose > 1) message(paste(hier_code, collapse = " -> "))
@@ -149,7 +145,7 @@
   }
   if (verbose > 1) message("hier level = ", length(hier_code))
   new_hier <- length(hier_code) + 1
-  # parallel mcapply is about 2-3x as fast, but may get throttled for multiple
+  # parallel mclapply is about 2-3x as fast, but may get throttled for multiple
   # connections. It seems to get up to about 10-15, which is reasonable.
   ap <- if (parallel) parallel::mclapply else lapply
   all_new_rows <- ap(
@@ -174,7 +170,7 @@
       hier_desc[new_hier] <- child_desc
       sub_sub_chapter <- NA
       hier_three_digit_idx <- which(nchar(hier_code) == 3 &
-                                      !grepl("[XVI-]", hier_code))
+        !grepl("[XVI-]", hier_code))
       if (length(hier_code) >= 3 && nchar(hier_code[3]) > 3) {
         sub_sub_chapter <- hier_desc[3]
       }
@@ -197,8 +193,12 @@
         new_rows <- rbind(new_rows, new_item)
       }
       if (!is_leaf) {
-        if (verbose > 1) message(paste(new_rows$code, collapse = ", "),
-                                 " not a leaf, so recursing")
+        if (verbose > 1) {
+          message(
+            paste(new_rows$code, collapse = ", "),
+            " not a leaf, so recursing"
+          )
+        }
         if (progress) cat(".")
         recursed_rows <- .dl_icd10who(
           concept_id = child_code,

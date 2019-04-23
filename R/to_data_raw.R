@@ -53,7 +53,6 @@
       )
     }
     if (!.confirm_download(msg = dl_msg)) return()
-    if (!is.null(dl_msg)) message(dl_msg)
     ok <- .unzip_single(
       url = url,
       file_name = file_name,
