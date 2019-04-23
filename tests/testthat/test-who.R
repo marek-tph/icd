@@ -1,11 +1,9 @@
 context("WHO")
 
 test_that("No ranges or NA in code section of WHO data", {
-  skip_on_cran()
-  skip_on_travis()
-  skip_on_appveyor()
-  # assign somehow forces binding to work when doing R CMD check, otherwise it
-  # tries to subset the function
+  skip_multi()
+  skip_missing_dat("icd10who2016")
+  skip_missing_dat("icd10who2008fr")
   for (nm in c("icd10who2016", "icd10who2008fr")) {
     if (!.exists_in_cache(nm)) {
       skip(paste(nm, "not available for testing."))
@@ -28,6 +26,8 @@ test_that("No ranges or NA in code section of WHO data", {
 })
 
 test_that("HIV is problematic for some reason", {
+  skip_multi()
+  skip_missing_dat("icd10who2016")
   b21 <- .who_api_children("B21")
   expect_match(b21$ID, "^B21\\.[0-9]$")
 })
