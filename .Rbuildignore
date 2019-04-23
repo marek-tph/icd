@@ -1,6 +1,7 @@
 ^(^src\/)?.*\.log$
 ^(src\/)?callgrind.*\.out$
 ^(vignettes\/)?\.build\.timestamp$
+^\.gdb_history$
 ^.*\.Rprof.*$
 ^.*\.Rproj$
 ^.*\.rprof.*$
