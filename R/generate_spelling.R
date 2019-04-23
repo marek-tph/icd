@@ -3,10 +3,10 @@
 #' This is a bit painful, but defining known spellings of names and technical
 #' terms makes the \code{aspell} checks useful (and removes a NOTE in the
 #' \code{R CMD check} which at least some of the CRAN people use.
-#' @template save_data
+#' @template save_pkg_data
 #' @keywords internal
 #' @noRd
-generate_spelling <- function(save_data = TRUE) {
+generate_spelling <- function(save_pkg_data = TRUE) {
   medical <- c(
     "arrythmia", "Musculoskeletal", "Myocardial",
     "Puerperium", "laterality", "Infarction", "healthcare",
@@ -40,7 +40,7 @@ generate_spelling <- function(save_data = TRUE) {
   )
   # "requestor" in Vermont data licence
   words <- c(medical, proper_nouns, acronyms, other)
-  if (save_data) {
+  if (save_pkg_data) {
     # per http://dirk.eddelbuettel.com/blog/2017/08/10/#008_aspell_cran_incoming
     saveRDS(words, file = ".aspell/icdwords.rds")
     # for spelling package

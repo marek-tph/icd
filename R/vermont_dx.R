@@ -4,11 +4,11 @@
 #' @template parse-template
 #' @examples
 #' \dontrun{
-#' generate_vermont_dx(save_data = TRUE)
+#' generate_vermont_dx(save_pkg_data = TRUE)
 #' }
 #' @keywords internal datagen
 #' @noRd
-.generate_vermont_dx <- function(save_data) {
+.generate_vermont_dx <- function(save_pkg_data) {
   # This is indeed in data-raw, because not available to download anymore
   vermont_fp <- .get_raw_data_path("VTINP13.TXT")
   vermont_dx <- utils::read.csv(vermont_fp,
@@ -47,6 +47,6 @@
     class(vermont_dx[[dc]]) <- c("icd9cm", "icd9", "character")
     attr(vermont_dx[[dc]], "icd_short_diag") <- TRUE
   }
-  if (save_data) .save_in_data_dir(vermont_dx)
+  if (save_pkg_data) .save_in_data_dir(vermont_dx)
   invisible(vermont_dx)
 }

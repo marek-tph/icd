@@ -1,19 +1,15 @@
 
-.icd10cm_parse_cms_pcs_all <- function(save_data = FALSE,
-                                       verbose = .verbose()) {
-  if (verbose) message("Parsing all ICD-10-CM procedure codes")
+.icd10cm_parse_cms_pcs_all <- function() {
+  if (.verbose()) message("Parsing all ICD-10-CM procedure codes")
   lapply(names(.icd10cm_sources),
-    .icd10cm_parse_cms_pcs_year,
-    save_data = save_data,
+    .icd10cm_parse_cms_pcs_year
   )
   invisible()
 }
 
 .icd10cm_parse_cms_pcs_year <- function(year,
-                                        must_work = FALSE,
-                                        verbose = .verbose()) {
+                                        must_work = FALSE) {
   year <- as.character(year)
-  message("Please wait a few moments to parse and cache data.")
   pcs_file <- .icd10cm_sources[[year]][["pcs_flat"]]
   pcs_path <- file.path(
     get_icd_data_dir(),

@@ -2,15 +2,22 @@
 #'
 #' Gets all ICD-10-CM codes from an archive on the CDC web site.
 #'
-#' The factor generation uses \code{sort.default} which is locale dependent.
-#' This meant a lot of time debugging a problem when white space was ignored for
-#' sorting on some platforms, but not others.
-#' @param save_pkg_data Save specific year diagnostic codes in the package data directory for CRAN package. All data retrieved is saved in the user cache regardless.
+#' The factor generation uses \code{sort} which is locale dependent. This meant
+#' a lot of time debugging a problem when white space was ignored for sorting on
+#' some platforms, but not others. For vectors of codes with an ICD class of
+#' some types, (e.g. ICD-9 and ICD-10-CM), a specific sort function and
+#' operators are defined.
+#' @param save_pkg_data Save specific year diagnostic codes in the package data
+#'   directory for CRAN package. All data retrieved is saved in the user cache
+#'   regardless.
 #' @source \url{https://www.cms.gov/Medicare/Coding/ICD10} also available from
 #'   \url{http://www.cdc.gov/nchs/data/icd/icd10cm/2016/ICD10CM_FY2016_code_descriptions.zip}.
+#'
 #' @references
-#'   \href{https://www.cms.gov/Medicare/Coding/ICD10/downloads/icd-10quickrefer.pdf}{CMS ICD-10 Quick Reference}
-#'   \href{https://www.cdc.gov/nchs/icd/icd10cm.htm#FY\%202019\%20release\%20of\%20ICD-10-CM}{CDC copy of ICD-10-CM for 2019}
+#' \href{https://www.cms.gov/Medicare/Coding/ICD10/downloads/icd-10quickrefer.pdf}{CMS
+#' ICD-10 Quick Reference}
+#' \href{https://www.cdc.gov/nchs/icd/icd10cm.htm#FY\%202019\%20release\%20of\%20ICD-10-CM}{CDC
+#' copy of ICD-10-CM for 2019}
 #' @keywords internal datagen
 #' @noRd
 .parse_icd10cm_all <- function(save_pkg_data = FALSE, ...) {
@@ -44,7 +51,7 @@
     )
     return()
   }
-  message("Working on parsing ICD-10-CM year: ", year)
+  if (.verbose()) message("Working on parsing ICD-10-CM year: ", year)
   # readLines may muck up encoding, resulting in weird factor order generation
   # later?
   x <- readLines(con = f_info$file_path, encoding = "ASCII")
@@ -114,7 +121,9 @@
     if (.verbose()) {
       message("Saving in package data: ", .get_icd10cm_name(year, dx))
     }
-    .save_in_data_dir(.get_icd10cm_name(year, dx), compress = "xz")
+    .save_in_data_dir(var_name = .get_icd10cm_name(year, dx),
+                      x = dat,
+                      compress = "xz")
   }
   invisible(dat)
 }

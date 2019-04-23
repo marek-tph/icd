@@ -170,7 +170,7 @@ with_icd10cm_version <- function(ver, code) {
   if (dx) {
     dat <- .parse_icd10cm_year(year = ver)
   } else {
-    dat <- .icd10cm_parse_cms_pcs_year(ver, verbose = FALSE)
+    dat <- .icd10cm_parse_cms_pcs_year(ver)
   }
   assign(var_name, dat, envir = .icd_data_env)
   return(dat)

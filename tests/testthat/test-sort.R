@@ -75,3 +75,51 @@ test_that("duplicates are accounted for", {
     c(1L, 3L, 2L)
   )
 })
+
+test_that("codes of different lengths", {
+  expect_false(icd10cm_compare_rcpp("C4A", "C430"))
+  expect_true(icd10cm_compare_rcpp("C430", "C4A"))
+  expect_false(icd10cm_compare_rcpp("C4A0", "C430"))
+  expect_false(icd10cm_compare_rcpp("C4A0", "C43"))
+})
+
+test_that("greater than and less than need to be implemented for is.unsorted", {
+  expect_true(as.icd10cm("C43") < as.icd10cm("C4A"))
+  expect_true(as.icd10cm("C44") > as.icd10cm("C4A"))
+  expect_true(as.icd10cm("C43") <= as.icd10cm("C4A"))
+  expect_true(as.icd10cm("C44") >= as.icd10cm("C4A"))
+  # equality
+  expect_true(as.icd10cm("C43") == as.icd10cm("C43"))
+  expect_true(as.icd10cm("C4A") == as.icd10cm("C4A"))
+  expect_true(as.icd10cm("C44") == as.icd10cm("C44"))
+  expect_true(as.icd10cm("C43") >= as.icd10cm("C43"))
+  expect_true(as.icd10cm("C4A") >= as.icd10cm("C4A"))
+  expect_true(as.icd10cm("C44") >= as.icd10cm("C44"))
+  expect_true(as.icd10cm("C43") <= as.icd10cm("C43"))
+  expect_true(as.icd10cm("C4A") <= as.icd10cm("C4A"))
+  expect_true(as.icd10cm("C44") <= as.icd10cm("C44"))
+})
+
+test_that("compare multiple", {
+  x <- as.icd10cm(rep(c("C430", "C4A0", "C440"), times = 3))
+  y <- as.icd10cm(rep(c("C430", "C4A0", "C440"), each = 3))
+  expect_equal(x < y, c(FALSE, FALSE, FALSE,
+                        TRUE, FALSE, FALSE,
+                        TRUE, TRUE, FALSE))
+  expect_equal(x <= y, c(TRUE, FALSE, FALSE,
+                        TRUE, TRUE, FALSE,
+                        TRUE, TRUE, TRUE))
+  expect_equal(x > y, c(FALSE, TRUE, TRUE,
+                        FALSE, FALSE, TRUE,
+                        FALSE, FALSE, FALSE))
+  expect_equal(x >= y, c(TRUE, TRUE, TRUE,
+                         FALSE, TRUE, TRUE,
+                         FALSE, FALSE, TRUE))
+})
+
+test_that("is_unsorted", {
+  x <- as.icd10cm(c("C44", "C4A", "C43"))
+  expect_true(is_unsorted(x))
+  expect_false(is_unsorted(sort(x)))
+  expect_false(is_unsorted(x[order(x)]))
+})

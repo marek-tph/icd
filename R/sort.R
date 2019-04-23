@@ -148,3 +148,21 @@ order.icd10cm <- function(x) {
 order.icd10be <- function(x) {
   order.icd10cm(x)
 }
+
+#' @keywords internal
+#' @noRd
+#' @export
+Ops.icd10cm <- function(x, y) {
+  switch(.Generic,
+         "<" = {x != y & icd10cm_compare_vector_rcpp(x, y) },
+         "<=" = {x == y | icd10cm_compare_vector_rcpp(x, y) },
+         ">" = {x != y & !icd10cm_compare_vector_rcpp(x, y) },
+         ">=" = {!icd10cm_compare_vector_rcpp(x, y) },
+         NextMethod()
+  )
+}
+
+# this is slower than is.unsorted, but actually works for my S3 classes
+is_unsorted <- function(x) {
+  !identical(x, sort(x))
+}

@@ -124,13 +124,13 @@ test_that("some randomly chosen codes are correct", {
 })
 
 test_that("ICD-9-CM billable codes package data is recreated", {
-  skip_if_not_installed("icd", "3.4")
+  skip_on_cran()
   skip_on_os(c("windows", "mac", "solaris"))
   # Do encoding problems on Linux. It is unpredictable at the best of times.
   skip_flat_icd9_all_avail()
-  check_billable <- .icd9cm_parse_leaf_descs(save_data = FALSE)
+  check_billable <- .icd9cm_parse_leaf_descs()
   # make specific quick tests for previously known problems:
-  b32 <- .parse_icd9cm_leaf_year("2014", save_data = FALSE)
+  b32 <- .parse_icd9cm_leaf_year("2014")
   expect_true(nrow(b32) == 14567L)
   expect_true(ncol(b32) == 3L)
   expect_identical(

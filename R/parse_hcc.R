@@ -12,8 +12,8 @@
 #' @template parse-template
 #' @keywords internal manip
 #' @noRd
-icd9_parse_cc <- function(save_data = FALSE) {
-  assert_flag(save_data)
+icd9_parse_cc <- function(save_pkg_data = FALSE) {
+  assert_flag(save_pkg_data)
   hcc_icd9_dir <- file.path(get_raw_data_dir(), "icd_hcc_rawdata", "icd9")
   icd9_map_cc <- lapply(
     list.files(hcc_icd9_dir, full.names = TRUE),
@@ -75,7 +75,7 @@ icd9_parse_cc <- function(save_data = FALSE) {
   # combine with full icd9_map_cc listing
   icd9_map_cc <- rbind(icd9_map_cc, extracodes)
   rm(extracodes)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd9_map_cc)
   }
   invisible(icd9_map_cc)
@@ -85,8 +85,8 @@ icd9_parse_cc <- function(save_data = FALSE) {
 #' @template parse-template
 #' @keywords internal manip
 #' @noRd
-icd10_parse_cc <- function(save_data = FALSE) {
-  assert_flag(save_data)
+icd10_parse_cc <- function(save_pkg_data = FALSE) {
+  assert_flag(save_pkg_data)
   hcc_icd10_dir <- file.path(get_raw_data_dir(), "icd_hcc_rawdata", "icd10")
   # Import raw CMS data for ICD-9
   icd10_map_cc <- lapply(
@@ -125,7 +125,7 @@ icd10_parse_cc <- function(save_data = FALSE) {
   # Per CMS instructions, some ICDs may to be manually assigned additional CCs
   # Currently, no rules exist for ICD10, but if they need to be added,
   # can adapt the code from icd9_map_cc()
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd10_map_cc)
   }
   invisible(icd10_map_cc)
@@ -145,8 +145,8 @@ icd10_parse_cc <- function(save_data = FALSE) {
 #' @template parse-template
 #' @keywords internal manip
 #' @noRd
-icd_parse_cc_hierarchy <- function(save_data = FALSE) {
-  assert_flag(save_data)
+icd_parse_cc_hierarchy <- function(save_pkg_data = FALSE) {
+  assert_flag(save_pkg_data)
   # Define Hierarchy
   # import raw hierarchy files from CMS
   hierarchy_path <- file.path(
@@ -209,7 +209,7 @@ icd_parse_cc_hierarchy <- function(save_data = FALSE) {
   )
   # combine CC requirements with CCs to zero
   icd_map_cc_hcc <- cbind(icd_map_cc_hcc[, c("year", "ifcc")], todrop)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd_map_cc_hcc)
   }
   invisible(icd_map_cc_hcc)

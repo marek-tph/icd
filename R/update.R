@@ -34,24 +34,24 @@ update_everything <- function() {
                        (Make sure lookup files are updated first.)
                        Depends on icd9cm_hierarchy being updated.")
   # ICD 9
-  icd9_parse_ahrq_sas(save_data = TRUE)
-  icd9_parse_quan_deyo_sas(save_data = TRUE)
-  icd9_parse_cc(save_data = TRUE)
-  icd9_parse_ahrq_ccs(single = TRUE, save_data = TRUE)
-  icd9_parse_ahrq_ccs(single = FALSE, save_data = TRUE)
-  icd10_parse_ahrq_ccs(version = "2018.1", save_data = TRUE)
+  icd9_parse_ahrq_sas(save_pkg_data = TRUE)
+  icd9_parse_quan_deyo_sas(save_pkg_data = TRUE)
+  icd9_parse_cc(save_pkg_data = TRUE)
+  icd9_parse_ahrq_ccs(single = TRUE, save_pkg_data = TRUE)
+  icd9_parse_ahrq_ccs(single = FALSE, save_pkg_data = TRUE)
+  icd10_parse_ahrq_ccs(version = "2018.1", save_pkg_data = TRUE)
   icd9_generate_map_quan_elix(save_pkg_data = TRUE)
   icd9_generate_map_elix(save_pkg_data = TRUE)
   # ICD 10
   .parse_icd10cm_all(save_pkg_data = TRUE)
-  icd10_parse_ahrq_sas(save_data = TRUE)
-  icd10_parse_cc(save_data = TRUE)
+  icd10_parse_ahrq_sas(save_pkg_data = TRUE)
+  icd10_parse_cc(save_pkg_data = TRUE)
   icd10_generate_map_quan_elix(save_pkg_data = TRUE)
   icd10_generate_map_quan_deyo(save_pkg_data = TRUE)
   icd10_generate_map_elix(save_pkg_data = TRUE)
-  generate_maps_pccc(save_data = TRUE)
+  generate_maps_pccc(save_pkg_data = TRUE)
   icd10_parse_map_ahrq_pc(save_pkg_data = TRUE)
-  icd_parse_cc_hierarchy(save_data = TRUE)
+  icd_parse_cc_hierarchy(save_pkg_data = TRUE)
   # icd9cm2014_leaf was formerly "icd9cm_billable[[version_number]]"
   icd9cm2014_leaf <- get_icd9cm2014_leaf()
   .save_in_data_dir(icd9cm2014_leaf)
@@ -69,11 +69,11 @@ update_everything <- function() {
 #'
 #' Generate correctly ordered look-up tables of numeric-only, V and E codes.
 #' This is quick, but much too slow when it appears many times in a loop.
-#' @template save_data
+#' @template save_pkg_data
 #' @return invisibly returns the data as a list
 #' @keywords internal
 #' @noRd
-generate_sysdata <- function(save_data = TRUE) {
+generate_sysdata <- function(save_pkg_data = TRUE) {
   path <- file.path("R", "sysdata.rda")
   icd9_short_n <- icd9_generate_all_n()
   icd9_short_v <- icd9_generate_all_v()
@@ -123,7 +123,7 @@ generate_sysdata <- function(save_data = TRUE) {
   # we assume we are in the root of the package directory. Save to sysdata.rda
   # because these are probably not of interest to a user and would clutter an
   # already busy namespace.
-  if (save_data) {
+  if (save_pkg_data) {
     save(list = sysdata_names, file = path, compress = "xz")
   }
   invisible(mget(sysdata_names))

@@ -47,7 +47,7 @@ icd10_fetch_ahrq_ccs <- function(version = "2018.1", ...) {
 #' level format. Single level is most common for risk adjustment (Ex. CMS
 #' Readmission metric)
 #' @template ccs-single
-#' @param save_data logical whether to save the result in the source tree.
+#' @param save_pkg_data logical whether to save the result in the source tree.
 #'   Defaults to \code{FALSE}.
 #' @template offline
 #' @importFrom utils read.csv
@@ -61,9 +61,9 @@ icd10_fetch_ahrq_ccs <- function(version = "2018.1", ...) {
 #' @keywords internal manip
 #' @noRd
 icd9_parse_ahrq_ccs <- function(single = TRUE,
-                                save_data = FALSE) {
+                                save_pkg_data = FALSE) {
   assert_flag(single)
-  assert_flag(save_data)
+  assert_flag(save_pkg_data)
   ahrq_ccs <- icd9_fetch_ahrq_ccs(single = single)
   clean_icd9 <- function(x) as.short_diag(as.icd9(trimws(x)))
   resort_lvls <- function(x) {
@@ -136,7 +136,7 @@ icd9_parse_ahrq_ccs <- function(single = TRUE,
       lvl3 = make_labels(3),
       lvl4 = make_labels(4)
     )
-    if (save_data) {
+    if (save_pkg_data) {
       .save_in_data_dir(icd9_map_multi_ccs)
       .save_in_data_dir(icd9_names_multi_ccs)
     }
@@ -161,7 +161,7 @@ icd9_parse_ahrq_ccs <- function(single = TRUE,
         trimws(ahrq_df$CCS.CATEGORY),
         clean_icd9
       ))
-    if (save_data) {
+    if (save_pkg_data) {
       .save_in_data_dir(icd9_map_single_ccs)
       .save_in_data_dir("icd9_names_single_ccs")
     }
@@ -179,7 +179,7 @@ icd9_parse_ahrq_ccs <- function(single = TRUE,
 #' These are in the format of \code{YYYY.1}, \code{YYYY.2} etc.
 #' @param version string in format like \sQuote{2018.1} where \sQuote{1} is the
 #'   version number as shown on the website
-#' @param save_data logical whether to save the result in the source tree.
+#' @param save_pkg_data logical whether to save the result in the source tree.
 #'   Defaults to \code{FALSE}.
 #' @template offline
 #' @importFrom utils read.csv
@@ -188,19 +188,19 @@ icd9_parse_ahrq_ccs <- function(single = TRUE,
 #' # offline = FALSE
 #' icd:::icd10_parse_ahrq_ccs(
 #'   version = "2018.1",
-#'   save_data = FALSE, offline = FALSE
+#'   save_pkg_data = FALSE, offline = FALSE
 #' )
 #' icd:::icd10_parse_ahrq_ccs(
 #'   version = "2018.1",
-#'   save_data = FALSE, offline = TRUE
+#'   save_pkg_data = FALSE, offline = TRUE
 #' )
 #' }
 #' @keywords internal manip
 #' @noRd
 icd10_parse_ahrq_ccs <- function(version = "2018.1",
-                                 save_data = FALSE) {
+                                 save_pkg_data = FALSE) {
   assert_character(version, pattern = "^20[0-9]{2}\\.[1-9]$")
-  assert_flag(save_data)
+  assert_flag(save_pkg_data)
   ahrq_ccs <-
     icd10_fetch_ahrq_ccs(version = version)
   # simpler structure than icd9, all categories in one file
@@ -269,7 +269,7 @@ icd10_parse_ahrq_ccs <- function(version = "2018.1",
     USE.NAMES = TRUE
   )
   # not applying over WHO codes because CCS is a US-oriented classification.
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd10_map_ccs)
     .save_in_data_dir(icd10_names_ccs)
   }

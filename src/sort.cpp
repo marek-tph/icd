@@ -55,76 +55,92 @@ IntegerVector icd9Order(const CharacterVector& x) {
   return orderWorker(x, icd9Compare);
 }
 
+//std::vector<char> qfirst = {'C', 'D', 'M', 'Z'};
 std::vector<std::string> qx  = {"C4A", "D3A", "M1A", "Z3A", "C7A", "C7B"};
-std::vector<std::string> qb  = {"C43", "D36", "M09", "Z36", "C75", "C7A"};
+std::vector<std::string> qb  = {"C4399999", "D3699999", "M0999999", "Z3699999", "C7599999", "C7A99999"};
 std::vector<std::string> qa  = {"C44", "D37", "M10", "Z37", "C7B", "C76"};
-std::vector<std::string> qbb = {"C43", "D36", "M09", "Z36", "C75", "C75"};
+std::vector<std::string> qbb = {"C4399999", "D3699999", "M0999999", "Z3699999", "C7599999", "C7599999"};
 std::vector<std::string> qaa = {"C44", "D37", "M10", "Z37", "C76", "C76"};
 
 ////////////
 // ICD-10 //
 ////////////
 
-std::pair<bool, bool> icd10cmCompareQuirk(
+bool icd10cmCompareQuirk(
     const char* xstr,
     const char* ystr,
     const char *quirk,
     const char *beforeQuirk,
     const char *afterQuirk,
     const char *beforeBeforeQuirk,
-    const char *afterAfterQuirk
-  ) {
-  bool mx          = (xstr == quirk || strncmp(xstr, quirk, 3) == 0);
-  bool my          = (ystr == quirk || strncmp(ystr, quirk, 3) == 0);
-  if (!mx && !my) return std::pair<bool, bool>(false, false);
-  if (xstr == ystr) return std::pair<bool, bool>(true, false);
-  // if (isQuirk(beforeQuirk)) realeforeQuirk =
-  // getBeforeQuirk(beforeQuirk).c_str();
-  //  if (isQuirk(afterQuirk)) afterQuirk = getAfterQuirk(beforeQuirk).c_str();
+    const char *afterAfterQuirk,
+    bool& res) {
+  bool mx = (xstr == quirk || strncmp(xstr, quirk, 3) == 0);
+  bool my = (ystr == quirk || strncmp(ystr, quirk, 3) == 0);
+  if (!mx && !my) {
+    TRACE("icd10cmCompareQuirk !mx and !my");
+    res = false;
+    return false;
+  }
+  if (xstr == ystr) {
+    TRACE("icd10cmCompareQuirk xstr == ystr");
+    res = false;
+    return true;
+  }
   if (mx) {
-    TRACE_UTIL(quirk << " matched x");
+    TRACE(quirk << " matched x");
     if (my) {
-      TRACE_UTIL(quirk << " also matched y for same quirk");
-      return std::pair<bool, bool>(true, strcmp(xstr, ystr) < 0);
+      TRACE(quirk << " also matched y for same quirk");
+      res = strcmp(xstr, ystr) < 0;
+      return true;
     }
-    TRACE_UTIL(quirk << " after x match falling through. x = " << xstr
-                     << ", beforeQuirk = " << beforeQuirk
-                     << ", afterQuirk = " << afterQuirk
-                     << ", beforeBeforeQuirk = " << beforeBeforeQuirk
-                     << ", afterAfterQuirk = " << afterAfterQuirk);
+    TRACE(quirk << " didn't match y");
+    TRACE(quirk << " after x match falling through.\nx = " << xstr
+                << "\nbeforeQuirk = " << beforeQuirk
+                << "\nafterQuirk = " << afterQuirk
+                << "\nbeforeBeforeQuirk = " << beforeBeforeQuirk
+                << "\nafterAfterQuirk = " << afterAfterQuirk);
     if (strcmp(beforeQuirk, beforeBeforeQuirk)) {
+      TRACE("beforeQuirk matches beforeBeforeQuirk");
+      bool res_nested;
       return icd10cmCompareQuirk(xstr,
                                  ystr,
                                  quirk,
                                  beforeBeforeQuirk,
                                  afterQuirk,
                                  beforeBeforeQuirk,
-                                 afterAfterQuirk);
+                                 afterAfterQuirk,
+                                 res_nested);
     }
-    TRACE_UTIL("Didn't do X recursion");
-    return std::pair<bool, bool>(true, strcmp(beforeQuirk, ystr) < 0);
+    TRACE("Didn't do X recursion");
+    res = strcmp(beforeQuirk, ystr) < 0;
+    return true;
   }
-  TRACE_UTIL(quirk << " falling through. x = " << xstr
+  TRACE(quirk << " falling through. x = " << xstr
                    << ", afterQuirk = " << afterQuirk);
   if (strcmp(afterQuirk, afterAfterQuirk)) {
+    bool res_nested2;
     return icd10cmCompareQuirk(xstr,
                                ystr,
                                quirk,
                                beforeQuirk,
                                afterAfterQuirk,
                                beforeBeforeQuirk,
-                               afterAfterQuirk);
+                               afterAfterQuirk,
+                               res_nested2);
   }
-  TRACE_UTIL("Didn't do Y recursion");
-  return std::pair<bool, bool>(true, strcmp(xstr, afterQuirk) < 0);
+  TRACE("Didn't do Y recursion");
+  res = strcmp(xstr, afterQuirk) < 0;
+  return true;
 }
 
 // [[Rcpp::export(icd10cm_compare_c)]]
-bool icd10cmCompareC(const char* xstr, const char* ystr) {
+bool icd10cmCompareC(const char* xstr,
+                     const char* ystr) {
   TRACE("icd10cmCompareC comparing " << xstr << " with " << ystr);
   const int i = strncmp(xstr, ystr, 1);
-  TRACE("icd10cmCompareC " << xstr << " vs " << ystr << " = " << i);
-  // get out quick if first character differs.
+  TRACE("icd10cmCompareC first char: " << xstr << " vs " << ystr << " = " << i);
+  // get out quick when possible
   if (i != 0) {
     TRACE("icd10cmCompareC First char differs so no need to do quirks");
 #ifdef ICD_DEBUG_TRACE
@@ -145,21 +161,25 @@ bool icd10cmCompareC(const char* xstr, const char* ystr) {
   if (y1 != 'C' && y1 != 'D' && y1 != 'M' && y1 != 'Z') {
     return strcmp(xstr, ystr) < 0;
   }
-  TRACE("icd10cmCompareC found that first char equal for " << xstr << " and " << ystr);
+  TRACE("icd10cmCompareC found that first char equal for " <<
+    xstr << " and " << ystr << ". Comparing quirky codes...");
   // in flat file, C4A is between 43 and 44. Definitive reference I am using is
   // the flat file with all the codes from CMS.
-  std::pair<bool, bool> quirkResult;
+  bool qres;
   for (std::vector<std::string>::size_type j = 0; j != qa.size(); ++j) {
-    TRACE_UTIL("icd10cmCompareStd Working on " << qx[j]);
-    quirkResult = icd10cmCompareQuirk(xstr,
-                                      ystr,
-                                      qx[j].c_str(),
-                                      qb[j].c_str(),
-                                      qa[j].c_str(),
-                                      qbb[j].c_str(),
-                                      qaa[j].c_str());
-    if (quirkResult.first) return quirkResult.second;
+    TRACE("icd10cmCompareC Working on quirk: " << qx[j]);
+    if (icd10cmCompareQuirk(xstr,
+                            ystr,
+                            qx[j].c_str(),
+                            qb[j].c_str(),
+                            qa[j].c_str(),
+                            qbb[j].c_str(),
+                            qaa[j].c_str(),
+                            qres)
+    )
+      return qres;
   }
+  TRACE("icd10cmCompareC falling back to strcmp");
   return strcmp(xstr, ystr) < 0;
 }
 
@@ -178,6 +198,26 @@ bool icd10cmCompare(const String& x, const String& y) {
     return false;
   }
   return icd10cmCompareC(x.get_cstring(), y.get_cstring());
+}
+
+// [[Rcpp::export(icd10cm_compare_vector_rcpp)]]
+LogicalVector icd10cmCompareVector(const StringVector& x,
+                                   const StringVector& y) {
+  if (x.size() != y.size()) stop("Both x and y must be same length");
+  if (x.size() == 0) return LogicalVector(0);
+  LogicalVector out(x.size());
+  auto xit = x.cbegin();
+  auto yit = y.cbegin();
+  for (; xit != x.cend(); ++xit, ++yit) {
+    const String& xx = *xit;
+    const String& yy = *yit;
+    auto n = std::distance(x.cbegin(), xit);
+    if (xx == NA_STRING || yy == NA_STRING)
+      out(n) = NA_LOGICAL;
+    else
+      out(n) = icd10cmCompare(*xit, *yit);
+  }
+  return out;
 }
 
 // [[Rcpp::export(icd10cm_sort_rcpp)]]

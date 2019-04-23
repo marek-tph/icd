@@ -20,10 +20,11 @@
 #' chapter Neoplasms (\code{C00-D49}). A way of determining whether there are
 #' extra levels would be to check the XML tree depth for a member of each
 #' putative sub-chapter.
-#' @template save_data
+#' @template save_pkg_data
 #' @keywords internal datagen
 #' @noRd
-.icd10cm_extract_sub_chapters <- function(save_pkg_data = FALSE, ...) {
+.icd10cm_extract_sub_chapters <- function(save_pkg_data = FALSE,
+                                          ...) {
   stopifnot(is.logical(save_pkg_data))
   f_info <- .dl_icd10cm_xml(...)
   stopifnot(!is.null(f_info))

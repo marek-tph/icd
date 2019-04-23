@@ -19,13 +19,14 @@ CharacterVector icd9Sort(const Rcpp::CharacterVector &x);
 // or IntegerVector?
 std::vector<std::size_t> icd9OrderStd(const VecStr& x);
 
-std::pair<bool, bool> icd10cmCompareQuirk(const char* x,
-                                          const char* y,
-                                          const char *quirk,
-                                          const char *beforeQuirk,
-                                          const char *afterQuirk,
-                                          const char *beforeBeforeQuirk,
-                                          const char *afterAfterQuirk);
+bool icd10cmCompareQuirk(const char* x,
+                         const char* y,
+                         const char *quirk,
+                         const char *beforeQuirk,
+                         const char *afterQuirk,
+                         const char *beforeBeforeQuirk,
+                         const char *afterAfterQuirk,
+                         bool& res);
 // inline in cpp: bool icd10cmCompare(const String& x, const String& y);
 CharacterVector icd10cmSort(const Rcpp::CharacterVector &x);
 // disable until std and rcpp implemented fully VecStr icd10cmSortStd(const std::vector<std::string> &x);

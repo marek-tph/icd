@@ -34,9 +34,12 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
 #' The file itself is 7 bit ASCII, but has its own internal encoding using
 #' \sQuote{CP1252}. Test \sQuote{Meniere's disease} with lines 24821 to 24822
 #' from 2012 RTF
+#'
+#' \code{save_pkg_data} will save the majors it finds in the package data, the
+#' rest is cached as resource data.
 #' @param year from 1996 to 2012 (this is what CDC has published). Only 2012
 #'   implemented thus far
-#' @template save_data
+#' @template save_pkg_data
 #' @source \url{https://www.cdc.gov/nchs/icd/icd9cm.htm} Navigate to
 #'   'Dtab12.zip' in the 2011 data. and similar files run from 1996 to 2011.
 #' @keywords internal datagen
@@ -196,6 +199,7 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
 #'
 #' \code{...} might include: \code{perl = TRUE, useBytes = TRUE}
 #' @param rtf_lines character vector containing RTF. Encoding?
+#' @template save_pkg_data
 #' @return named character vector, with names being the ICD-9 codes, and the
 #'   contents being the descriptions from the RTF source. Elsewhere I do this
 #'   the other way around, but the tests are now wired for this layout. 'Tidy'

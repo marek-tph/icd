@@ -1,4 +1,4 @@
-.dl_icd10fr2019 <- function(save_data = TRUE, ...) {
+.dl_icd10fr2019 <- function(...) {
   if (!.confirm_download()) return()
   .unzip_to_data_raw(
     url = paste(
@@ -70,16 +70,16 @@
 #' at least as good.
 #' @keywords internal
 #' @noRd
-.get_chapters_fr <- function(save_data = FALSE) {
+.get_chapters_fr <- function() {
   icd10_chapters_fr <- .get_chapter_ranges_from_flat(
     flat_hier = get_icd10who2008fr(),
     field = "chapter"
   )
-  .save_in_data_dir(icd10_chapters_fr)
+  .save_in_resource_dir(icd10_chapters_fr)
   invisible(icd10_chapters_fr)
 }
 
-.get_sub_chapters_fr <- function(save_data = FALSE) {
+.get_sub_chapters_fr <- function() {
   icd10_sub_chapters_fr <- .get_chapter_ranges_from_flat(
     flat_hier = get_icd10who2008fr(),
     field = "sub_chapter"

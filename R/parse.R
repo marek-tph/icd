@@ -29,23 +29,15 @@
 #' For versions 23 to 32, those which are on the CMS web site, get any codes
 #' with long or short descriptions. Earlier years only have abbreviated
 #' descriptions, not long descriptions.
-#' @param save_data single logical value, if \code{TRUE} the source text or CSV
-#'   file will be saved in the raw data directory, otherwise (the default) the
-#'   data is simply returned invisibly.
-#' @template verbose
 #' @return data frame with \code{icd9}, \code{short_desc} and \code{long_desc}
 #'   columns. \code{NA} is placed in \code{long_desc} when not available.
 #' @source
 #' http://www.cms.gov/Medicare/Coding/ICD9ProviderDiagnosticCodes/codes.html
 #' @keywords internal datagen
 #' @noRd
-.icd9cm_parse_leaf_descs <- function(save_data = TRUE,
-                                     verbose = FALSE,
-                                     ...) {
-  stopifnot(is.logical(save_data), length(save_data) == 1)
-  stopifnot(is.logical(verbose), length(verbose) == 1)
+.icd9cm_parse_leaf_descs <- function(...) {
   versions <- .icd9cm_sources$version
-  if (verbose) {
+  if (.verbose()) {
     message(
       "Available versions of sources are: ",
       paste(versions, collapse = ", ")
@@ -53,17 +45,14 @@
   }
   icd9cm_leaf_v32 <- .parse_icd9cm_leaf_year(
     ver = "2014",
-    save_data = TRUE,
     ...
   )
   invisible(icd9cm_leaf_v32)
 }
 
-.dl_icd9cm_leaf_year <- function(year,
-                                 verbose = .verbose(),
-                                 ...) {
+.dl_icd9cm_leaf_year <- function(year, ...) {
   year <- as.character(year)
-  if (verbose) message("Downloading ICD-9-CM leaf/billable year: ", year)
+  if (.verbose()) message("Downloading ICD-9-CM leaf/billable year: ", year)
   stopifnot(year %in% .icd9cm_sources$f_year)
   dat <- .icd9cm_sources[.icd9cm_sources$f_year == year, ]
   fn_short_orig <- dat$short_filename
@@ -103,7 +92,6 @@
 #' formerly called icd9cm_hierarchy.
 #' @param version character vector of length one containing the ICD-9 version,
 #'   e.g., \code{"32"}.
-#' @template save_data
 #' @param path Absolute path in which to save parsed data
 #' @param ... Arguments passed to other functions, e.g., \code{offline} for
 #'   \code{.unzip_to_data_raw}

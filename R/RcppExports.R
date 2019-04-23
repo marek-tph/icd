@@ -321,6 +321,10 @@ icd10cm_compare_rcpp <- function(x, y) {
     .Call(`_icd_icd10cmCompare`, x, y)
 }
 
+icd10cm_compare_vector_rcpp <- function(x, y) {
+    .Call(`_icd_icd10cmCompareVector`, x, y)
+}
+
 icd10cm_sort_rcpp <- function(x) {
     .Call(`_icd_icd10cmSort`, x)
 }

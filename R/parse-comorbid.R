@@ -61,8 +61,8 @@ icd10_fetch_ahrq_sas <- function(ver = "2016") {
 #' @template parse-template
 #' @keywords internal manip
 #' @noRd
-icd9_parse_ahrq_sas <- function(save_data = FALSE) {
-  assert_flag(save_data)
+icd9_parse_ahrq_sas <- function(save_pkg_data = FALSE) {
+  assert_flag(save_pkg_data)
   # readLines make assumptions or guess about encoding, consider using
   # Hadleyverse for this in future
   ahrq_info <- icd9_fetch_ahrq_sas()
@@ -130,7 +130,7 @@ icd9_parse_ahrq_sas <- function(save_data = FALSE) {
   }
   names(icd9_map_ahrq) <- icd::names_ahrq_htn_abbrev
   icd9_map_ahrq <- comorbidity_map(icd9_map_ahrq)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir("icd9_map_ahrq")
   }
   invisible(icd9_map_ahrq)
@@ -138,8 +138,9 @@ icd9_parse_ahrq_sas <- function(save_data = FALSE) {
 
 # This is in some ways simpler than that ICD-9 equivalent because I make no
 # attempt to find all the child codes.
-icd10_parse_ahrq_sas <- function(save_data = FALSE, offline = TRUE) {
-  assert_flag(save_data)
+icd10_parse_ahrq_sas <- function(save_pkg_data = FALSE,
+                                 offline = TRUE) {
+  assert_flag(save_pkg_data)
   ahrq_info <- icd10_fetch_ahrq_sas()
   ahrq_sas_lines <- readLines(ahrq_info$file_path, warn = FALSE)
   icd10_map_ahrq <- sas_format_extract_rcomfmt(ahrq_sas_lines)
@@ -154,7 +155,7 @@ icd10_parse_ahrq_sas <- function(save_data = FALSE, offline = TRUE) {
   icd10_map_ahrq <- lapply(icd10_map_ahrq, as.short_diag)
   icd10_map_ahrq <- lapply(icd10_map_ahrq, as.icd10)
   icd10_map_ahrq <- comorbidity_map(icd10_map_ahrq)
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir("icd10_map_ahrq")
   }
   invisible(icd10_map_ahrq)
@@ -190,8 +191,8 @@ icd10_parse_ahrq_sas <- function(save_data = FALSE, offline = TRUE) {
 #' @template offline
 #' @keywords internal manip
 #' @noRd
-icd9_parse_quan_deyo_sas <- function(save_data = FALSE) {
-  assert_flag(save_data)
+icd9_parse_quan_deyo_sas <- function(save_pkg_data = FALSE) {
+  assert_flag(save_pkg_data)
   # download the file and/or just get the path or file name, fails if missing
   # by default
   f_info <- .dl_icd9_quan_deyo_sas()
@@ -212,7 +213,7 @@ icd9_parse_quan_deyo_sas <- function(save_data = FALSE) {
   icd9_map_quan_deyo <-
     comorbidity_map(icd9(as.short_diag(icd9_map_quan_deyo)))
   icd9_map_charlson <- icd9_map_quan_deyo
-  if (save_data) {
+  if (save_pkg_data) {
     .save_in_data_dir(icd9_map_quan_deyo)
     .save_in_data_dir(icd9_map_charlson)
   }

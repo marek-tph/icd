@@ -1,7 +1,7 @@
 .icd10be_site <- "https://www.health.belgium.be"
 .icd10be_url_path <- "sites/default/files/uploads/fields/fpshealth_theme_file"
-.dl_icd10be2017 <- function(save_data = TRUE,
-                            dx = TRUE,
+
+.dl_icd10be2017 <- function(dx = TRUE,
                             must_work = FALSE,
                             ...) {
   site_file_2017 <-
@@ -20,7 +20,6 @@
 }
 
 .dl_icd10be2014 <- function(dx = TRUE,
-                            verbose = .verbose(),
                             ...) {
   if (.offline() && !.interact()) {
     msg <- "Offline and not interactive, so not downloading Belgian data."
@@ -28,7 +27,7 @@
     return(NULL)
   }
   site_file <- "fy2014_reflist_icd-10-be.xlsx"
-  if (verbose) message("Downloading or getting cached icd10be2014 data")
+  if (.verbose()) message("Downloading or getting cached icd10be2014 data")
   .download_to_data_raw(
     paste(.icd10be_site,
       .icd10be_url_path,
