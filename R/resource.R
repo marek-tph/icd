@@ -177,6 +177,7 @@
       if (verbose) message("Found ", var_name, " in cache or package data.")
       return(.get_anywhere(var_name = var_name))
     }
+    if (verbose) message("Not in cache or package data")
     if (!.icd_data_dir_okay() && .offline()) {
       if (verbose) message("Offline and/or no cache")
       .absent_action_switch(
@@ -185,6 +186,7 @@
       )
       return(alt)
     }
+    if (verbose) message("Trying again to get from anywhere - unnecessary?")
     # duplicated from above:
     if (.exists_anywhere(var_name)) {
       if (verbose) message("Found ", var_name, " in cache or package data.")
@@ -214,6 +216,7 @@
     } else {
       stop("No parse function: ", parse_fun_name)
     }
+    if (verbose) message("Getting form cache now we have parsed.")
     # Parse function should have saved the data in env and file caches
     dat <- .get_from_cache(var_name, must_work = FALSE)
     if (!is.null(dat)) return(dat)

@@ -104,6 +104,7 @@ NULL
     options("icd.data.verbose" = ev)
     if (ev) message("Reset verbose option to ICD_DATA_VERBOSE")
   }
+  gcinfo(x > 5)
   invisible(.get_opt("verbose"))
 }
 

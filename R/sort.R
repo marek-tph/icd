@@ -164,5 +164,7 @@ Ops.icd10cm <- function(x, y) {
 
 # this is slower than is.unsorted, but actually works for my S3 classes
 is_unsorted <- function(x) {
+  if (.verbose() && identical(class(x), "character"))
+    message("checking is_unsorted on a character vector")
   !identical(x, sort(x))
 }

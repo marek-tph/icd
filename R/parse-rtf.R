@@ -546,17 +546,16 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
   enc2utf8(filtered)
 }
 
-#' fix duplicates detected in RTF parsing
+#' Fix duplicates detected in RTF parsing
 #'
-#' clean up duplicates (about 350 in 2015 data), mostly one very brief
-#' description and a correct longer one; or, identical descriptions
+#' Clean up duplicates (about 350 in 2015 data), mostly one very brief
+#' description and a correct longer one; or the descriptions are identical.
 #' @keywords internal datagen
 #' @noRd
 .rtf_fix_duplicates <- function(out) {
   dupes <- out[duplicated(names(out)) | duplicated(names(out), fromLast = TRUE)]
   dupes <- unique(names(dupes))
   for (d in dupes) {
-    if (d == "730.95" && .verbose() > 4) browser()
     dupe_rows <- which(names(out) == d)
     if (all(out[dupe_rows[1]] == out[dupe_rows[-1]])) {
       if (.verbose() > 3) {
@@ -577,7 +576,6 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
         paste(out[dupe_rows])
       )
       if (.verbose() > 2) {
-        if (.verbose() > 9) browser()
         message("desclengths: ", paste(desclengths, collapse = ", "))
         message("max_len: ", max_len)
         message(
