@@ -228,9 +228,13 @@ CharacterVector icd10cmSort(const CharacterVector &x) {
 }
 
 //' @title Order ICD-10-CM codes
-//' @description Currently required for C7A, C7B (which fall after C80), and
+//' @description Currently required for C7A, C7B (which fall after C80 nad before C81), and
 //'   D3A, which falls after D48. C4A M1A Z3A are also problems within
 //'   sub-chapters.
+//' https://www.icd10data.com/ICD10CM/Codes/C00-D49
+//' https://www.icd10data.com/ICD10CM/Codes/C00-D49/C43-C44
+//' https://www.icd10data.com/ICD10CM/Codes/M00-M99/M05-M14
+//' https://www.icd10data.com/ICD10CM/Codes/Z00-Z99/Z30-Z39
 //' @keywords internal
 //' @noRd
 // [[Rcpp::export(icd10cm_order_rcpp)]]

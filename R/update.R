@@ -56,9 +56,9 @@ update_everything <- function() {
   icd9cm2014_leaf <- get_icd9cm2014_leaf()
   .save_in_data_dir(icd9cm2014_leaf)
   # TODO: deprecate and remove icd10cm2016 in icd 4.1 or 4.2
-  icd10cm2016 <- .get_from_cache(var_name = "icd10cm2016", must_work = TRUE)
+  icd10cm2016 <- .parse_icd10cm_year(2016)
   .save_in_data_dir(icd10cm2016)
-  icd10cm2019 <- .get_from_cache(var_name = "icd10cm2019", must_work = TRUE)
+  icd10cm2019 <- .parse_icd10cm_year(2019)
   .save_in_data_dir(icd10cm2019)
   icd9cm_hierarchy <- get_icd9cm2014()
   names(icd9cm_hierarchy)[names(icd9cm_hierarchy) == "leaf"] <- "billable"

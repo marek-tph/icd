@@ -389,38 +389,46 @@ get_icd_data_dir <- function(must_work = TRUE) {
                    rds = FALSE,
                    memoise = FALSE,
                    raw = FALSE,
-                   destroy = FALSE) {
+                   destroy = FALSE,
+                   pattern = ".*",
+                   dry_run = FALSE) {
   if (env) {
-    rm(list = ls(.icd_data_env, all.names = TRUE), envir = .icd_data_env)
+    if (!dry_run) rm(list = ls(.icd_data_env,
+                 all.names = TRUE,
+                 pattern = pattern),
+       envir = .icd_data_env)
   }
   if (destroy) {
-    if (askYesNo("Destroy entire resource directory?")) {
-      unlink(get_icd_data_dir(), recursive = TRUE)
+    if (askYesNo("Destroy entire resource directory? (Consider hiding?)")) {
+      if (!dry_run) unlink(get_icd_data_dir(), recursive = TRUE)
     }
     return(invisible())
   }
   if (memoise) {
     message("deleting memoise directory")
-    unlink(
+    if (!dry_run) unlink(
       file.path(get_icd_data_dir(), "memoise"),
       recursive = TRUE
     )
   }
   if (raw) {
     raw_files <- list.files(get_icd_data_dir(),
-      pattern = "(\\.txt$)|(\\.xlsx$)",
+      pattern = sprintf(fmt = "(%s\\.txt$)|(%s\\.xlsx$)",
+                        pattern, pattern),
       ignore.case = TRUE,
       full.names = TRUE
     )
     message("Deleting:")
     print(raw_files)
-    unlink(raw_files, recursive = FALSE)
+    if (!dry_run) unlink(raw_files, recursive = FALSE)
   }
   if (rds) {
-    rds_files <- list.files(get_icd_data_dir(), ".*\\.rds", full.names = TRUE)
+    rds_files <- list.files(get_icd_data_dir(),
+                            paste0(pattern, "\\.rds"),
+                            full.names = TRUE)
     message("Deleting:")
     print(rds_files)
-    unlink(rds_files,
+    if (!dry_run) unlink(rds_files,
       recursive = FALSE
     )
   }

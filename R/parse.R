@@ -184,7 +184,8 @@
   out$short_desc <- enc2utf8(out$short_desc)
   out$long_desc <- enc2utf8(out$long_desc)
   var_name <- paste0("icd9cm", year, "_leaf")
-  out[order.icd9(out$code), ]
+  out <- out[order.icd9(out$code), ]
+  out$code <- as.icd9cm(out$code)
   rownames(out) <- NULL
   .save_in_resource_dir(var_name = var_name, x = out)
   invisible(out)

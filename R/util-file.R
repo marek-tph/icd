@@ -52,8 +52,11 @@
     paste0(var_name, ".rda")
   )
   # check diff before overwrite:
-  load(file = out_file, envir = (tenv <- new.env(emptyenv())))
-  oldx <- tenv[[var_name]]
+  oldx = NULL
+  if (file.exists(out_file)) {
+    load(file = out_file, envir = (tenv <- new.env(emptyenv())))
+    oldx <- tenv[[var_name]]
+  }
   if (!identical(x, oldx)) {
     warning("Data for ", sQuote(var_name), " is being updated.")
     old_file <- tempfile(paste0(var_name, ".old"), fileext = "rds")
