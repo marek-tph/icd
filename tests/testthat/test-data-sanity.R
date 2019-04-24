@@ -4,14 +4,7 @@ test_that("row numbers and factors are sequential for data frames", {
   skip_slow()
   # print("may have to increase ulimit -s to e.g. 64000 for this to run")
   for (data_name in c(.ls_lazy(), .ls())) {
-    if (.verbose()) print("data frame: ", data_name)
-    if (.verbose() > 5) {
-      print(Cstack_info())
-      print(sys.calls())
-      #gcinfo(TRUE)
-      }
-    gc()
-   # if (.verbose() > 5) gcinfo(FALSE)
+    if (.verbose()) print(paste0("data frame: ", data_name))
     d <- .get_anywhere(data_name)
     if (!is.data.frame(d) || grepl("map", data_name)) next
     expect_gt(nrow(d), 1)

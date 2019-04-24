@@ -59,7 +59,7 @@ sort_icd <- function(x,
 sort.icd10 <- function(x,
                        decreasing = FALSE,
                        ...) {
-  res <- sort(x)
+  res <- sort.default(x)
   # names are preserved, but using attributes would overwrite
   attr(res, "icd_short_diag") <- attr(x, "icd_short_diag")
   class(res) <- class(x)
