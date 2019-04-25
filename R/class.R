@@ -12,7 +12,9 @@ icd9_classes <- c(icd9_sub_classes, "icd9")
 # ICD-10
 icd10_dx_sub_classes <- c(
   "icd10cm",
-  "icd10who"
+  "icd10who",
+  "icd10fr",
+  "icd10be"
 )
 icd10_pc_sub_classes <- "icd10cm_pc"
 icd10_sub_classes <- c(
@@ -212,11 +214,11 @@ classes_ordered <- function(x) {
 #' x
 #' attributes(x) <- list(icd_short_diag = NULL)
 #' x
-#' 
+#'
 #' y <- as.decimal_diag(as.icd10("A10.09"))
 #' y
 #' is.short_diag(y)
-#' 
+#'
 #' j <- as.short_diag(as.icd10(c("A11", "B2222")))
 #' j[2] <- "C33"
 #' stopifnot(is.short_diag(j))
@@ -341,6 +343,8 @@ icd10cm <- function(x) {
 #' @describeIn set_icd_class Use ICD-10-CM (USA) class for the given data
 #' @export
 as.icd10cm <- function(x, short_code = NULL) {
+  # TODO: as.icd10cm(as.icd10be("A00)) works, but gives both classes, which the
+  # print method fails on.
   stopifnot(is.atomic(x))
   if (inherits(x, "icd10cm")) return(x)
   icd10_pos <- match("icd10", class(x))
@@ -723,7 +727,7 @@ c.icd10 <- function(..., warn = FALSE) {
 #' # preserving the ICD class
 #' stopifnot(!inherits(x[[1]], "list"))
 #' stopifnot(!inherits(x[[1]][2], "list"))
-#' 
+#'
 #' y <- as.icd10(c("A01", "B0234"))
 #' y[2]
 #' y[[2]]
@@ -893,7 +897,7 @@ print.icd10 <- function(x, verbose = FALSE, ...) {
     icd10be_pc = "ICD-10-BE (Belgian Procedure Codes)",
     "ICD-10 Codes (Subtype not set)"
   )
-  print_codes(x, sub_class, ...)
+  print_codes(x, sub_class, verbose = verbose, ...)
 }
 
 print_codes <- function(x, code_str, verbose = FALSE, ...) {

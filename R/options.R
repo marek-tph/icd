@@ -323,7 +323,7 @@ set_icd_data_dir <- function(path = NULL) {
 #' download_icd_data()
 #' }
 #' @export
-download_icd_data <- function() {
+icd_download_all <- function() {
   set_icd_data_dir()
   message("Downloading, caching and parsing all ICD data")
   message("This will take a few minutes.")

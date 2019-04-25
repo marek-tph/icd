@@ -24,7 +24,7 @@
 #' identical(icd:::factor_nosort(x), x)
 #' # unless the levels change:
 #' icd:::factor_nosort(x, levels = c("a", "z"))
-#' 
+#'
 #' # existing factor levels aren't re-ordered without also moving elements
 #' f <- factor(c("a", "b", "b", "c"))
 #' g <- icd:::factor_nosort(f, levels = c("a", "c", "b"))
@@ -112,4 +112,24 @@ refactor <- function(x,
       validate = validate
     )
   }
+}
+
+#' Factor with levels sorted according to class, not alphabetic
+#' @examples
+#' (f <- factor(as.icd9cm(c("E100", "100", "V90"))))
+#' (g <- factor_sorted_levels(as.icd9cm(c("E100", "100", "V90"))))
+#' factor_sorted_levels(f)
+#' stopifnot(identical(g, factor_sorted_levels(as.icd9cm(f))))
+#' str(g)
+#' class(g)
+#' @keywords internal
+#' @noRd
+factor_sorted_levels <- function(x, levels = unique(sort(x)), ...) {
+  cl <- class(x)
+  # unique drops the class, sort uses it and keeps it.
+  out <- factor(x = x, levels = levels, ...)
+  class(out) <- if ("factor" %in% cl)  cl
+  else if ("character" %in% cl) sub("character", "factor", cl)
+  else c(cl, "factor")
+  out
 }

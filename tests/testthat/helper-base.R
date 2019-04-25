@@ -253,3 +253,8 @@ skip_multi <- function() {
     skip("Don't have all data cached, yet.")
   }
 }
+
+expect_valid <- function(x, whitespace_ok = TRUE) {
+  if (is.function(x)) stop("valid ICD code expectation should not get a closure")
+  expect_true(all(is_valid(x, whitespace_ok = whitespace_ok)))
+}

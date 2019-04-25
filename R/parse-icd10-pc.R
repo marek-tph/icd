@@ -1,7 +1,8 @@
 
 .icd10cm_parse_cms_pcs_all <- function() {
   if (.verbose()) message("Parsing all ICD-10-CM procedure codes")
-  lapply(names(.icd10cm_sources),
+  lapply(
+    names(.icd10cm_sources),
     .icd10cm_parse_cms_pcs_year
   )
   invisible()

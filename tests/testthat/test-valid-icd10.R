@@ -79,3 +79,7 @@ test_that("major dispatch intact, white space not okay", {
   expect_false(is_valid_major(icd10(" A00"), whitespace_ok = FALSE))
   expect_false(is_valid_major(as.icd10cm("A00 "), whitespace_ok = FALSE))
 })
+
+test_that("French CIM-10 are different", {
+  expect_valid(as.icd10fr(c("A00", "W260+2", "W26019", "W26")))
+})

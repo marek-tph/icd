@@ -145,7 +145,7 @@ test_that("extraction from qualifier subset works", {
 context("RTF tests")
 
 test_year <- "2014"
-
+skip_slow()
 # if we are in offline mode, and the data is not available, we can't proceed.
 # test whether the RTF is available offline. N.b. we skip in a 'context' so all
 # subsequent tests are skipped.

@@ -476,6 +476,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// icd9CompareVector
+LogicalVector icd9CompareVector(const StringVector& x, const StringVector& y);
+RcppExport SEXP _icd_icd9CompareVector(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const StringVector& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const StringVector& >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(icd9CompareVector(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // icd9Sort
 CharacterVector icd9Sort(const CharacterVector& x);
 RcppExport SEXP _icd_icd9Sort(SEXP xSEXP) {
@@ -684,6 +696,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_icd_refactor_narm", (DL_FUNC) &_icd_refactor_narm, 3},
     {"_icd_factorIsValid", (DL_FUNC) &_icd_factorIsValid, 1},
     {"_icd_icd9Compare", (DL_FUNC) &_icd_icd9Compare, 2},
+    {"_icd_icd9CompareVector", (DL_FUNC) &_icd_icd9CompareVector, 2},
     {"_icd_icd9Sort", (DL_FUNC) &_icd_icd9Sort, 1},
     {"_icd_icd9Order", (DL_FUNC) &_icd_icd9Order, 1},
     {"_icd_icd10cmCompareC", (DL_FUNC) &_icd_icd10cmCompareC, 2},

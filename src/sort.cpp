@@ -9,6 +9,8 @@ IntegerVector orderWorker(
   IntegerVector index =  Rcpp::no_init_vector(x.size());
   // R indexed
   std::iota(index.begin(), index.end(), 1);
+  // stable sort give the same indices for identical values, although these may
+  // not be what R would give.
   std::stable_sort(
     index.begin(),
     index.end(),
@@ -18,6 +20,26 @@ IntegerVector orderWorker(
     }
   );
   return index;
+}
+
+LogicalVector compareVectorWorker(const StringVector& x,
+                                  const StringVector& y,
+                                  std::function <bool (String, String)> f) {
+  if (x.size() != y.size()) stop("Both x and y must be same length");
+  if (x.size() == 0) return LogicalVector(0);
+  LogicalVector out(x.size());
+  auto xit = x.cbegin();
+  auto yit = y.cbegin();
+  for (; xit != x.cend(); ++xit, ++yit) {
+    const String& xx = *xit;
+    const String& yy = *yit;
+    auto n = std::distance(x.cbegin(), xit);
+    if (xx == NA_STRING || yy == NA_STRING)
+      out(n) = NA_LOGICAL;
+    else
+      out(n) = f(*xit, *yit);
+  }
+  return out;
 }
 
 // [[Rcpp::export(icd9_compare_rcpp)]]
@@ -41,6 +63,12 @@ bool icd9Compare(String a, String b) {
   if (*acs == 'E' && *bcs == 'V') return false;
   // now cover both V codes or both E codes
   return strcmp(acs, bcs) < 0;
+}
+
+// [[Rcpp::export(icd9_compare_vector_rcpp)]]
+LogicalVector icd9CompareVector(const StringVector& x,
+                                const StringVector& y) {
+  return compareVectorWorker(x, y, icd9Compare);
 }
 
 // [[Rcpp::export(icd9_sort_rcpp)]]
@@ -161,6 +189,15 @@ bool icd10cmCompareC(const char* xstr,
   if (y1 != 'C' && y1 != 'D' && y1 != 'M' && y1 != 'Z') {
     return strcmp(xstr, ystr) < 0;
   }
+  // the quirks are all A or B in third position
+  if (strlen(xstr) >= 3 &&
+      strlen(ystr) >= 3 &&
+      isdigit(xstr[2]) &&
+      isdigit(ystr[2])) {
+    TRACE("third character is digit, so cannot be quirk for xstr = " <<
+      xstr << " and ystr = " << ystr);
+    return strcmp(xstr, ystr) < 0;
+  }
   TRACE("icd10cmCompareC found that first char equal for " <<
     xstr << " and " << ystr << ". Comparing quirky codes...");
   // in flat file, C4A is between 43 and 44. Definitive reference I am using is
@@ -200,24 +237,14 @@ bool icd10cmCompare(const String& x, const String& y) {
   return icd10cmCompareC(x.get_cstring(), y.get_cstring());
 }
 
+
+
+
+
 // [[Rcpp::export(icd10cm_compare_vector_rcpp)]]
 LogicalVector icd10cmCompareVector(const StringVector& x,
                                    const StringVector& y) {
-  if (x.size() != y.size()) stop("Both x and y must be same length");
-  if (x.size() == 0) return LogicalVector(0);
-  LogicalVector out(x.size());
-  auto xit = x.cbegin();
-  auto yit = y.cbegin();
-  for (; xit != x.cend(); ++xit, ++yit) {
-    const String& xx = *xit;
-    const String& yy = *yit;
-    auto n = std::distance(x.cbegin(), xit);
-    if (xx == NA_STRING || yy == NA_STRING)
-      out(n) = NA_LOGICAL;
-    else
-      out(n) = icd10cmCompare(*xit, *yit);
-  }
-  return out;
+  return compareVectorWorker(x, y, icd10cmCompare);
 }
 
 // [[Rcpp::export(icd10cm_sort_rcpp)]]

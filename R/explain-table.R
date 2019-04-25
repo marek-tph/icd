@@ -109,7 +109,8 @@ explain_table_worker <- function(x, hierarchy, short_code, condense,
     all.x = TRUE
   )
   # merge has reordered...
-  exptable[["is_major"]] <- exptable[["three_digit"]] == exptable[["code"]]
+  exptable[["is_major"]] <-
+    as_char_no_warn(exptable[["three_digit"]]) == exptable[["code"]]
   exptable[["valid_icd9"]] <- is_valid.icd9(xs, short_code = TRUE)
   exptable[["valid_icd10"]] <- is_valid.icd10(xs, short_code = TRUE)
   if (condense) {
@@ -123,9 +124,12 @@ explain_table_worker <- function(x, hierarchy, short_code, condense,
 #' @author Ed Lee
 #' @export
 #' @keywords internal
-explain_table.icd9cm <- function(x, short_code = guess_short(x),
-                                 condense = FALSE, brief = TRUE,
-                                 warn = TRUE, ...) {
+explain_table.icd9cm <- function(x,
+                                 short_code = guess_short(x),
+                                 condense = FALSE,
+                                 brief = TRUE,
+                                 warn = TRUE,
+                                 ...) {
   explain_table_worker(
     x = x,
     hierarchy = icd9cm_hierarchy,

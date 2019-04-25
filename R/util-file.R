@@ -52,7 +52,7 @@
     paste0(var_name, ".rda")
   )
   # check diff before overwrite:
-  oldx = NULL
+  oldx <- NULL
   if (file.exists(out_file)) {
     load(file = out_file, envir = (tenv <- new.env(emptyenv())))
     oldx <- tenv[[var_name]]
@@ -183,4 +183,8 @@
   ret <- file.copy(file.path(zipdir, file_name), save_path, overwrite = TRUE)
   unlink(zipdir, recursive = TRUE)
   ret
+}
+
+.dir_writable <- function(path) {
+  dir.exists(path) && file.access(path, 2) == 0
 }

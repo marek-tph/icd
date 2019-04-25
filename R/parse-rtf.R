@@ -1,10 +1,3 @@
-# these are taken from 'icd', which is where they are derived
-re_icd9_decimal_strict_bare <- "[[:digit:]]{3}(?:\\.(?:[[:digit:]]{1,2})?)?|V(?:0[1-9]|[1-9][[:digit:]])(?:\\.(?:[[:digit:]]{1,2})?)?|E[[:digit:]]{3}(?:\\.(?:[[:digit:]]{1})?)?" # nolint
-re_icd9_decimal_bare <- "[[:digit:]]{1,3}(?:\\.(?:[[:digit:]]{1,2})?)?|[Vv](?:0[1-9]|[1-9][[:digit:]]?)(?:\\.(?:[[:digit:]]{1,2})?)?|[Ee][[:digit:]]{1,3}(?:\\.(?:[[:digit:]]{1})?)?" # nolint
-re_icd9_major_strict_bare <- "(?:[[:digit:]]{3}|V(?:0[1-9]|[1-9][[:digit:]])|E[[:digit:]]{3})" # nolint
-re_icd9_major_bare <- "(?:[[:digit:]]{1,3}|[Vv](?:0[1-9]|[1-9][[:digit:]]?)|[Ee][[:digit:]]{1,3})" # nolint
-re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
-
 #' Fetch RTF for a given year
 #'
 #' Will return NULL if offline and not available
@@ -102,6 +95,7 @@ re_icd10_major_bare <- "[[:alpha:]][[:digit:]][[:alnum:]]"
     )
   ]
   rownames(out_df) <- NULL
+  out_df$three_digit <- factor_sorted_levels(out_df$three_digit)
   invisible(out_df)
 }
 

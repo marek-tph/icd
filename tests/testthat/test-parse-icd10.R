@@ -3,7 +3,7 @@ context("icd10 fixed width parse")
 test_icd10_most_majors <- outer(LETTERS, sprintf(0:99, fmt = "%02i"), paste0)
 
 test_that("icd10 flat file details are okay", {
-  skip_slow("this test is very slow, but important")
+  skip_slow("this test is very slow, may download data, but is important")
   skip_no_icd_data_resource()
   # check cols at a time, so I get better error feedback:
   col_names <- c(

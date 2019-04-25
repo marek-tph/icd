@@ -108,10 +108,7 @@
       )[["chap_desc"]]
   }
   class(dat$code) <- c("icd10cm", "icd10", "character")
-  dat$three_digit <- refactor(x = dat$three_digit,
-                              levels = sort.icd10cm(unique(dat$three_digit)),
-                              validate = TRUE
-  )
+  dat$three_digit <- factor_sorted_levels(dat$three_digit)
   class(dat$three_digit) <- c("icd10cm", "icd10", "factor")
   if (.verbose()) message("Correcting order of ", nrow(dat), " codes")
   dat <- dat[order.icd10cm(dat$code), ]
@@ -125,9 +122,11 @@
     if (.verbose()) {
       message("Saving in package data: ", .get_icd10cm_name(year, dx))
     }
-    .save_in_data_dir(var_name = .get_icd10cm_name(year, dx),
-                      x = dat,
-                      compress = "xz")
+    .save_in_data_dir(
+      var_name = .get_icd10cm_name(year, dx),
+      x = dat,
+      compress = "xz"
+    )
   }
   invisible(dat)
 }

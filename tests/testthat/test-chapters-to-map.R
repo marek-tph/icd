@@ -14,7 +14,7 @@ test_that("chapters to map", {
   class(ooe[["code"]]) <- c("icd9", "icd_decimal_diag", "factor")
   expect_warning(
     test_map <- chapters_to_map(
-      icd9_chapters[n],
+      .get_lazy("icd9_chapters")[n],
       defined = FALSE
     ),
     regexp = NA

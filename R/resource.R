@@ -318,10 +318,6 @@
   # version = utils::packageVersion("icd")
 }
 
-.dir_writable <- function(path) {
-  dir.exists(path) && file.access(path, 2) == 0
-}
-
 #' @describeIn set_icd_data_dir Get the currently active data directory, and check it exists and is writable.
 #' @export
 get_icd_data_dir <- function(must_work = TRUE) {
@@ -396,10 +392,15 @@ get_icd_data_dir <- function(must_work = TRUE) {
                    pattern = ".*",
                    dry_run = FALSE) {
   if (env) {
-    if (!dry_run) rm(list = ls(.icd_data_env,
-                 all.names = TRUE,
-                 pattern = pattern),
-       envir = .icd_data_env)
+    if (!dry_run) {
+      rm(
+        list = ls(.icd_data_env,
+          all.names = TRUE,
+          pattern = pattern
+        ),
+        envir = .icd_data_env
+      )
+    }
   }
   if (destroy) {
     if (askYesNo("Destroy entire resource directory? (Consider hiding?)")) {
@@ -409,15 +410,19 @@ get_icd_data_dir <- function(must_work = TRUE) {
   }
   if (memoise) {
     message("deleting memoise directory")
-    if (!dry_run) unlink(
-      file.path(get_icd_data_dir(), "memoise"),
-      recursive = TRUE
-    )
+    if (!dry_run) {
+      unlink(
+        file.path(get_icd_data_dir(), "memoise"),
+        recursive = TRUE
+      )
+    }
   }
   if (raw) {
     raw_files <- list.files(get_icd_data_dir(),
-      pattern = sprintf(fmt = "(%s\\.txt$)|(%s\\.xlsx$)",
-                        pattern, pattern),
+      pattern = sprintf(
+        fmt = "(%s\\.txt$)|(%s\\.xlsx$)",
+        pattern, pattern
+      ),
       ignore.case = TRUE,
       full.names = TRUE
     )
@@ -427,13 +432,16 @@ get_icd_data_dir <- function(must_work = TRUE) {
   }
   if (rds) {
     rds_files <- list.files(get_icd_data_dir(),
-                            paste0(pattern, "\\.rds"),
-                            full.names = TRUE)
+      paste0(pattern, "\\.rds"),
+      full.names = TRUE
+    )
     message("Deleting:")
     print(rds_files)
-    if (!dry_run) unlink(rds_files,
-      recursive = FALSE
-    )
+    if (!dry_run) {
+      unlink(rds_files,
+        recursive = FALSE
+      )
+    }
   }
 }
 
@@ -497,6 +505,10 @@ get_icd_data_dir <- function(must_work = TRUE) {
   ls(.icd_data_env, all.names = TRUE)
 }
 
+.ls_cache <- function(...) {
+  list.files(path = get_icd_data_dir(), ...)
+}
+
 # for development, list envrionment of a function
 .ls_fun <- function(f) ls(environment(f))
 
@@ -525,4 +537,52 @@ get_icd_data_dir <- function(must_work = TRUE) {
   } else {
     stop("neither or both directories exist")
   }
+}
+
+
+.get_lazy <- function(var_name) {
+  ns <- asNamespace("icd")
+  lz <- ns$.__NAMESPACE__.$lazydata
+  get(var_name, lz)
+}
+
+.exists_in_lazy <- function(var_name) {
+  ns <- asNamespace("icd")
+  lz <- ns$.__NAMESPACE__.$lazydata
+  exists(var_name, lz)
+}
+
+.get_anywhere <- function(var_name, fetch = FALSE) {
+  if (.verbose()) {
+    message(".get_anywhere: ", var_name)
+    if (.exists_in_lazy(var_name)) message("lazy")
+    if (.exists_in_cache(var_name)) message("cache")
+    ns <- asNamespace("icd")
+    if (exists(var_name, ns)) message("from package namespace itself")
+    if (fetch) message("will try to fetch") else message("not going to fetch")
+  }
+  if (.exists_in_lazy(var_name)) return(.get_lazy(var_name))
+  if (.exists_in_cache(var_name)) return(.get_from_cache(var_name))
+  ns <- asNamespace("icd")
+  if (exists(var_name, ns)) return(get(var_name, ns))
+  if (fetch && exists(.get_fetcher_name(var_name), ns, mode = "function")) {
+    return(.get_fetcher_fun(var_name)())
+  }
+  .absent_action_switch(
+    paste(var_name, "not available in icd.data regular or lazy data")
+  )
+}
+
+.exists_anywhere <- function(var_name, fetch = FALSE) {
+  ns <- asNamespace("icd")
+  if (.exists_in_lazy(var_name) ||
+      .exists_in_cache(var_name) ||
+      exists(var_name, ns)) {
+    return(TRUE)
+  }
+  if (fetch && exists(.get_fetcher_name(var_name), ns, mode = "function")) {
+    dat <- with_absent_action("silent", .get_fetcher_fun(var_name))
+    if (!is.null(dat) && is.data.frame(dat)) return(TRUE)
+  }
+  FALSE
 }

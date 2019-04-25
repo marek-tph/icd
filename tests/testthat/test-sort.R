@@ -12,6 +12,8 @@ test_that("sorting of icd9 object", {
   k <- sort(j)
   expect_identical(j[2], k[1])
   expect_identical(j[1], k[2])
+  expect_true(as.icd9cm("V9199") < as.icd9cm("E000"))
+  expect_true(as.icd9cm("E000") > as.icd9cm("V9199"))
 })
 
 test_that("order some icd-9 codes", {
@@ -103,18 +105,26 @@ test_that("greater than and less than need to be implemented for is.unsorted", {
 test_that("compare multiple", {
   x <- as.icd10cm(rep(c("C430", "C4A0", "C440"), times = 3))
   y <- as.icd10cm(rep(c("C430", "C4A0", "C440"), each = 3))
-  expect_equal(x < y, c(FALSE, FALSE, FALSE,
-                        TRUE, FALSE, FALSE,
-                        TRUE, TRUE, FALSE))
-  expect_equal(x <= y, c(TRUE, FALSE, FALSE,
-                        TRUE, TRUE, FALSE,
-                        TRUE, TRUE, TRUE))
-  expect_equal(x > y, c(FALSE, TRUE, TRUE,
-                        FALSE, FALSE, TRUE,
-                        FALSE, FALSE, FALSE))
-  expect_equal(x >= y, c(TRUE, TRUE, TRUE,
-                         FALSE, TRUE, TRUE,
-                         FALSE, FALSE, TRUE))
+  expect_equal(x < y, c(
+    FALSE, FALSE, FALSE,
+    TRUE, FALSE, FALSE,
+    TRUE, TRUE, FALSE
+  ))
+  expect_equal(x <= y, c(
+    TRUE, FALSE, FALSE,
+    TRUE, TRUE, FALSE,
+    TRUE, TRUE, TRUE
+  ))
+  expect_equal(x > y, c(
+    FALSE, TRUE, TRUE,
+    FALSE, FALSE, TRUE,
+    FALSE, FALSE, FALSE
+  ))
+  expect_equal(x >= y, c(
+    TRUE, TRUE, TRUE,
+    FALSE, TRUE, TRUE,
+    FALSE, FALSE, TRUE
+  ))
 })
 
 test_that("is_unsorted", {

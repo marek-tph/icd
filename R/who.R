@@ -230,7 +230,6 @@
 }
 
 .dl_icd10who_finalize <- function(dat, year, lang) {
-  rownames(dat) <- NULL
   dat[["code"]] <- sub(pattern = "\\.", replacement = "", x = dat[["code"]])
   for (col_name in c(
     "chapter",
@@ -238,15 +237,22 @@
     "sub_sub_chapter",
     "major",
     "desc"
-  ))
+  )) {
     dat[[col_name]] <- sub("[^ ]+ ", "", dat[[col_name]])
-  var_name <- paste0("icd10who", year, ifelse(lang == "en", "", lang))
-  .save_in_resource_dir(var_name, x = dat)
-  # First, if three digit doesn't match code, then drop the row, as these are incorrectly assimilated rows.
+  }
+  # First, if three digit doesn't match code, then drop the row, as these are
+  # incorrectly assimilated rows.
   thr <- get_major.icd10(dat$code)
   dat <- dat[dat$three_digit == thr, ]
+  dat$three_digit <- factor_sorted_levels(as.icd10who(dat$three_digit))
   # Then I think any remaining rows are plain duplicates
-  dat[!duplicated(dat$code), ]
+  dat <- dat[!duplicated(dat$code), ]
+  dat <- dat[order(dat$code), ]
+  rownames(dat) <- NULL
+  var_name <- paste0("icd10who", year, ifelse(lang == "en", "", lang))
+  dat$code <- as.icd10who(dat$code)
+  .save_in_resource_dir(var_name, x = dat)
+  invisible(dat)
 }
 
 .parse_icd10who2016 <- function(...) {
@@ -261,7 +267,8 @@
   if (!.confirm_download()) return()
   .dl_icd10who_finalize(
     .dl_icd10who(year = 2008, lang = "fr", ...),
-    2008, "fr"
+    2008,
+    "fr"
   )
 }
 

@@ -152,19 +152,84 @@ order.icd10be <- function(x) {
 #' @keywords internal
 #' @noRd
 #' @export
-Ops.icd10cm <- function(x, y) {
+Ops.icd9 <- function(e1, e2) {
   switch(.Generic,
-         "<" = {x != y & icd10cm_compare_vector_rcpp(x, y) },
-         "<=" = {x == y | icd10cm_compare_vector_rcpp(x, y) },
-         ">" = {x != y & !icd10cm_compare_vector_rcpp(x, y) },
-         ">=" = {!icd10cm_compare_vector_rcpp(x, y) },
+    "<" = {
+      e1 != e2 & icd9_compare_vector_rcpp(e1, e2)
+    },
+    "<=" = {
+      e1 == e2 | icd9_compare_vector_rcpp(e1, e2)
+    },
+    ">" = {
+      e1 != e2 & !icd9_compare_vector_rcpp(e1, e2)
+    },
+    ">=" = {
+      !icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    NextMethod()
+  )
+}
+
+#' @keywords internal
+#' @noRd
+#' @export
+Ops.icd10cm <- function(e1, e2) {
+  switch(.Generic,
+    "<" = {
+      e1 != e2 & icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    "<=" = {
+      e1 == e2 | icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    ">" = {
+      e1 != e2 & !icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    ">=" = {
+      !icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    NextMethod()
+  )
+}
+
+#' @keywords internal
+#' @noRd
+#' @export
+Ops.icd10be <- function(e1, e2) {
+  switch(.Generic,
+         "<" = {
+           e1 != e2 & icd10cm_compare_vector_rcpp(e1, e2)
+         },
+         "<=" = {
+           e1 == e2 | icd10cm_compare_vector_rcpp(e1, e2)
+         },
+         ">" = {
+           e1 != e2 & !icd10cm_compare_vector_rcpp(e1, e2)
+         },
+         ">=" = {
+           !icd10cm_compare_vector_rcpp(e1, e2)
+         },
          NextMethod()
   )
 }
 
-# this is slower than is.unsorted, but actually works for my S3 classes
 is_unsorted <- function(x) {
-  if (.verbose() && identical(class(x), "character"))
+  if (.verbose() && identical(class(x), "character")) {
     message("checking is_unsorted on a character vector")
-  !identical(x, sort(x))
+  }
+  if (is.factor(x)) {
+    cl <- class(x)
+    x <- as_char_no_warn(x)
+    class(x) <- sub("factor", "character", cl)
+  }
+  if (!inherits(x, icd_version_classes)) {
+    return(is.unsorted(x))
+  }
+  lenx <- length(x)
+  for (i in seq.int(2, lenx)) {
+    if (x[i] < x[i - 1]) {
+      message("i = ", i, ": ", x[i], " < ", x[i - 1])
+      return(TRUE)
+    }
+  }
+  FALSE
 }

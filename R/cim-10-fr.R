@@ -57,7 +57,10 @@
   icd10fr2019$major <- factor(icd10fr2019$major)
   # TODO: chapitres
   class(icd10fr2019$code) <- c("icd10fr", "icd10", "character")
-  class(icd10fr2019$three_digit) <- c("icd10fr", "icd10", "character")
+  icd10fr2019$three_digit <-
+    factor_sorted_levels(as.icd10fr(icd10fr2019$three_digit))
+  stopifnot(all(is_valid.icd10fr(icd10fr2019$code)))
+  stopifnot(all(is_valid.icd10fr(icd10fr2019$three_digit)))
   .save_in_resource_dir(icd10fr2019)
   invisible(icd10fr2019)
 }

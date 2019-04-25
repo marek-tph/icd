@@ -305,6 +305,10 @@ icd9_compare_rcpp <- function(a, b) {
     .Call(`_icd_icd9Compare`, a, b)
 }
 
+icd9_compare_vector_rcpp <- function(x, y) {
+    .Call(`_icd_icd9CompareVector`, x, y)
+}
+
 icd9_sort_rcpp <- function(x) {
     .Call(`_icd_icd9Sort`, x)
 }
