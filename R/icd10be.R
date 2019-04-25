@@ -27,7 +27,7 @@
     return(NULL)
   }
   site_file <- "fy2014_reflist_icd-10-be.xlsx"
-  if (.verbose()) message("Downloading or getting cached icd10be2014 data")
+  .msg("Downloading or getting cached icd10be2014 data")
   .download_to_data_raw(
     paste(.icd10be_site,
       .icd10be_url_path,
@@ -91,7 +91,7 @@
     "SHORT_TXTNL",
     "SHORT_TXTEN"
   )]
-  raw_dat[["ICDPREC"]] <- raw_dat[["ICDPREC"]] != "*"
+  raw_dat[["ICDPREC"]] <- raw_dat[["ICDPREC"]] != "*" || is.na(raw_dat[["ICDPREC"]])
   icd10be2017 <- as.data.frame(raw_dat[raw_dat$ICDDORO == "D", -2])
   icd10be2017_pc <- as.data.frame(raw_dat[raw_dat$ICDDORO == "O", -2])
   names <- c(
@@ -106,6 +106,7 @@
   )
   names(icd10be2017) <- names
   names(icd10be2017_pc) <- names
+  icd10be2017$not_poa <- !is.na(icd10be2017$not_poa) && icd10be2017 == "Y"
   icd10be2017 <- icd10be2017[order.icd10be(icd10be2017$code), ]
   icd10be2017_pc <- icd10be2017_pc[order(icd10be2017_pc$code), ]
   class(icd10be2017$code) <- c("icd10be", "icd10", "character")
@@ -160,7 +161,8 @@
     "SHORT_TXTNL",
     "SHORT_TXTEN"
   )]
-  raw_dat[["ICDPREC"]] <- raw_dat[["ICDPREC"]] != "*"
+  # ICDPREC indicates non-leaf node
+  raw_dat[["ICDPREC"]] <- raw_dat[["ICDPREC"]] != "*" || is.na(raw_dat[["ICDPREC"]])
   icd10be2014 <- as.data.frame(raw_dat[raw_dat$ICDDORO == "D", -2])
   icd10be2014_pc <- as.data.frame(raw_dat[raw_dat$ICDDORO == "O", -2])
   names <- c(
@@ -178,6 +180,7 @@
   )
   names(icd10be2014) <- names
   names(icd10be2014_pc) <- names
+  icd10be2014$not_poa <- !is.na(icd10be2014$not_poa) && icd10be2014 == "Y"
   icd10be2014 <- icd10be2014[order.icd10be(icd10be2014$code), ]
   icd10be2014_pc <- icd10be2014_pc[order(icd10be2014_pc$code), ]
   class(icd10be2014$code) <- c("icd10be", "icd10", "character")

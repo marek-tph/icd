@@ -4,9 +4,7 @@ context("icd9cm_hierarchy was parsed as expected")
 # another text file parsing.`
 
 test_that("icd9cm_hierarchy as saved in data can be recreated as expected", {
-  # avoid encoding problems by just doing this on Linux.
-  # skip_on_os(c("windows", "mac", "solaris"))
-  skip_flat_icd9_avail(year = "2011")
+  skip_flat_icd9_avail(year = "2014")
   skip_on_no_rtf("2011")
   skip_slow()
   cmh_headings <- c(
@@ -18,7 +16,7 @@ test_that("icd9cm_hierarchy as saved in data can be recreated as expected", {
     "sub_chapter",
     "chapter"
   )
-  cmh <- .parse_icd9cm_rtf_year("2014", save_pkg_data = FALSE)
+  cmh <- .parse_icd9cm_rtf_year("2014", save_pkg_majors = FALSE)
   for (h in cmh_headings)
     expect_equal(cmh[[h]],
       icd9cm_hierarchy[[h]],

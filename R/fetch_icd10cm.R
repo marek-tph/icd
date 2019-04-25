@@ -67,7 +67,7 @@
   file_name <- s$dx_hier
   if (!dx) {
     if ("pcs_zip" %nin% names(s) || is.na(s$pcs_zip)) {
-      if (.verbose()) message("No PCS flat file zip name.")
+      .msg("No PCS flat file zip name.")
       return()
     }
     url <- paste0(s$base_url, s$pcs_zip)
@@ -75,7 +75,7 @@
   }
   stopifnot(!is.null(file_name))
   if (is.na(file_name)) {
-    if (.verbose()) message("No PCS file name.")
+    .msg("No PCS file name.")
     return()
   }
   save_name <- .get_versioned_raw_file_name(file_name, year)

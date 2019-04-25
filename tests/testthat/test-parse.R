@@ -157,9 +157,8 @@ if (rtf_year_ok(test_year)) {
     file_name = rtf_dat$rtf_filename
   )
   rtf <- .rtf_parse_lines(
-    readLines(f_info_short$file_path, warn = FALSE),
-    perl = TRUE, useBytes = TRUE
-  )
+    rtf_lines = readLines(f_info_short$file_path, warn = FALSE),
+    year = "2014")
   nrtf <- names(rtf)
   test_that("all parsed codes are valid decimals", {
     expect_true(all(icd::is_valid(nrtf, short_code = FALSE)),
@@ -192,9 +191,7 @@ if (rtf_year_ok(test_year)) {
       )
     )
   })
-  is_major <- function(x) {
-    nchar(x) - startsWith(x, "E") < 4
-  }
+
   test_that("majors extracted from web page are the same as those from RTF", {
     # why is this even a list not a named vector?
     webmajors <- unlist(icd9_majors)

@@ -110,7 +110,7 @@ icd9_generate_map_elix <- function(save_pkg_data = TRUE) {
 #' @rdname icd9_generate_map_elix
 #' @keywords internal
 #' @noRd
-icd10_generate_map_elix <- function(save_pkg_data = TRUE, verbose = FALSE) {
+icd10_generate_map_elix <- function(save_pkg_data = TRUE) {
   icd10_map_elix <- list(
     chf = c(
       "I099", "I110", "I130", "I132", "I255", "I420", "I425", "I426",
@@ -236,11 +236,11 @@ icd10_generate_map_elix <- function(save_pkg_data = TRUE, verbose = FALSE) {
   names(icd10_map_elix) <- icd::names_elix_htn_abbrev
   icd10_map_elix <- .apply_over_icd10who_vers(icd10_map_elix)
   icd10_map_elix <- .apply_over_icd10cm_vers(icd10_map_elix)
-  if (verbose) message("applied ICD-10-CM and WHO versions")
+  .msg("applied ICD-10-CM and WHO versions")
   icd10_map_elix <- lapply(icd10_map_elix, as.short_diag)
-  if (verbose) message("applied as.short_diag")
+  .msg("applied as.short_diag")
   icd10_map_elix <- lapply(icd10_map_elix, as.icd10)
-  if (verbose) message("applied as.icd10")
+  .msg("applied as.icd10")
   icd10_map_elix <- as.comorbidity_map(icd10_map_elix)
   if (save_pkg_data) {
     .save_in_data_dir(icd10_map_elix)
@@ -357,7 +357,7 @@ icd9_generate_map_quan_elix <- function(save_pkg_data = TRUE) {
 #' @template parse-template
 #' @keywords internal
 #' @noRd
-icd10_generate_map_quan_elix <- function(save_pkg_data = TRUE, verbose = FALSE) {
+icd10_generate_map_quan_elix <- function(save_pkg_data = TRUE) {
   quan_elix_raw <- list(
     c(
       "I099", "I110", "I130", "I132", "I255", "I420", "I425", "I426", "I427",
@@ -487,7 +487,7 @@ icd10_generate_map_quan_elix <- function(save_pkg_data = TRUE, verbose = FALSE) 
 #' @template parse-template
 #' @keywords internal
 #' @noRd
-icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE, verbose = FALSE) {
+icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE) {
   quan_charl_raw <- list(
     mi = c("I21", "I22", "I252"),
     chf = c(
@@ -604,9 +604,9 @@ icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE, verbose = FALSE) 
       print(only_prev)
       stop("Not going to make a map smaller without manual review.")
     }
-    if (length(only_this) && .verbose() > 1) {
-      message("Found new items for ", cmb)
-      print(only_this)
+    if (length(only_this)) {
+      .dbg("Found new items for ", cmb)
+      .dbg(only_this, print = TRUE)
     }
     out[[cmb]] <- sort(union(out[[cmb]], upd[[cmb]]))
   }
@@ -616,7 +616,7 @@ icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE, verbose = FALSE) 
 .apply_over_icd10cm_vers <- function(raw) {
   out <- raw
   for (yr in 2014:2019) {
-    if (.verbose()) message("Applying ICD-10-CM year: ", yr)
+    .msg("Applying ICD-10-CM year: ", yr)
     with_icd10cm_version(
       as.character(yr),
       code = {
@@ -645,7 +645,7 @@ icd10_generate_map_quan_deyo <- function(save_pkg_data = TRUE, verbose = FALSE) 
 .apply_over_icd10who_vers <- function(raw) {
   out <- raw
   for (who_ver in c("icd10who2016", "icd10who2008fr")) {
-    if (.verbose()) message("Working on ", who_ver)
+    .msg("Working on ", who_ver)
     upd <- sapply(out,
       FUN = .apply_over_ver_worker,
       inner_fun = children_defined.icd10who,

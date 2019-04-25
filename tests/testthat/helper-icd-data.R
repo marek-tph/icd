@@ -80,7 +80,7 @@ skip_icd10cm_flat_avail <- function(year, dx = TRUE) {
   if (!.exists_in_cache(.get_icd10cm_name(year, dx))) {
     testthat::skip(msg)
   }
-  if (.verbose()) message(paste("Not", msg))
+  .msg(paste("Not", msg))
   invisible()
 }
 

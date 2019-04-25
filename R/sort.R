@@ -214,7 +214,7 @@ Ops.icd10be <- function(e1, e2) {
 
 is_unsorted <- function(x) {
   if (.verbose() && identical(class(x), "character")) {
-    message("checking is_unsorted on a character vector")
+    warning("checking is_unsorted on a character vector without ICD classes")
   }
   if (is.factor(x)) {
     cl <- class(x)
@@ -225,9 +225,10 @@ is_unsorted <- function(x) {
     return(is.unsorted(x))
   }
   lenx <- length(x)
+  # fails if NA present
   for (i in seq.int(2, lenx)) {
     if (x[i] < x[i - 1]) {
-      message("i = ", i, ": ", x[i], " < ", x[i - 1])
+      # message("i = ", i, ": ", x[i], " < ", x[i - 1])
       return(TRUE)
     }
   }

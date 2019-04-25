@@ -18,11 +18,9 @@ update_everything <- function() {
     year = "2014",
     save_pkg_data = TRUE
   )
-
   .print_options()
   .set_icd_data_dir()
   .print_options()
-
   .icd10cm_extract_sub_chapters(.icd10cm_extract_sub_chapters = TRUE)
   #  icd9cm_billable <- list()
   #  icd9cm_billable[["32"]] <- get_icd9cm2014_leaf(must_work = TRUE)

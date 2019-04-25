@@ -1,6 +1,7 @@
 context("data sanity")
 
 test_that("row numbers and factors are sequential for data frames", {
+  print <- function(...) { base::print(..., quote = FALSE) }
   skip_slow()
   data_names <- c("icd10be2014",
                   "icd10who2016",
@@ -25,19 +26,17 @@ test_that("row numbers and factors are sequential for data frames", {
     )
     for (col_name in names(d)) {
       col_dat <- d[[col_name]]
-      if (.verbose() > 2) print(paste0("now checking column: ", col_name))
+      .trc("now checking column: ", col_name)
       info <- paste0("get_", data_name, "()[[\"", col_name, "\"]]")
-      if (.verbose() > 2) print("checking three_digit is right class")
-      if (col_name %in% c("three_digit")) {
-        expect_true(inherits(col_dat, "icd9") || inherits(col_dat, "icd10"),
-                    info = info
-        )
+      if (col_name %nin% c("sub_sub_chapter", "age_group", "sex")) {
+        expect_true(!anyNA(col_dat), info = info)
       }
+      if (.verbose() > 2)
+        print(paste(info, "checking code and three_digit"))
       if (col_name %in% c("code", "three_digit")) {
-        test_that("codes are valid", {
+        expect_true(inherits(col_dat, c("icd9", "icd10")), info = info)
           j <- d[[col_name]]
-          expect_valid(j, whitespace_ok = FALSE)
-        })
+          expect_valid(j, whitespace_ok = FALSE, info = info)
         test_that("three-digits match the codes", {
           four_digit_majors <- nchar(as_char_no_warn(d$three_digit)) == 4
           d_three <- d[!four_digit_majors, ]
@@ -54,59 +53,39 @@ test_that("row numbers and factors are sequential for data frames", {
           )
         })
         if (col_name == "code") {
-          expect_is(d[[col_name]], "character", info = info)
+          expect_is(d[["code"]], "character", info = info)
+        } else {
+          expect_is(d[["three_digit"]], "factor", info = info)
+          levs <- levels(col_dat)
+          class(levs) <- sub("factor", "character", class(col_dat))
+          expect_false(
+            is_unsorted(levs),
+            info = paste0(
+              "levels(", info, "), class(levs) = ",
+              paste(class(levs), collapse = ", ")
+            )
+          )
         }
-        if (.verbose()) print("checking code columns are sorted")
+        if (.verbose()) print(paste(info, "checking code columns are sorted"))
         if (data_name %nin% c(
           "uranium_pathology",
           "vermont_dx")
         ) {
-          if (is.factor(col_dat)) {
-            levs <- levels(col_dat)
-            class(levs) <- sub("factor", "character", class(col_dat))
-            expect_false(
-              is_unsorted(levs),
-              info = paste0(
-                "levels(", info, "), class(levs) = ",
-                paste(class(levs), collapse = ", ")
-              )
-            )
-          }
           expect_true(col_name %in% names(d))
           expect_true(!is.null(col_dat))
-          expect_false(
-            is_unsorted(col_dat),
-            info = info
-          )
+          if (.verbose()) print(paste(info, "class of col_dat is: ",
+                                      paste(class(col_dat), collapse = ", ")))
+          expect_error(regexp = NA, us <- is_unsorted(col_dat), info = info)
+          if (.verbose()) print(paste(info, "class of is_unsorted(col_dat) is: ",
+                                      paste(class(us), collapse = ", ")))
+          expect_false(is_unsorted(col_dat), info = info)
         }
-        if (.verbose()) print("checking three_digit is a factor")
-        if (col_name == "three_digit") {
-          test_that("three_digit is a factor", {
-            expect_true(is.factor(col_dat), info = info)
-          })
-          # next
-        }
-        test_that("classes are ordered", {
-          if (inherits(col_dat, c("icd9", "icd10"))) {
-            expect_classes_ordered(col_dat)
-          }
-        })
-        if (.verbose()) print("icd9cm is also icd9")
-        if (inherits(col_dat, "icd9cm")) {
-          expect_true(inherits(d[[col_name]], "icd9"))
-        }
+        expect_classes_ordered(col_dat)
         if (inherits(col_dat, icd9_classes)) {
           expect_is(col_dat, "icd9")
         }
         if (inherits(col_dat, icd10_classes)) {
           expect_is(col_dat, "icd10")
-        }
-        if (inherits(col_dat, "icd9") || inherits(col_dat, "icd10")) {
-          if (data_name != "vermont_dx" && col_name != "code") {
-            test_that("ICD data columns are factors", {
-              expect_is(col_dat, "factor", info = info)
-            })
-          }
         }
         # end code or three digit only block
       } else {

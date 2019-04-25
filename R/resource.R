@@ -64,32 +64,27 @@
 
 .exists_in_cache_single <- function(var_name) {
   stopifnot(length(var_name) == 1L)
-  verbose <- .verbose() > 1
-  if (verbose) {
-    message("Seeing if ", sQuote(var_name), " exists in cache env or dir")
-  }
+  .dbg("Seeing if ", sQuote(var_name), " exists in cache env or dir")
   if (!.exists_icd_data_dir()) {
-    if (.verbose()) {
-      message(
-        "Don't even have the icd.data.resource option defined,",
-        " and default location of ", sQuote(.default_icd_data_dir()),
-        " is missing."
-      )
-    }
+    .msg(
+      "Don't even have the icd.data.resource option defined,",
+      " and default location of ", sQuote(.default_icd_data_dir()),
+      " is missing."
+    )
     return(FALSE)
   }
   stopifnot(is.character(var_name))
-  if (verbose) message(".exists_in_cache trying icd_data_env environment")
+  .msg(".exists_in_cache trying icd_data_env environment")
   if (.exists(var_name)) {
-    if (verbose) message(sQuote(var_name), " found in env.")
+    .msg(sQuote(var_name), " found in env.")
     return(TRUE)
   }
   fp <- .rds_path(var_name)
-  if (verbose) message("Checking if we have file path for exists")
+  .msg("Checking if we have file path for exists")
   if (is.null(fp)) return(FALSE)
-  if (verbose) message("Trying file at: ", fp)
+  .msg("Trying file at: ", fp)
   return(file.exists(fp))
-  if (verbose) message(var_name, " not seen in cache env or dir.")
+  .msg(var_name, " not seen in cache env or dir.")
   FALSE
 }
 
@@ -101,9 +96,9 @@
       "Trying to get ", sQuote(var_name), " from cache env or dir"
     )
   }
-  if (verbose) message(".get_from_cache Trying icd_data_env environment")
+  .msg(".get_from_cache Trying icd_data_env environment")
   if (.exists(var_name)) {
-    if (verbose) message("Found in env cache")
+    .msg("Found in env cache")
     return(.get(var_name))
   }
   if (!.exists_in_cache(var_name = var_name)) {
@@ -112,9 +107,9 @@
     return(invisible())
   }
   fp <- .rds_path(var_name)
-  if (verbose) message("Checking if we have file path for get")
+  .msg("Checking if we have file path for get")
   if (is.null(fp)) return()
-  if (verbose) message("Getting file at: ", fp)
+  .msg("Getting file at: ", fp)
   val <- readRDS(fp)
   .assign(var_name, val)
   val
@@ -133,13 +128,13 @@
                            must_work = TRUE,
                            msg = paste("Unable to find", var_name)) {
     verbose <- .verbose()
-    if (verbose) message("Starting getter for: ", var_name)
+    .msg("Starting getter for: ", var_name)
     stopifnot(is.character(var_name))
     dat <- .get_from_cache(var_name,
       must_work = FALSE
     )
     if (!is.null(dat)) {
-      if (verbose) message("Found in cache ", var_name, " in cache.")
+      .msg("Found in cache ", var_name, " in cache.")
       return(dat)
     }
     if (must_work) {
@@ -172,24 +167,24 @@
                             must_work = is.null(alt),
                             msg = paste("Unable to find", var_name)) {
     verbose <- .verbose()
-    if (verbose) message("Starting fetcher for ", var_name)
+    .msg("Starting fetcher for ", var_name)
     if (.exists_anywhere(var_name)) {
-      if (verbose) message("Found ", var_name, " in cache or package data.")
+      .msg("Found ", var_name, " in cache or package data.")
       return(.get_anywhere(var_name = var_name))
     }
-    if (verbose) message("Not in cache or package data")
+    .msg("Not in cache or package data")
     if (!.icd_data_dir_okay() && .offline()) {
-      if (verbose) message("Offline and/or no cache")
+      .msg("Offline and/or no cache")
       .absent_action_switch(
         "Offline so not attempting to download or parse",
         must_work = must_work
       )
       return(alt)
     }
-    if (verbose) message("Trying again to get from anywhere - unnecessary?")
+    .msg("Trying again to get from anywhere - unnecessary?")
     # duplicated from above:
     if (.exists_anywhere(var_name)) {
-      if (verbose) message("Found ", var_name, " in cache or package data.")
+      .msg("Found ", var_name, " in cache or package data.")
       return(.get_anywhere(var_name = var_name))
     }
     if (verbose) {
@@ -200,7 +195,7 @@
     }
     fr <- environment()
     if (exists(parse_fun_name, fr, inherits = TRUE)) {
-      if (verbose) message("Found parse function. Calling it.")
+      .msg("Found parse function. Calling it.")
       out <- do.call(
         get(parse_fun_name,
           envir = fr,
@@ -216,7 +211,7 @@
     } else {
       stop("No parse function: ", parse_fun_name)
     }
-    if (verbose) message("Getting form cache now we have parsed.")
+    .msg("Getting form cache now we have parsed.")
     # Parse function should have saved the data in env and file caches
     dat <- .get_from_cache(var_name, must_work = FALSE)
     if (!is.null(dat)) return(dat)
@@ -227,7 +222,7 @@
       )
     }
     if (is.null(alt)) {
-      if (verbose) message("Returning NULL, as alternative data are not set")
+      .msg("Returning NULL, as alternative data are not set")
       return()
     }
     if (verbose) {
@@ -248,16 +243,16 @@
 .make_getters_and_fetchers <- function(final_env = parent.frame()) {
   verbose <- .verbose()
   for (var_name in .data_names) {
-    if (verbose) message("Making getters and fetchers for ", var_name)
+    .msg("Making getters and fetchers for ", var_name)
     getter_name <- .get_getter_name(var_name)
-    if (verbose) message("assigning: ", getter_name)
+    .msg("assigning: ", getter_name)
     # TODO: this doesn't need to be specific to each data element?
     assign(getter_name,
       .make_getter(var_name),
       envir = final_env
     )
     fetcher_name <- .get_fetcher_name(var_name)
-    if (verbose) message("assigning: ", fetcher_name)
+    .msg("assigning: ", fetcher_name)
     assign(fetcher_name,
       .make_fetcher(var_name),
       envir = final_env
@@ -296,10 +291,8 @@
 }
 
 .set_icd_data_dir <- function(path) {
-  if (.verbose() > 1) {
-    message("icd_data_dir: options are currently:")
-    .print_options()
-  }
+  .dbg("icd_data_dir: options are currently:")
+  if (.verbose() > 1) .print_options()
   if (missing(path)) path <- .default_icd_data_dir()
   if (!dir.exists(path)) {
     if (!dir.create(path, recursive = TRUE, showWarnings = FALSE)) {
@@ -330,11 +323,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
   )
   o <- .get_opt("resource")
   if (!is.null(o)) {
-    if (.verbose() > 1) {
-      message(
-        "icd.data.resource options set to: ", o, ", so using it."
-      )
-    }
+      .dbg("icd.data.resource options set to: ", o, ", so using it.")
     if (!.dir_writable(o)) {
       msg <- paste(
         "icd.data.resource option set to:", o,
@@ -344,19 +333,17 @@ get_icd_data_dir <- function(must_work = TRUE) {
       if (must_work) {
         stop(msg)
       } else {
-        if (.verbose()) message(msg)
+        .msg(msg)
         return(NA_character_)
       }
     }
   } else {
     o <- .default_icd_data_dir()
     if (dir.exists(o) && .dir_writable(o)) {
-      if (.verbose() > 1) {
-        message(
+        .dbg(
           "icd.data.resource option not set, but default path: ",
           sQuote(o), " exists, so using it and setting option."
         )
-      }
       .set_opt("resource" = o)
     } else {
       msg <- paste(
@@ -367,7 +354,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
       if (must_work) {
         stop(msg)
       } else {
-        if (.verbose()) message(msg)
+        .msg(msg)
         return(NA_character_)
       }
     }

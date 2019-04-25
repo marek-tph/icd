@@ -44,7 +44,7 @@
     )
   }
   icd9cm_leaf_v32 <- .parse_icd9cm_leaf_year(
-    ver = "2014",
+    year = "2014",
     ...
   )
   invisible(icd9cm_leaf_v32)
@@ -52,7 +52,7 @@
 
 .dl_icd9cm_leaf_year <- function(year, ...) {
   year <- as.character(year)
-  if (.verbose()) message("Downloading ICD-9-CM leaf/billable year: ", year)
+  .msg("Downloading ICD-9-CM leaf/billable year: ", year)
   stopifnot(year %in% .icd9cm_sources$f_year)
   dat <- .icd9cm_sources[.icd9cm_sources$f_year == year, ]
   fn_short_orig <- dat$short_filename
@@ -102,7 +102,7 @@
   stopifnot(length(year) == 1L)
   year <- as.character(year)
   stopifnot(grepl("^[[:digit:]]{4}$", year))
-  if (.verbose()) message("Fetching billable codes version: ", year)
+  .msg("Fetching billable codes version: ", year)
   # 2009 version 27 is exceptionally badly formatted:
   if (year == "2009") {
     return(invisible(.parse_leaf_desc_icd9cm_v27(...)))
@@ -142,14 +142,14 @@
       )
     )
   }
-  if (.verbose()) message("codes and descs separated")
+  .msg("codes and descs separated")
   out <- data.frame(
     code = short_codes,
     short_desc = short_descs,
     long_desc = long_descs,
     stringsAsFactors = FALSE
   )
-  if (.verbose()) message("now sort so that E is after V")
+  .msg("now sort so that E is after V")
   new_order <- order.icd9(out[["code"]])
   stopifnot(!anyNA(out[["code"]]))
   stopifnot(!anyNA(new_order))
@@ -197,7 +197,7 @@
 #' @keywords internal datagen
 #' @noRd
 .parse_leaf_desc_icd9cm_v27 <- function(...) {
-  message("working on version 27 quirk")
+  message("working on version 27 (2009)  quirk")
   v27_dat <- .icd9cm_sources[.icd9cm_sources$version == "27", ]
   fn_orig <- v27_dat$other_filename
   url <- v27_dat$url
@@ -257,7 +257,7 @@
   # later evaluated in a different environment.
   force(year)
   parse_fun <- function() {
-    if (.verbose()) message("Calling ICD-9-CM leaf parser for year:", year)
+    .msg("Calling ICD-9-CM leaf parser for year:", year)
     .parse_icd9cm_leaf_year(year = year)
   }
   parse_fun_env <- environment(parse_fun)

@@ -156,7 +156,7 @@ expand_range_major.default <- function(start, end, defined = TRUE) {
 # Expand range of all (currently) possible ICD-10 major, three-digit part of
 # codes.
 .icd10cm_get_majors_possible <- function(s, e) {
-  if (.verbose() > 3) message(".icd10cm_get_majors_possible: ", s, ", ", e)
+  .dbg(".icd10cm_get_majors_possible: ", s, ", ", e)
   ss <- substr(s, 1L, 1L)
   es <- substr(e, 1L, 1L)
   lets <- LETTERS[which(LETTERS == ss):which(LETTERS == es)]

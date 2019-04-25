@@ -64,22 +64,29 @@ justify_re <- function(x, whitespace_ok = FALSE) {
   justify_re(x, whitespace_ok = TRUE)
 }
 
-# contain any | options within a regular expression, applies to ICD codes
-# without ^ and $, (and avoids counting the parenthesis in matched parts)
-wrap_re <- function(x) {
+# non-capturing expression to contain any | options within a regular expression,
+# applies to ICD codes without ^ and $, (and avoids counting the parenthesis in
+# matched parts)
+nce <- function(x) {
   paste0("(?:", x, ")")
 }
 
 wrap_short_re <- function(maj, min) {
-  paste0(maj, wrap_re(min), "?")
+  paste0(maj, nce(min), "?")
 }
 
 wrap_decimal_re <- function(maj, min) {
   paste0(
     maj,
-    wrap_re(
-      paste0("\\.", wrap_re(min))
-      ),
+    nce(
+      paste0("\\.|",
+             nce(
+               paste0("\\.",
+                      nce(min)
+               )
+             )
+      )
+    ),
     "?")
 }
 
@@ -105,7 +112,7 @@ set_re_globals <- function(env = parent.frame()) {
   ),
   collapse = "|"
   )
-  re_icd9_major_bare <- wrap_re(paste0(c(
+  re_icd9_major_bare <- nce(paste0(c(
     re_icd9_major_n,
     re_icd9_major_v,
     re_icd9_major_e
@@ -119,7 +126,7 @@ set_re_globals <- function(env = parent.frame()) {
   ),
   collapse = "|"
   )
-  re_icd9_major_strict_bare <- wrap_re(paste0(c(
+  re_icd9_major_strict_bare <- nce(paste0(c(
     re_icd9_major_n_strict,
     re_icd9_major_v_strict,
     re_icd9_major_e_strict
@@ -205,7 +212,7 @@ set_re_globals <- function(env = parent.frame()) {
   # ICD-10-FR see cim.pdf in the zip from <https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/telecharger/gratuit/11616/456>
   re_icd10fr_major_bare <- re_icd10_major_bare
   re_icd10fr_major <- .jws(re_icd10fr_major_bare)
-  re_icd10fr_minor <- "[[:alnum:]+]{1,2}[[:alnum:]]?"
+  re_icd10fr_minor <- "[[:digit:]+]{1,2}[[:digit:]]?"
   re_icd10fr_short <- wrap_short_re(re_icd10fr_major_bare, re_icd10fr_minor)
   re_icd10fr_decimal <- wrap_decimal_re(re_icd10fr_major_bare, re_icd10fr_minor)
   re_icd10fr_any <- wrap_any_re(re_icd10fr_major_bare, re_icd10fr_minor)
@@ -331,11 +338,11 @@ icd_valid_worker <- function(x,
   if (whitespace_ok) {
     na_to_false(
       grepl(pattern = .jws(regex), x = x, perl = TRUE)
-      )
+    )
   } else {
     na_to_false(
       grepl(pattern = justify_re(regex_no_ws), x = x, perl = TRUE)
-      )
+    )
   }
 }
 
@@ -485,8 +492,8 @@ icd9_is_valid_major_e <- function(x, whitespace_ok = TRUE)
 #' @keywords internal
 is_valid.comorbidity_map <- function(x, short_code, ...) {
   assert_list(x,
-    types = "character",
-    min.len = 1, unique = TRUE, names = "named"
+              types = "character",
+              min.len = 1, unique = TRUE, names = "named"
   )
   assert_flag(short_code)
   all(unlist(

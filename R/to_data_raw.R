@@ -25,7 +25,7 @@
                                dl_msg = NULL) {
   stopifnot(is.character(url), length(url) == 1)
   stopifnot(is.character(file_name), length(file_name) == 1)
-  if (.verbose()) message(url)
+  .msg(url)
   if (is.null(data_raw_path)) {
     .absent_action_switch("Data directory not defined.", must_work = TRUE)
     return()
@@ -39,19 +39,17 @@
   }
   file_path <- file.path(data_raw_path, save_name)
   if (any(grepl("tmp", file_path))) stop("TEMP")
-  if (.verbose()) {
+  .msg(
     sprintf(
       "file path = %s\nfile name = %s\nsave name = %s",
       file_path, file_name, save_name
     )
-  }
+  )
   if (!file.exists(file_path)) {
-    if (.verbose()) {
-      message(
+    .msg(
         "Unable to find downloaded file at: ",
         file_path, ". Attempting download..."
       )
-    }
     if (!.confirm_download(msg = dl_msg)) return()
     ok <- .unzip_single(
       url = url,

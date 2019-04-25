@@ -21,9 +21,7 @@ set_icd10cm_active_year <- function(ver, check_exists = TRUE) {
 #' @export
 get_icd10cm_active_year <- function() {
   ver <- .get_opt("icd10cm_active_year", default = "2019")
-  if (.verbose() > 1) {
-    message("getting icd.data.icd10cm_active_year: ", ver)
-  }
+  .dbg("getting icd.data.icd10cm_active_year: ", ver)
   ver <- as.character(ver)
   if (!grepl("^[[:digit:]]+$", ver)) {
     stop(
@@ -52,7 +50,7 @@ get_icd10cm_version <- function(ver) {
   .stopifnot_year(ver)
   # don't use :: so we don't trigger every active binding at once!
   var_name <- .get_icd10cm_name(year = ver, dx = TRUE)
-  if (.verbose()) message("Trying package data env first for ", var_name)
+  .msg("Trying package data env first for ", var_name)
   if (.exists_in_cache(var_name)) {
     cached_dat <- .get_from_cache(var_name)
     if (!is.null(cached_dat)) {
@@ -66,7 +64,7 @@ get_icd10cm_version <- function(ver) {
     }
   }
   # for 2016 and 2019 (currently), we look in lazy data.
-  if (.verbose()) message("Resorting to normal package data")
+  .msg("Resorting to normal package data")
   # try double checking it exists for bizarre R CMD check problem
   lazyenv <- asNamespace("icd")$.__NAMESPACE__.$lazydata
   if (exists(var_name, lazyenv)) {
@@ -92,7 +90,7 @@ get_icd10cm_active <- function() {
   if (.exists_anywhere(ver_var)) {
     return(.get_anywhere(ver_var))
   }
-  if (.verbose()) message("Getting active version: ", ver)
+  .msg("Getting active version: ", ver)
   .get_fetcher_fun(ver_var)()
 }
 

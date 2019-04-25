@@ -125,7 +125,7 @@ test_that("some randomly chosen codes are correct", {
 
 test_that("ICD-9-CM billable codes package data is recreated", {
   skip_on_cran()
-  skip_on_os(c("windows", "mac", "solaris"))
+  skip_slow()
   # Do encoding problems on Linux. It is unpredictable at the best of times.
   skip_flat_icd9_all_avail()
   check_billable <- .icd9cm_parse_leaf_descs()
@@ -185,4 +185,20 @@ test_that("explain icd9GetChapters simple input", {
   expect_equal(chaps3, chaps8)
   chap9 <- .icd9_get_chapters(NA, short_code = FALSE)
   expect_true(all(is.na(chap9)))
+})
+
+# parsing quirks
+
+test_that("2017 quirks", {
+  skip_missing_dat("icd9cm2007")
+  x <- get_icd9cm2007()
+  expect_true("00863" %in% x$code)
+})
+
+test_that("2018 quirks ok", {
+  skip_missing_dat("icd9cm2008")
+  x <- get_icd9cm2008()
+  nines <- grep(pattern = "^945[012345]9$", x$code)
+  expect_match(x[nines, "long_desc"],
+               ".*multiple sites of lower limb\\(s\\).*")
 })

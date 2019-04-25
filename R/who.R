@@ -25,10 +25,10 @@
     .absent_action_switch(msg)
     return(NULL)
   }
-  if (.verbose() > 1) message("Getting WHO data with JSON: ", json_url)
+  .msg("Getting WHO data with JSON: ", json_url)
   http_response <- httr::RETRY("GET", json_url)
   if (hs <- http_response$status_code >= 400) {
-    if (.verbose() > 1) message("trying once more")
+    .msg("trying once more")
     http_response <- httr::RETRY("GET", json_url)
     if (hs <- http_response$status_code >= 400) {
       stop(
@@ -109,25 +109,22 @@
                          hier_desc = character(),
                          parallel = TRUE,
                          ...) {
-  verbose <- .verbose()
   if (parallel) {
     progress <- FALSE
-    if (verbose > 1) {
-      message("Parallel WHO processing disabled with this verbosity level")
+    if (.verbose() > 1) {
+      .dbg("Parallel WHO processing disabled with this verbosity level")
       parallel <- FALSE
-    } else if (verbose) {
-      message("Parallel WHO prevents messages in child processes")
+    } else {
+      .msg("Parallel WHO prevents messages in child processes")
     }
   }
-  if (verbose > 1) {
-    message(
+    .dbg(
       ".who_api with concept_id = ",
       ifelse(is.null(concept_id), "NULL", concept_id)
     )
-  }
-  if (verbose > 1) message(paste(hier_code, collapse = " -> "))
+  .dbg(paste(hier_code, collapse = " -> "))
   if (.offline()) {
-    if (verbose) message("Returning NULL because offline")
+    .msg("Returning NULL because offline")
     return()
   }
   tree_json <- .who_api_children(
@@ -143,7 +140,7 @@
     )
     return()
   }
-  if (verbose > 1) message("hier level = ", length(hier_code))
+  .dbg("hier level = ", length(hier_code))
   new_hier <- length(hier_code) + 1
   # parallel mclapply is about 2-3x as fast, but may get throttled for multiple
   # connections. It seems to get up to about 10-15, which is reasonable.
@@ -193,12 +190,10 @@
         new_rows <- rbind(new_rows, new_item)
       }
       if (!is_leaf) {
-        if (verbose > 1) {
-          message(
+          .dbg(
             paste(new_rows$code, collapse = ", "),
             " not a leaf, so recursing"
           )
-        }
         if (progress) cat(".")
         recursed_rows <- .dl_icd10who(
           concept_id = child_code,
@@ -214,13 +209,12 @@
       new_rows
     }
   ) # lapply loop
-  if (verbose > 1) {
-    message(
-      "leaving recursion with length(all_new_rows) = ",
+  if (.verbose() > 1) {
+    .dbg("leaving recursion with length(all_new_rows) = ",
       length(all_new_rows)
     )
-    if (verbose > 2 && length(all_new_rows$code)) {
-      print(paste(all_new_rows$code, collapse = ", "))
+    if (length(all_new_rows$code)) {
+      .trc(paste(all_new_rows$code, collapse = ", "), print = TRUE)
     }
   }
   # just return the rows (we are recursing so can't save anything in this

@@ -21,7 +21,7 @@
 #' @keywords internal datagen
 #' @noRd
 .parse_icd10cm_all <- function(save_pkg_data = FALSE, ...) {
-  if (.verbose()) message("Parsing all ICD-10-CM diagnostic codes.")
+  .msg("Parsing all ICD-10-CM diagnostic codes.")
   yrs <- names(.icd10cm_sources)
   out <- lapply(
     yrs,
@@ -51,11 +51,11 @@
     )
     return()
   }
-  if (.verbose()) message("Working on parsing ICD-10-CM year: ", year)
+  .msg("Working on parsing ICD-10-CM year: ", year)
   # readLines may muck up encoding, resulting in weird factor order generation
   # later?
   x <- readLines(con = f_info$file_path, encoding = "ASCII")
-  if (.verbose()) message("Got flat file for year: ", year)
+  .msg("Got flat file for year: ", year)
   stopifnot(all(Encoding(x) == "unknown"))
   dat <- data.frame(
     # id = substr(x, 1, 5),
@@ -85,7 +85,7 @@
   )
   dat[["major"]] <- icd::as.short_diag(icd::as.icd10cm(dat[["major"]]))
   if (dx) {
-    if (.verbose()) message("Generating sub-chapter lookup for year: ", year)
+    .msg("Generating sub-chapter lookup for year: ", year)
     sc_lookup <- .icd10_generate_subchap_lookup()
     mismatch_sub_chap <-
       dat$three_digit[which(dat$three_digit %nin% sc_lookup$sc_major)]
@@ -98,7 +98,7 @@
         by.y = "sc_major",
         all.x = TRUE
       )[["sc_desc"]]
-    if (.verbose()) message("Generating chap lookup for year: ", year)
+    .msg("Generating chap lookup for year: ", year)
     chap_lookup <- .icd10_generate_chap_lookup()
     dat[["chapter"]] <-
       merge(
@@ -110,10 +110,10 @@
   class(dat$code) <- c("icd10cm", "icd10", "character")
   dat$three_digit <- factor_sorted_levels(dat$three_digit)
   class(dat$three_digit) <- c("icd10cm", "icd10", "factor")
-  if (.verbose()) message("Correcting order of ", nrow(dat), " codes")
+  .msg("Correcting order of ", nrow(dat), " codes")
   dat <- dat[order.icd10cm(dat$code), ]
   row.names(dat) <- NULL
-  if (.verbose()) message("Saving in resource dir")
+  .msg("Saving in resource dir")
   .save_in_resource_dir(
     var_name = .get_icd10cm_name(year = year, dx = dx),
     x = dat

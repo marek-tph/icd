@@ -391,3 +391,29 @@ get_raw_data_dir <- function() {
     stop(year, " is not a four-digit year.", call. = FALSE)
   }
 }
+
+.m <- function(threshold, ..., print = FALSE) {
+  v <- as.integer(.verbose())
+  if (v < threshold) return()
+  if (print) {
+    dots <- list(...)
+    print(
+      lapply(dots, paste, collapse = ", ")
+    )
+    return()
+  }
+  message(...)
+  invisible()
+}
+
+.msg <- function(...) {
+  .m(1, ...)
+}
+
+.dbg <- function(...) {
+  .m(2, ...)
+}
+
+.trc <- function(...) {
+  .m(3, ...)
+}

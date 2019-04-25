@@ -45,6 +45,7 @@
   icd10fr2019$three_digit <- ""
   current_major <- NULL
   current_three_digit <- NULL
+  # slow, but effective:
   for (i in seq_along(icd10fr2019$code)) {
     icd <- icd10fr2019[i, "code"]
     if (nchar(icd) == 3L) {
@@ -57,8 +58,19 @@
   icd10fr2019$major <- factor(icd10fr2019$major)
   # TODO: chapitres
   class(icd10fr2019$code) <- c("icd10fr", "icd10", "character")
+  # there are "+" symbols, which require ordering before numbers, which is the
+  # same in ASCII, so we should be okay, but need to validate French codes
+  # differently.
+  icd10fr2019 <- icd10fr2019[order(icd10fr2019$code), ]
+  rownames(icd10fr2019) <- NULL
   icd10fr2019$three_digit <-
     factor_sorted_levels(as.icd10fr(icd10fr2019$three_digit))
+  if (!all(is_valid.icd10fr(icd10fr2019$code))) {
+    v <- !is_valid.icd10fr(icd10fr2019$code)
+    j <- icd10fr2019$code
+    print(head(j[v]))
+    browser()
+  }
   stopifnot(all(is_valid.icd10fr(icd10fr2019$code)))
   stopifnot(all(is_valid.icd10fr(icd10fr2019$three_digit)))
   .save_in_resource_dir(icd10fr2019)

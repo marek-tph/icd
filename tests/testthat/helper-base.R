@@ -254,7 +254,7 @@ skip_multi <- function() {
   }
 }
 
-expect_valid <- function(x, whitespace_ok = TRUE) {
+expect_valid <- function(x, whitespace_ok = TRUE, info = NULL) {
   if (is.function(x)) stop("valid ICD code expectation should not get a closure")
-  expect_true(all(is_valid(x, whitespace_ok = whitespace_ok)))
+  expect_true(all(is_valid(x, whitespace_ok = whitespace_ok)), info = info)
 }

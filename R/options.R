@@ -65,9 +65,7 @@ NULL
           stop("Option ", sQuote(o), " is not a valid icd option.")
         }
         if (overwrite || is.null(.get_opt(o))) {
-          if (.verbose() > 1) {
-            message("Writing option ", sQuote(o))
-          }
+          .dbg("Writing option ", sQuote(o))
           if (overwrite && .verbose() > 1) {
             message("overwriting the previous value: ", getOption(o))
           }
@@ -112,7 +110,7 @@ NULL
   if (missing(x)) {
     if (is.na(.get_opt("interact", default = NA)) &&
       !is.na(Sys.getenv("ICD_DATA_INTERACT", unset = NA))) {
-      if (.verbose() > 1) message("Setting interactivity with env var")
+      .msg("Setting interactivity with env var")
       .set_opt("interact" = .env_var_is_true("ICD_DATA_INTERACT"))
     }
     .set_opt("interact" = interactive(), overwrite = FALSE)
@@ -311,19 +309,25 @@ set_icd_data_dir <- function(path = NULL) {
 
 #' Download all the additional data at once
 #'
-#' This may take ten minutes on a broadband connection. It will download and
+#' It will download and
 #' parse WHO ICD-10, French, and Belgian codes and descriptions. It will also
 #' get years 2014, 2015, 2017, and 2018 for ICD-10-CM (diagnostic codes), and
 #' 2014--2019 procedure codes. 2016 and 2019 diagnostic codes are included in
-#' the package data.
+#' the package data. The total amount of data is about 340Mb. It is not necessary to do call \code{download_all_icd_data} for normal use: you may simply call the functions like \code{get_icd10cm2014}, which will download data when needed.
 #' @seealso \code{\link{set_icd_data_dir}}
 #' @examples
 #' \dontrun{
 #' set_icd_data_dir()
-#' download_icd_data()
+#' download_all_icd_data()
+#' # or configure a directory to us:
+#' options("icd.data.resource" = "/tmp/icd")
+#' # or
+#' set_icd_data_dir("/tmp/icd")
+#' # then
+#' download_all_icd_data()
 #' }
 #' @export
-icd_download_all <- function() {
+download_all_icd_data <- function() {
   set_icd_data_dir()
   message("Downloading, caching and parsing all ICD data")
   message("This will take a few minutes.")

@@ -46,9 +46,7 @@
     names(chapters),
     function(nm) {
       chap <- chapters[[nm]]
-      if (verbose > 3) {
-        message("icd10 chap lookup: ", paste(chap, collapse = ", "))
-      }
+      .trc("icd10 chap lookup: ", paste(chap, collapse = ", "))
       data.frame(
         expand_range_major.icd10cm(
           as.icd10cm(unname(chap["start"])),
