@@ -63,13 +63,10 @@ test_that("chapter parsing for ICD-10 went okay", {
 })
 
 test_that("sub-chapter parsing for ICD-10 went okay", {
-  skip_slow("12 seconds on laptop")
-  skip_on_cran()
-  skip_if_not_installed("icd", "3.4")
-  for (y in 2014:2019) {
-    sc_lookup <- .icd10_generate_subchap_lookup(year = y)
-    expect_equal(anyDuplicated(sc_lookup$sc_major), 0, info = y)
-    # 2019 duplicated/parse errors?
-    sc_lookup[sc_lookup$sc_major %in% c("C7A", "C7B", "D3A"), ]
-  }
+  skip_slow("sub-chapter lookup slow without memoise")
+  # TODO: annualize?
+  sc_lookup <- .icd10_generate_subchap_lookup()
+  expect_equal(anyDuplicated(sc_lookup$sc_major), 0, info = y)
+  # 2019 duplicated/parse errors?
+  expect_true(all(sc_lookup$sc_major %in% c("C7A", "C7B", "D3A")))
 })
