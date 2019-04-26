@@ -199,6 +199,8 @@ test_that("2018 quirks ok", {
   skip_missing_dat("icd9cm2008")
   x <- get_icd9cm2008()
   nines <- grep(pattern = "^945[012345]9$", x$code)
-  expect_match(x[nines, "long_desc"],
-               ".*multiple sites of lower limb\\(s\\).*")
+  expect_match(
+    x[nines, "long_desc"],
+    ".*multiple sites of lower limb\\(s\\).*"
+  )
 })

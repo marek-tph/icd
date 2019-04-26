@@ -47,9 +47,9 @@
   )
   if (!file.exists(file_path)) {
     .msg(
-        "Unable to find downloaded file at: ",
-        file_path, ". Attempting download..."
-      )
+      "Unable to find downloaded file at: ",
+      file_path, ". Attempting download..."
+    )
     if (!.confirm_download(msg = dl_msg)) return()
     ok <- .unzip_single(
       url = url,

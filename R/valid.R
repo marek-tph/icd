@@ -79,15 +79,18 @@ wrap_decimal_re <- function(maj, min) {
   paste0(
     maj,
     nce(
-      paste0("\\.|",
-             nce(
-               paste0("\\.",
-                      nce(min)
-               )
-             )
+      paste0(
+        "\\.|",
+        nce(
+          paste0(
+            "\\.",
+            nce(min)
+          )
+        )
       )
     ),
-    "?")
+    "?"
+  )
 }
 
 wrap_any_re <- function(maj, min) {
@@ -152,7 +155,7 @@ set_re_globals <- function(env = parent.frame()) {
   re_icd9_decimal_n <- .jws(re_icd9_decimal_n_bare)
   re_icd9_decimal_v <- .jws(re_icd9_decimal_v_bare)
   re_icd9_decimal_e <- .jws(re_icd9_decimal_e_bare)
-  re_icd9_short_n <- .jws(wrap_short_re(re_icd9_major_n,  re_icd9_minor_nv))
+  re_icd9_short_n <- .jws(wrap_short_re(re_icd9_major_n, re_icd9_minor_nv))
   re_icd9_short_v <- .jws(wrap_short_re(re_icd9_major_v, re_icd9_minor_nv))
   re_icd9_short_e <- .jws(wrap_short_re(re_icd9_major_e, re_icd9_minor_e))
   re_icd9_any_n <- .jws(wrap_any_re(re_icd9_major_n, re_icd9_minor_nv))
@@ -207,7 +210,7 @@ set_re_globals <- function(env = parent.frame()) {
   re_icd10cm_minor <- re_icd10_minor
   re_icd10cm_short <- paste0(re_icd10cm_major_bare, re_icd10cm_minor)
   re_icd10cm_decimal <-
-    wrap_decimal_re(re_icd10cm_major_bare,re_icd10cm_minor)
+    wrap_decimal_re(re_icd10cm_major_bare, re_icd10cm_minor)
   re_icd10cm_any <- wrap_any_re(re_icd10cm_major_bare, re_icd10cm_minor)
   # ICD-10-FR see cim.pdf in the zip from <https://www.atih.sante.fr/plateformes-de-transmission-et-logiciels/logiciels-espace-de-telechargement/telecharger/gratuit/11616/456>
   re_icd10fr_major_bare <- re_icd10_major_bare
@@ -385,12 +388,14 @@ is_valid.icd10fr <- function(x,
                              short_code = guess_short(x),
                              whitespace_ok = TRUE,
                              ...) {
-  is_valid.icd10(x = x,
-                 short_code = short_code,
-                 whitespace_ok = whitespace_ok,
-                 re_short = re_icd10fr_short,
-                 re_decimal = re_icd10fr_decimal,
-                 ...)
+  is_valid.icd10(
+    x = x,
+    short_code = short_code,
+    whitespace_ok = whitespace_ok,
+    re_short = re_icd10fr_short,
+    re_decimal = re_icd10fr_decimal,
+    ...
+  )
 }
 
 #' @describeIn is_valid Test whether generic ICD-10 code is valid
@@ -492,8 +497,8 @@ icd9_is_valid_major_e <- function(x, whitespace_ok = TRUE)
 #' @keywords internal
 is_valid.comorbidity_map <- function(x, short_code, ...) {
   assert_list(x,
-              types = "character",
-              min.len = 1, unique = TRUE, names = "named"
+    types = "character",
+    min.len = 1, unique = TRUE, names = "named"
   )
   assert_flag(short_code)
   all(unlist(

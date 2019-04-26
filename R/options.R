@@ -330,7 +330,7 @@ set_icd_data_dir <- function(path = NULL) {
 download_all_icd_data <- function() {
   set_icd_data_dir()
   message("Downloading, caching and parsing all ICD data")
-  message("This will take a few minutes.")
+  message("This will take a few minutes, and use about 340MB.")
   options("icd.data.offline" = FALSE)
   for (d in .data_names) {
     message("Working on: ", d)

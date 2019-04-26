@@ -24,7 +24,7 @@
 #' identical(icd:::factor_nosort(x), x)
 #' # unless the levels change:
 #' icd:::factor_nosort(x, levels = c("a", "z"))
-#'
+#' 
 #' # existing factor levels aren't re-ordered without also moving elements
 #' f <- factor(c("a", "b", "b", "c"))
 #' g <- icd:::factor_nosort(f, levels = c("a", "c", "b"))
@@ -128,8 +128,12 @@ factor_sorted_levels <- function(x, levels = unique(sort(x)), ...) {
   cl <- class(x)
   # unique drops the class, sort uses it and keeps it.
   out <- factor(x = x, levels = levels, ...)
-  class(out) <- if ("factor" %in% cl)  cl
-  else if ("character" %in% cl) sub("character", "factor", cl)
-  else c(cl, "factor")
+  class(out) <- if ("factor" %in% cl) {
+    cl
+  } else if ("character" %in% cl) {
+    sub("character", "factor", cl)
+  } else {
+    c(cl, "factor")
+  }
   out
 }

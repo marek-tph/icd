@@ -1,13 +1,16 @@
 context("data sanity")
 
 test_that("row numbers and factors are sequential for data frames", {
-  print <- function(...) { base::print(..., quote = FALSE) }
+  print <- function(...) {
+    base::print(..., quote = FALSE)
+  }
   skip_slow()
-  data_names <- c("icd10be2014",
-                  "icd10who2016",
-                  "icd10who2008fr",
-                  "icd9cm2008",
-                  "icd10fr2019"
+  data_names <- c(
+    "icd10be2014",
+    "icd10who2016",
+    "icd10who2008fr",
+    "icd9cm2008",
+    "icd10fr2019"
   )
   # data_names <- c(rev(.ls()), .ls_lazy())
   for (data_name in data_names) {
@@ -31,12 +34,13 @@ test_that("row numbers and factors are sequential for data frames", {
       if (col_name %nin% c("sub_sub_chapter", "age_group", "sex")) {
         expect_true(!anyNA(col_dat), info = info)
       }
-      if (.verbose() > 2)
+      if (.verbose() > 2) {
         print(paste(info, "checking code and three_digit"))
+      }
       if (col_name %in% c("code", "three_digit")) {
         expect_true(inherits(col_dat, c("icd9", "icd10")), info = info)
-          j <- d[[col_name]]
-          expect_valid(j, whitespace_ok = FALSE, info = info)
+        j <- d[[col_name]]
+        expect_valid(j, whitespace_ok = FALSE, info = info)
         test_that("three-digits match the codes", {
           four_digit_majors <- nchar(as_char_no_warn(d$three_digit)) == 4
           d_three <- d[!four_digit_majors, ]
@@ -69,15 +73,24 @@ test_that("row numbers and factors are sequential for data frames", {
         if (.verbose()) print(paste(info, "checking code columns are sorted"))
         if (data_name %nin% c(
           "uranium_pathology",
-          "vermont_dx")
+          "vermont_dx"
+        )
         ) {
           expect_true(col_name %in% names(d))
           expect_true(!is.null(col_dat))
-          if (.verbose()) print(paste(info, "class of col_dat is: ",
-                                      paste(class(col_dat), collapse = ", ")))
+          if (.verbose()) {
+            print(paste(
+              info, "class of col_dat is: ",
+              paste(class(col_dat), collapse = ", ")
+            ))
+          }
           expect_error(regexp = NA, us <- is_unsorted(col_dat), info = info)
-          if (.verbose()) print(paste(info, "class of is_unsorted(col_dat) is: ",
-                                      paste(class(us), collapse = ", ")))
+          if (.verbose()) {
+            print(paste(
+              info, "class of is_unsorted(col_dat) is: ",
+              paste(class(us), collapse = ", ")
+            ))
+          }
           expect_false(is_unsorted(col_dat), info = info)
         }
         expect_classes_ordered(col_dat)

@@ -118,10 +118,10 @@
       .msg("Parallel WHO prevents messages in child processes")
     }
   }
-    .dbg(
-      ".who_api with concept_id = ",
-      ifelse(is.null(concept_id), "NULL", concept_id)
-    )
+  .dbg(
+    ".who_api with concept_id = ",
+    ifelse(is.null(concept_id), "NULL", concept_id)
+  )
   .dbg(paste(hier_code, collapse = " -> "))
   if (.offline()) {
     .msg("Returning NULL because offline")
@@ -190,10 +190,10 @@
         new_rows <- rbind(new_rows, new_item)
       }
       if (!is_leaf) {
-          .dbg(
-            paste(new_rows$code, collapse = ", "),
-            " not a leaf, so recursing"
-          )
+        .dbg(
+          paste(new_rows$code, collapse = ", "),
+          " not a leaf, so recursing"
+        )
         if (progress) cat(".")
         recursed_rows <- .dl_icd10who(
           concept_id = child_code,
@@ -210,7 +210,8 @@
     }
   ) # lapply loop
   if (.verbose() > 1) {
-    .dbg("leaving recursion with length(all_new_rows) = ",
+    .dbg(
+      "leaving recursion with length(all_new_rows) = ",
       length(all_new_rows)
     )
     if (length(all_new_rows$code)) {

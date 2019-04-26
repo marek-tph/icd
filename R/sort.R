@@ -196,19 +196,19 @@ Ops.icd10cm <- function(e1, e2) {
 #' @export
 Ops.icd10be <- function(e1, e2) {
   switch(.Generic,
-         "<" = {
-           e1 != e2 & icd10cm_compare_vector_rcpp(e1, e2)
-         },
-         "<=" = {
-           e1 == e2 | icd10cm_compare_vector_rcpp(e1, e2)
-         },
-         ">" = {
-           e1 != e2 & !icd10cm_compare_vector_rcpp(e1, e2)
-         },
-         ">=" = {
-           !icd10cm_compare_vector_rcpp(e1, e2)
-         },
-         NextMethod()
+    "<" = {
+      e1 != e2 & icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    "<=" = {
+      e1 == e2 | icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    ">" = {
+      e1 != e2 & !icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    ">=" = {
+      !icd10cm_compare_vector_rcpp(e1, e2)
+    },
+    NextMethod()
   )
 }
 

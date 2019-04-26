@@ -322,7 +322,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
   )
   o <- .get_opt("resource")
   if (!is.null(o)) {
-      .dbg("icd.data.resource options set to: ", o, ", so using it.")
+    .dbg("icd.data.resource options set to: ", o, ", so using it.")
     if (!.dir_writable(o)) {
       msg <- paste(
         "icd.data.resource option set to:", o,
@@ -339,10 +339,10 @@ get_icd_data_dir <- function(must_work = TRUE) {
   } else {
     o <- .default_icd_data_dir()
     if (dir.exists(o) && .dir_writable(o)) {
-        .dbg(
-          "icd.data.resource option not set, but default path: ",
-          sQuote(o), " exists, so using it and setting option."
-        )
+      .dbg(
+        "icd.data.resource option not set, but default path: ",
+        sQuote(o), " exists, so using it and setting option."
+      )
       .set_opt("resource" = o)
     } else {
       msg <- paste(
@@ -562,8 +562,8 @@ get_icd_data_dir <- function(must_work = TRUE) {
 .exists_anywhere <- function(var_name, fetch = FALSE) {
   ns <- asNamespace("icd")
   if (.exists_in_lazy(var_name) ||
-      .exists_in_cache(var_name) ||
-      exists(var_name, ns)) {
+    .exists_in_cache(var_name) ||
+    exists(var_name, ns)) {
     return(TRUE)
   }
   if (fetch && exists(.get_fetcher_name(var_name), ns, mode = "function")) {

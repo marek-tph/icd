@@ -50,8 +50,8 @@
   on.exit(close(fp_conn))
   rtf_lines <- readLines(fp_conn, warn = FALSE, encoding = "ASCII")
   out <- .rtf_parse_lines(rtf_lines,
-                          year = year,
-                          save_pkg_majors = save_pkg_majors
+    year = year,
+    save_pkg_majors = save_pkg_majors
   )
   # quick sanity on a tricky code (can remove later as it is in a test)
   stopifnot("945.09" %in% names(out))
@@ -178,9 +178,11 @@
 .rtf_pre_filter <- function(filtered) {
   stopifnot(is.character(filtered))
   # merge any line NOT starting with "\\par" on to previous line
-  non_par_lines <- grep(pattern = "^\\\\par",
-                        x = filtered,
-                        invert = TRUE)
+  non_par_lines <- grep(
+    pattern = "^\\\\par",
+    x = filtered,
+    invert = TRUE
+  )
   # in reverse order, put each non-par line on end of previous, then filter out
   # all non-par lines
   for (i in rev(non_par_lines))
@@ -229,12 +231,12 @@
   if (year == "2008") {
     # replace 945.09 with 945.0{7,8}
     for (f945 in 0:5) {
-    splice_idx <- which(invalid_qual == sprintf("945.%d9", f945))
-    invalid_qual <- c(
-      invalid_qual[seq_len(splice_idx - 1)],
-      sprintf(c("945.%d7", "945.%d8"), f945),
-      invalid_qual[seq.int(splice_idx + 1, length(invalid_qual))]
-    )
+      splice_idx <- which(invalid_qual == sprintf("945.%d9", f945))
+      invalid_qual <- c(
+        invalid_qual[seq_len(splice_idx - 1)],
+        sprintf(c("945.%d7", "945.%d8"), f945),
+        invalid_qual[seq.int(splice_idx + 1, length(invalid_qual))]
+      )
     }
   }
   # if (year == "2009") {
@@ -305,13 +307,15 @@
     ")-(", re_icd9_decimal_bare, ")\\)"
   )
   filtered <- grep(re_bracketed,
-                   filtered,
-                   value = TRUE,
-                   invert = TRUE)
-  filtered <- grep("Exclude",
-                   filtered,
+    filtered,
     value = TRUE,
-    invert = TRUE)
+    invert = TRUE
+  )
+  filtered <- grep("Exclude",
+    filtered,
+    value = TRUE,
+    invert = TRUE
+  )
   sub(
     "((70[[:digit:]]\\.[[:digit:]]{2})|066\\.40)([[:alpha:]])", "\\1 \\2",
     filtered
@@ -340,7 +344,7 @@
     )
   # and high-level headings like "210-229 Benign neoplasms"
   filtered <- grep("^[[:space:]]*[[:digit:]]{3}-[[:digit:]]{3}.*",
-                   filtered,
+    filtered,
     value = TRUE,
     invert = TRUE
   )
@@ -354,7 +358,7 @@
 }
 
 .rtf_make_majors <- function(filtered, save_pkg_majors = FALSE) {
-  use_bytes <- NULL #list(...)[["useBytes"]]
+  use_bytes <- NULL # list(...)[["useBytes"]]
   major_lines <- grep(paste0("^(", re_icd9_major_strict_bare, ") "),
     filtered,
     value = TRUE
@@ -607,21 +611,21 @@
         ", with values: ",
         paste(out[dupe_rows])
       )
-        .trc("desclengths: ", paste(desclengths, collapse = ", "))
-        .trc("max_len: ", max_len)
-        .trc(
-          "which(desclengths != max_len): ",
-          which(desclengths != max_len)
-        )
-        .trc("dupe_rows: ", paste(dupe_rows, collapse = ", "))
-        .trc(
-          "dupe_rows[-which(desclengths != max_len)]: ",
-          dupe_rows[-which(desclengths != max_len)]
-        )
-        .trc(
-          "out[-dupe_rows[-which(desclengths != max_len)]]",
-          out[dupe_rows[-which(desclengths != max_len)]]
-        )
+      .trc("desclengths: ", paste(desclengths, collapse = ", "))
+      .trc("max_len: ", max_len)
+      .trc(
+        "which(desclengths != max_len): ",
+        which(desclengths != max_len)
+      )
+      .trc("dupe_rows: ", paste(dupe_rows, collapse = ", "))
+      .trc(
+        "dupe_rows[-which(desclengths != max_len)]: ",
+        dupe_rows[-which(desclengths != max_len)]
+      )
+      .trc(
+        "out[-dupe_rows[-which(desclengths != max_len)]]",
+        out[dupe_rows[-which(desclengths != max_len)]]
+      )
     }
     out <- out[-dupe_rows[-which(desclengths != max_len)]]
   }

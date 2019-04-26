@@ -158,7 +158,8 @@ if (rtf_year_ok(test_year)) {
   )
   rtf <- .rtf_parse_lines(
     rtf_lines = readLines(f_info_short$file_path, warn = FALSE),
-    year = "2014")
+    year = "2014"
+  )
   nrtf <- names(rtf)
   test_that("all parsed codes are valid decimals", {
     expect_true(all(icd::is_valid(nrtf, short_code = FALSE)),
