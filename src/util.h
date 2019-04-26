@@ -7,8 +7,6 @@
 
 std::string trimLeftCpp(std::string s);
 std::string strimCpp(std::string s);
-int valgrindCallgrindStart(bool zerostats);
-int valgrindCallgrindStop();
 bool strVecEqual(Rcpp::CharacterVector x, Rcpp::CharacterVector y);
 Rcpp::CharacterVector icd10cmSort(const Rcpp::CharacterVector &x);
 Rcpp::IntegerVector icd10cmOrder(const Rcpp::CharacterVector &x);

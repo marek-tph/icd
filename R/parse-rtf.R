@@ -532,6 +532,7 @@
     icd::expand_range("V30", "V37",
       short_code = FALSE, defined = FALSE
     ),
+    #TODO: just undefined
     icd::children("V39", short_code = FALSE, defined = FALSE)
   )
   range <- grep(re_v30v39_fifth, range, value = TRUE)
@@ -686,6 +687,9 @@
         first <- paste0(get_major.icd9(base_code, short_code = FALSE), pair[1])
         last <- paste0(get_major.icd9(base_code, short_code = FALSE), pair[2])
         .dbg("expanding specified minor range from ", first, " to ", last)
+        # TODO: do I need expand range variant with defined always turned off,
+        # so I never need to have circular reference to
+        # icd9cm_hierarchy/icd9cm2014?
         out <- c(out, icd::expand_range(first,
           last,
           short_code = FALSE,
@@ -693,6 +697,7 @@
         ))
       } else {
         single <- paste0(get_major.icd9(base_code, short_code = FALSE), dotmnr)
+        # call just undefined
         out <- c(out, icd::children(single,
           short_code = FALSE,
           defined = FALSE
@@ -728,6 +733,7 @@
           icd::get_invalid(v, short_code = FALSE)
         ))
       }
+      # TODO: call just undefined
       out <- c(out, icd::children(v, short_code = FALSE, defined = FALSE))
     }
   }

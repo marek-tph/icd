@@ -17,15 +17,15 @@
 #' # icd.data package highly recommended, but not a depependency for comorbidity calculations
 #' # no children other than self
 #' children("10201", short_code = TRUE, defined = FALSE)
-#' 
+#'
 #' # guess it was ICD-9 and a short, not decimal code
 #' children("0032")
-#' 
+#'
 #' # empty because 102.01 is not meaningful
 #' children("10201", short_code = TRUE, defined = TRUE)
 #' x <- children("003", short_code = TRUE, defined = TRUE)
 #' explain_code(x, condense = FALSE, short_code = TRUE)
-#' 
+#'
 #' children(short_code = FALSE, "100.0")
 #' children(short_code = FALSE, "100.00")
 #' children(short_code = FALSE, "2.34")
@@ -65,20 +65,24 @@ children.icd9cm <- function(x,
   stopifnot(is.logical(short_code))
   stopifnot(is.logical(defined))
   stopifnot(is.logical(billable))
-  res <- if (short_code) {
-    .Call("_icd_icd9ChildrenShortUnordered",
-      icd9Short = toupper(x),
-      # TODO: update to use new icd.data naming scheme
-      icd9cmReal = icd9cm_hierarchy$code,
-      onlyReal = defined
-    )
-  } else {
-    .Call("_icd_icd9ChildrenDecimalCpp",
-      icd9Decimal = toupper(x),
-      icd9cmReal = icd9cm_hierarchy$code,
-      onlyReal = defined
-    )
-  }
+  res <-
+    if (short_code) {
+      if (defined) {
+        icd9_children_short_unordered_rcpp(
+          icd9Short = toupper(x),
+          icd9cmReal = icd9cm_hierarchy$code)
+      } else {
+        icd9_children_short_unordered_undefined_rcpp(toupper(x))
+      }
+    } else {
+      # TODO: unordered variant
+      icd9_children_decimal_rcpp(
+        icd9Decimal = toupper(x),
+        icd9cmReal = icd9cm_hierarchy$code,
+        onlyReal = defined
+      )
+    }
+  # ICD-9 and ICD-9-CM sort the same, I think.
   res <- sort.icd9(res)
   res <- if (billable) {
     get_billable.icd9cm(icd9cm(res), short_code)
@@ -94,11 +98,15 @@ children.icd9cm <- function(x,
 #' @describeIn children Get children of ICD-9 codes, based on the super-set
 #'   ICD-9-CM at present
 #' @export
-children.icd9 <- function(x, short_code = guess_short(x),
-                          defined = TRUE, billable = FALSE, ...)
+children.icd9 <- function(x,
+                          short_code = guess_short(x),
+                          defined = TRUE,
+                          billable = FALSE,
+                          ...)
   children.icd9cm(x,
     short_code = short_code,
-    defined = defined, billable = billable
+    defined = defined,
+    billable = billable
   )
 
 #' @describeIn children Get children of ICD-10 codes (warns because this

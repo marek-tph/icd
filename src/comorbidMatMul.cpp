@@ -6,7 +6,6 @@
 #include "mapplus.h"
 #include "refactor.h"
 #include "relevant.h"
-#include "valgrind_icd.h"
 #include <cstring>
 #include <string>
 #include <unordered_set>

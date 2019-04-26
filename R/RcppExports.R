@@ -248,24 +248,44 @@ icd9_add_leading_zeroes_rcpp <- function(x, short_code) {
     .Call(`_icd_icd9AddLeadingZeroes`, x, short_code)
 }
 
-icd9_expand_minor_wrap <- function(mnr, isE) {
+icd9_expand_minor_rcpp <- function(mnr, isE) {
     .Call(`_icd_icd9ExpandMinor`, mnr, isE)
 }
 
-icd9ChildrenShort <- function(icd9Short, icd9cmReal, onlyReal) {
+icd9_children_short_undefined_rcpp <- function(icd9Short) {
+    .Call(`_icd_icd9ChildrenShortUndefined`, icd9Short)
+}
+
+icd9_children_short_defined_rcpp <- function(icd9Short, icd9cmReal) {
+    .Call(`_icd_icd9ChildrenShortDefined`, icd9Short, icd9cmReal)
+}
+
+icd9_children_short_rcpp <- function(icd9Short, icd9cmReal, onlyReal) {
     .Call(`_icd_icd9ChildrenShort`, icd9Short, icd9cmReal, onlyReal)
 }
 
-icd9ChildrenShortUnordered <- function(icd9Short, icd9cmReal, onlyReal) {
+icd9_children_short_unordered_undefined_rcpp <- function(icd9Short) {
+    .Call(`_icd_icd9ChildrenShortUnorderedUndefined`, icd9Short)
+}
+
+icd9_children_short_unordered_defined_rcpp <- function(icd9Short, icd9cmReal) {
+    .Call(`_icd_icd9ChildrenShortUnorderedDefined`, icd9Short, icd9cmReal)
+}
+
+icd9_children_short_unordered_rcpp <- function(icd9Short, icd9cmReal, onlyReal) {
     .Call(`_icd_icd9ChildrenShortUnordered`, icd9Short, icd9cmReal, onlyReal)
 }
 
-icd9ChildrenDecimalCpp <- function(icd9Decimal, icd9cmReal, onlyReal) {
-    .Call(`_icd_icd9ChildrenDecimalCpp`, icd9Decimal, icd9cmReal, onlyReal)
+icd9_children_decimal_rcpp <- function(icd9Decimal, icd9cmReal, onlyReal) {
+    .Call(`_icd_icd9ChildrenDecimal`, icd9Decimal, icd9cmReal, onlyReal)
 }
 
-icd9ChildrenCpp <- function(icd9, isShort, icd9cmReal, onlyReal = TRUE) {
-    .Call(`_icd_icd9ChildrenCpp`, icd9, isShort, icd9cmReal, onlyReal)
+icd9_children_decimal_unordered_rcpp <- function(icd9Decimal, icd9cmReal, onlyReal) {
+    .Call(`_icd_icd9ChildrenDecimalUnordered`, icd9Decimal, icd9cmReal, onlyReal)
+}
+
+icd9_children_rcpp <- function(icd9, isShort, icd9cmReal, onlyReal) {
+    .Call(`_icd_icd9Children`, icd9, isShort, icd9cmReal, onlyReal)
 }
 
 #' @title Factor without sorting \CRANpkg{Rcpp} implementation
@@ -378,13 +398,5 @@ fin <- function(x, table) {
 #' @noRd
 build_info <- function() {
     invisible(.Call(`_icd_build_info`))
-}
-
-valgrindCallgrindStart <- function(zerostats = FALSE) {
-    .Call(`_icd_valgrindCallgrindStart`, zerostats)
-}
-
-valgrindCallgrindStop <- function() {
-    .Call(`_icd_valgrindCallgrindStop`)
 }
 

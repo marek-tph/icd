@@ -301,7 +301,7 @@ icd9_expand_range_worker <- function(start,
       is.null(leaf_env[[x]])
     }
   }
-  icd_get_missing_kids <- function(code, defined) {
+  get_missing_kids <- function(code, defined) {
     s_kids <- children.icd9(code, short_code = TRUE, defined = defined)
     s_kids_in <- vapply(s_kids, function(x) !is.null(out_env[[x]]), logical(1))
     s_kids[!s_kids_in]
@@ -311,10 +311,8 @@ icd9_expand_range_worker <- function(start,
     if (!is_parent(x, defined)) {
       return()
     }
-    kids <- icd_get_missing_kids(x, defined)
-    if (length(kids) == 0L) {
-      return()
-    }
+    kids <- get_missing_kids(x, defined)
+    if (length(kids) == 0L) return()
     suppressWarnings(rm(list = x, envir = out_env))
   }
   if (ex_ambig_end) {
@@ -500,5 +498,5 @@ expand_minor <- function(mnr, ...) {
 #' @keywords internal
 #' @noRd
 expand_minor.icd9 <- function(mnr, is_e = FALSE) {
-  icd9_expand_minor_wrap(mnr, isE = is_e)
+  icd9_expand_minor_rcpp(mnr, isE = is_e)
 }

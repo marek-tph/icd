@@ -21,8 +21,6 @@ extern "C" {
 // #define ICD_DEBUG_SETUP
 // #define ICD_DEBUG_SETUP_SLOW
 // #define ICD_DEBUG_SETUP_TRACE
-// #define ICD_DEBUG_PARALLEL
-// #define ICD_VALGRIND
 
 #if !defined(NDEBUG)
 // good for testing, but aborts all the time
@@ -70,18 +68,6 @@ extern "C" {
 #define DEBUG_UTIL(x) ((void)0)
 #define TRACE_UTIL(x) ((void)0)
 #define DEBUG_UTIL_VEC(x) ((void)0)
-#endif
-
-#ifdef ICD_DEBUG_VALGRIND
-#define DEBUG_VALGRIND(x) DEBUG(x)
-#else
-#define DEBUG_VALGRIND(x) ((void)0)
-#endif
-
-#if defined(ICD_VALGRIND) && defined(HAVE_VALGRIND_VALGRIND_H)
-#include <valgrind/callgrind.h>
-#else
-#undef ICD_VALGRIND
 #endif
 
 #if (defined ICD_DEBUG || defined ICD_DEBUG_SETUP)
