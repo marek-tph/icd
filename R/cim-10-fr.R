@@ -65,12 +65,6 @@
   rownames(icd10fr2019) <- NULL
   icd10fr2019$three_digit <-
     factor_sorted_levels(as.icd10fr(icd10fr2019$three_digit))
-  if (!all(is_valid.icd10fr(icd10fr2019$code))) {
-    v <- !is_valid.icd10fr(icd10fr2019$code)
-    j <- icd10fr2019$code
-    print(head(j[v]))
-    browser()
-  }
   stopifnot(all(is_valid.icd10fr(icd10fr2019$code)))
   stopifnot(all(is_valid.icd10fr(icd10fr2019$three_digit)))
   .save_in_resource_dir(icd10fr2019)

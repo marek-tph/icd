@@ -89,7 +89,6 @@
     sc_lookup <- .icd10_generate_subchap_lookup()
     mismatch_sub_chap <-
       dat$three_digit[which(dat$three_digit %nin% sc_lookup$sc_major)]
-    if (length(mismatch_sub_chap) != 0L) browser()
     dat[["sub_chapter"]] <-
       merge(
         x = dat["three_digit"],

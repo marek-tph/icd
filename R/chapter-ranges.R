@@ -39,8 +39,6 @@
 
 .icd10_generate_chap_lookup <- function(chapters = icd10_chapters,
                                         prefix = "chap") {
-  # browser()
-  verbose <- .verbose()
   stopifnot(is.list(chapters), is.character(prefix))
   df_rows <- lapply(
     names(chapters),

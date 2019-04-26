@@ -99,7 +99,6 @@
   if (anyNA(out_df$code) || anyNA(out_df$three_digit)) {
     print(out_df[which(with(out_df, is.na(code) | is.na(three_digit))), ])
     print(summary(is.na(out_df)))
-    browser()
   }
   out_df$three_digit <- factor_sorted_levels(as.icd9cm(out_df$three_digit))
   invisible(out_df)
