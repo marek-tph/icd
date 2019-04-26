@@ -53,8 +53,6 @@
     year = year,
     save_pkg_majors = save_pkg_majors
   )
-  # quick sanity on a tricky code (can remove later as it is in a test)
-  stopifnot("945.09" %in% names(out))
   out <- icd::as.icd9cm(.swap_names_vals(out))
   out_df <- data.frame(
     code = icd::as.icd9cm(icd::decimal_to_short(unname(out))),
@@ -239,18 +237,6 @@
       )
     }
   }
-  # if (year == "2009") {
-  #   bad <- short_to_decimal(c("0081", "00863", "0625", "0651", "0652", "0823",
-  #            "1539", "2113", "2303", "25512"))
-  #   # show the filtered lines
-  #   lapply(bad, grep, filtered, value = TRUE)
-  #   # get the original rtf lines
-  #   lapply(sub("\\.", "\\\\.", bad),
-  #          FUN = grep,
-  #          rtf_lines,
-  #          value = TRUE)
-  #   grep("\\{\\\\\\*\\\\xmlopen\\\\xmlns2\\{\\\\factoidname[[:space:]A-Za-z]+\\}\\}", rtf_lines)
-  # }
   # Several occurances of "Requires fifth digit", referring back to the previous
   # higher-level definition, without having the parent code in the line itself
   re_fifth_range_other <- "fifth +digit +to +identify +stage"
@@ -262,7 +248,6 @@
     paste(filtered[fifth_backref], filtered[fifth_backref - 1])
   re_fourth_range <- "fourth-digit.+categor"
   fourth_rows <- grep(re_fourth_range, filtered)
-  lookup_fourth <- .rtf_generate_fourth_lookup(filtered, fourth_rows)
   # at least two examples of "Use 0 as fourth digit for category 672"
   re_fourth_digit_zero <- "Use 0 as fourth digit for category"
   fourth_digit_zero_lines <- grep(re_fourth_digit_zero, filtered)
@@ -285,12 +270,15 @@
   lookup_fifth <- .rtf_make_lookup_fifth(filtered, re_fifth_range_other)
   filtered <- .rtf_filter_excludes(filtered)
   out <- .rtf_main_filter(filtered)
-  out <- c(out, .rtf_lookup_fourth(out = out, lookup_fourth = lookup_fourth))
+  out <- c(out,
+           .rtf_lookup_fourth(
+             out = out,
+             lookup_fourth = .rtf_generate_fourth_lookup(filtered, fourth_rows)
+           )
+  )
   out <- c(out, .rtf_lookup_fifth(out, lookup_fifth))
   out <- .rtf_fix_duplicates(out)
-  # still have 945.09
   out <- out[-which(names(out) %in% invalid_qual)]
-  # 945.09 in 2008 data is gone now.
   .rtf_fix_quirks_2015(out)
 }
 
@@ -426,7 +414,6 @@
   lookup_fourth <- c()
   for (f in fourth_rows) {
     range <- .rtf_parse_fifth_digit_range(filtered[f])
-
     fourth_suffices <- .str_pair_match(
       string = filtered[seq(f + 1, f + 37)],
       pattern = "^([[:digit:]])[[:space:]](.*)"
@@ -533,7 +520,7 @@
       short_code = FALSE, defined = FALSE
     ),
     #TODO: just undefined
-    icd::children("V39", short_code = FALSE, defined = FALSE)
+    icd9_children_decimal_unordered_undefined_rcpp("V39")
   )
   range <- grep(re_v30v39_fifth, range, value = TRUE)
   names(range) <- range
@@ -698,10 +685,7 @@
       } else {
         single <- paste0(get_major.icd9(base_code, short_code = FALSE), dotmnr)
         # call just undefined
-        out <- c(out, icd::children(single,
-          short_code = FALSE,
-          defined = FALSE
-        ))
+        out <- c(out, icd9_children_decimal_unordered_undefined_rcpp(single))
       }
     }
     vals <- vals[1] # still need to process the base code
@@ -733,8 +717,7 @@
           icd::get_invalid(v, short_code = FALSE)
         ))
       }
-      # TODO: call just undefined
-      out <- c(out, icd::children(v, short_code = FALSE, defined = FALSE))
+      out <- c(out, icd9_children_decimal_unordered_undefined_rcpp(v))
     }
   }
   out

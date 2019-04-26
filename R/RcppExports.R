@@ -284,6 +284,14 @@ icd9_children_decimal_unordered_rcpp <- function(icd9Decimal, icd9cmReal, onlyRe
     .Call(`_icd_icd9ChildrenDecimalUnordered`, icd9Decimal, icd9cmReal, onlyReal)
 }
 
+icd9_children_decimal_unordered_undefined_rcpp <- function(icd9Decimal) {
+    .Call(`_icd_icd9ChildrenDecimalUnorderedUndefined`, icd9Decimal)
+}
+
+icd9_children_decimal_unordered_defined_rcpp <- function(icd9Decimal, icd9cmReal) {
+    .Call(`_icd_icd9ChildrenDecimalUnorderedDefined`, icd9Decimal, icd9cmReal)
+}
+
 icd9_children_rcpp <- function(icd9, isShort, icd9cmReal, onlyReal) {
     .Call(`_icd_icd9Children`, icd9, isShort, icd9cmReal, onlyReal)
 }

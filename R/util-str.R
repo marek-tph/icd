@@ -16,7 +16,11 @@
 #'   not to swap, so the first match becomes the name.
 #' @keywords internal manip
 #' @noRd
-.str_pair_match <- function(string, pattern, pos, swap = FALSE, ...) {
+.str_pair_match <- function(string,
+                            pattern,
+                            pos,
+                            swap = FALSE,
+                            ...) {
   stopifnot(is.character(string))
   stopifnot(is.character(pattern))
   stopifnot(is.logical(swap))
@@ -34,6 +38,7 @@
   )
   res <- res[vapply(res, function(x) length(x) != 0, logical(1))]
   res <- do.call(rbind, res)
+  stopifnot(!is.null(res))
   if (pos_missing && ncol(res) > max(pos)) {
     stop("the pair matching has three or more ress but needed two.
           Use (?: to have a non-grouping regular expression parenthesis")

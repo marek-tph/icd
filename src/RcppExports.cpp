@@ -458,6 +458,29 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// icd9ChildrenDecimalUnorderedUndefined
+CV icd9ChildrenDecimalUnorderedUndefined(const CV& icd9Decimal);
+RcppExport SEXP _icd_icd9ChildrenDecimalUnorderedUndefined(SEXP icd9DecimalSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const CV& >::type icd9Decimal(icd9DecimalSEXP);
+    rcpp_result_gen = Rcpp::wrap(icd9ChildrenDecimalUnorderedUndefined(icd9Decimal));
+    return rcpp_result_gen;
+END_RCPP
+}
+// icd9ChildrenDecimalUnorderedDefined
+CV icd9ChildrenDecimalUnorderedDefined(const CV& icd9Decimal, const VecStr& icd9cmReal);
+RcppExport SEXP _icd_icd9ChildrenDecimalUnorderedDefined(SEXP icd9DecimalSEXP, SEXP icd9cmRealSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const CV& >::type icd9Decimal(icd9DecimalSEXP);
+    Rcpp::traits::input_parameter< const VecStr& >::type icd9cmReal(icd9cmRealSEXP);
+    rcpp_result_gen = Rcpp::wrap(icd9ChildrenDecimalUnorderedDefined(icd9Decimal, icd9cmReal));
+    return rcpp_result_gen;
+END_RCPP
+}
 // icd9Children
 CV icd9Children(const CV& icd9, bool isShort, const VecStr& icd9cmReal, bool onlyReal);
 RcppExport SEXP _icd_icd9Children(SEXP icd9SEXP, SEXP isShortSEXP, SEXP icd9cmRealSEXP, SEXP onlyRealSEXP) {
@@ -733,6 +756,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_icd_icd9ChildrenShortUnordered", (DL_FUNC) &_icd_icd9ChildrenShortUnordered, 3},
     {"_icd_icd9ChildrenDecimal", (DL_FUNC) &_icd_icd9ChildrenDecimal, 3},
     {"_icd_icd9ChildrenDecimalUnordered", (DL_FUNC) &_icd_icd9ChildrenDecimalUnordered, 3},
+    {"_icd_icd9ChildrenDecimalUnorderedUndefined", (DL_FUNC) &_icd_icd9ChildrenDecimalUnorderedUndefined, 1},
+    {"_icd_icd9ChildrenDecimalUnorderedDefined", (DL_FUNC) &_icd_icd9ChildrenDecimalUnorderedDefined, 2},
     {"_icd_icd9Children", (DL_FUNC) &_icd_icd9Children, 4},
     {"_icd_factorNoSort", (DL_FUNC) &_icd_factorNoSort, 3},
     {"_icd_refactor", (DL_FUNC) &_icd_refactor, 4},

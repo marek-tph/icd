@@ -226,6 +226,24 @@ CV icd9ChildrenDecimalUnordered(const CV& icd9Decimal,
   return out;
 }
 
+// [[Rcpp::export(icd9_children_decimal_unordered_undefined_rcpp)]]
+CV icd9ChildrenDecimalUnorderedUndefined(const CV& icd9Decimal) {
+  CV shrt = icd9DecimalToShort(icd9Decimal);
+  CV kids = icd9ChildrenShortUnorderedUndefined(shrt);
+  CV out = icd9ShortToDecimal(kids);
+  out.attr("icd_short_diag") = false;
+  return out;
+}
+
+// [[Rcpp::export(icd9_children_decimal_unordered_defined_rcpp)]]
+CV icd9ChildrenDecimalUnorderedDefined(const CV& icd9Decimal,
+                                const VecStr& icd9cmReal) {
+  CV shrt = icd9DecimalToShort(icd9Decimal);
+  CV kids = icd9ChildrenShortUnorderedDefined(shrt, icd9cmReal);
+  CV out = icd9ShortToDecimal(kids);
+  out.attr("icd_short_diag") = false;
+  return out;
+}
 // [[Rcpp::export(icd9_children_rcpp)]]
 CV icd9Children(const CV& icd9,
                 bool isShort,
