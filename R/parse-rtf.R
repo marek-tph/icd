@@ -268,8 +268,8 @@
       ))
   }
   lookup_fifth <- .rtf_make_lookup_fifth(filtered, re_fifth_range_other)
-  filtered <- .rtf_filter_excludes(filtered)
-  out <- .rtf_main_filter(filtered)
+  filtered_excl <- .rtf_filter_excludes(filtered)
+  out <- .rtf_main_filter(filtered_excl)
   out <- c(out,
            .rtf_lookup_fourth(
              out = out,
@@ -448,13 +448,6 @@
 #' @keywords internal datagen
 #' @noRd
 .rtf_lookup_fourth <- function(out, lookup_fourth) {
-  .rtf_lookup_fourth_alt_env(
-    out = out,
-    lookup_fourth = lookup_fourth
-  )
-}
-
-.rtf_lookup_fourth_alt_env <- function(out, lookup_fourth) {
   out_fourth <- c()
   out_env <- list2env(as.list(out))
   for (f_num in seq_along(lookup_fourth)) {
@@ -717,6 +710,7 @@
           icd::get_invalid(v, short_code = FALSE)
         ))
       }
+      # TODO: call just undefined
       out <- c(out, icd9_children_decimal_unordered_undefined_rcpp(v))
     }
   }
