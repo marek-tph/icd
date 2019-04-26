@@ -270,20 +270,20 @@ with_absent_action <- function(absent_action = c(
 set_icd_data_dir <- function(path = NULL) {
   .set_opt("offline" = FALSE, overwrite = TRUE)
   if (!is.null(path)) {
-    message("Using the icd data cache set by argument from user: ", path)
+    .msg("Using the icd data cache set by argument from user: ", path)
   }
   if (is.null(path)) {
     path <- .get_opt("resource", default = NULL)
-    message("Trying the icd data cache set by option(\"icd.data.resource\"): ", path) # nolint
+    .msg("Trying the icd data cache set by option(\"icd.data.resource\"): ", path) # nolint
   }
   if (is.null(path)) {
     path <- Sys.getenv("ICD_DATA_RESOURCE", unset = NA)
-    message("Trying the icd data cache set by the environment variable ICD_DATA_RESOURCE: ", path) # nolint
+    .msg("Trying the icd data cache set by the environment variable ICD_DATA_RESOURCE: ", path) # nolint
     if (is.na(path)) path <- NULL
   }
   if (is.null(path)) {
     path <- .default_icd_data_dir()
-    message("Trying the default icd data cache: ", path)
+    .msg("Trying the default icd data cache: ", path)
   }
   if (is.null(path)) {
     stop(
@@ -303,7 +303,7 @@ set_icd_data_dir <- function(path = NULL) {
       " to complete downloading all available data, or let this happen on demand."
     )
   }
-
+  message("Using ", sQuote(path), " for saving ICD data.")
   invisible(path)
 }
 
