@@ -68,7 +68,7 @@ children.icd9cm <- function(x,
   res <-
     if (short_code) {
       if (defined) {
-        icd9_children_short_unordered_rcpp(
+        icd9_children_short_unordered_defined_rcpp(
           icd9Short = toupper(x),
           icd9cmReal = icd9cm_hierarchy$code)
       } else {
