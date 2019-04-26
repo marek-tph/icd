@@ -35,9 +35,9 @@ Surprisingly, there are potential copyright restrictions on redistributing the W
 ```{r getstarted, eval = FALSE}
 # if not already done, set up the downloaded data cache:
 setup_icd_data()
-# or setup and download everything at once
-# (takes 5-10 mins with reasonable internet connection)
-download_icd_data()
+# or setup and optionally download everything at once (currently ~350 MB)
+# and a few minutes to generate the data structures.
+download_all_icd_data()
 ```
 
 ```{r quicklook}

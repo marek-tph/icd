@@ -75,7 +75,7 @@ get_icd10cm_version <- function(ver) {
     .absent_action_switch(
       paste(
         "ICD-10-CM", ver, " diagnostic codes not found anywhere.",
-        "Consider icd::download_icd_data() or ask for help."
+        "Consider icd::download_all_icd_data() or ask for help."
       ),
     )
   }

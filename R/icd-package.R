@@ -63,8 +63,8 @@
 #'   this. Use \code{\link{set_icd_data_dir}} to do this, e.g.,
 #'   \code{set_icd_data_dir()} for a default location in a suitable place for
 #'   your OS, e.g. \code{~/.local/icd/icd-ver-num} on Linux. Use
-#'   \code{\link{download_icd_data}} to download everything at once, which will
-#'   take a few minutes on a broadband connection.
+#'   \code{\link{download_all_icd_data}} to download everything at once, which
+#'   will take a few minutes on a broadband connection.
 #'
 #'   Validation depends on the class of code, and is different if the code is
 #'   from France, Belgium, the USA, or the World Health Organization (WHO). Use

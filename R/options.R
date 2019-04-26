@@ -265,7 +265,7 @@ with_absent_action <- function(absent_action = c(
 #' @return The path to the resource directory, or \code{NULL} if it could not be
 #'   found.
 #' @return Invisibly returns the data path which was set, or NULL if not done.
-#' @seealso \code{\link{download_icd_data}}
+#' @seealso \code{\link{download_all_icd_data}}
 #' @export
 set_icd_data_dir <- function(path = NULL) {
   .set_opt("offline" = FALSE, overwrite = TRUE)
@@ -299,7 +299,7 @@ set_icd_data_dir <- function(path = NULL) {
   if (!.all_cached()) {
     message(
       "Not all available data is currently downloaded. ",
-      "You may use: ", sQuote("download_icd_data()"),
+      "You may use: ", sQuote("download_all_icd_data()"),
       " to complete downloading all available data, or let this happen on demand."
     )
   }

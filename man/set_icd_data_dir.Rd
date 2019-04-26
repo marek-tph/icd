@@ -40,5 +40,5 @@ get_icd_data_dir()
 }
 }
 \seealso{
-\code{\link{download_icd_data}}
+\code{\link{download_all_icd_data}}
 }
