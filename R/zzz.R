@@ -17,14 +17,18 @@
 
 .onAttach <- function(libname, pkgname) {
   if (system.file(package = "icd9") != "") {
-    packageStartupMessage(paste(
-      "The", sQuote("icd9"), "package is now deprecated, and should be removed to avoid",
-      "conflicts with ", sQuote("icd"), ". The", sQuote("icd"),
-      "package up to version 2.1 contains",
-      "tested versions of all the deprecated function names which overlap with",
-      "those in the old", sQuote("icd9"), "package, e.g., 'icd9ComorbidAhrq'. It is",
-      "strongly recommended to run the command: remove.packages(\"icd9\")"
-    ))
+    packageStartupMessage(
+      paste(
+        "The", sQuote("icd9"), "package is deprecated, and should be removed to",
+        "avoid conflicts with ", sQuote("icd"), ". The", sQuote("icd"),
+        "package up to version 2.1 contains",
+        "tested versions of all the deprecated function names which overlap with",
+        "those in the old", sQuote("icd9"), "package, e.g.,",
+        sQuote("icd9ComorbidAhrq"), "'. It is",
+        "highly recommended to run the command:",
+        sQuote("remove.packages(\"icd9\")")
+      )
+    )
   }
   if (interactive()) {
     if (!.exists_icd_data_dir()) {
@@ -56,7 +60,7 @@ release_questions <- function() {
   c( # vignette
     "manual rebuild of efficiency and country-lang-vers vignettes",
     # commands:
-    "update_everything() on linux and mac - should be no diff",
+    ".clean(destroy = TRUE), then update_everything() on win, linux and mac: should be identical results including encoding - check with digest",
     "aspell_package_Rd_files('.')",
     # documentation:
     "Check all TODO comments, make into github issues",

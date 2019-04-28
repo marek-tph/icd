@@ -465,8 +465,8 @@ NULL
 #' Deprecated name for the list of annual ICD-9-CM billable/leaf descriptions
 #'
 #' This now just contains the final version (2014, version number 32). This is
-#' actually the same from 2011 to 2014. Use getter functions such as
-#' \code{\link{get_icd9cm2014_leaf}} instead.
+#' actually the same from 2011 to 2014. Use \code{get_xxx} functions such as
+#' \code{\link{get_icd9cm2014}} instead.
 #' @docType data
 #' @keywords datasets
 #' @format list of data frames with columns \code{code}, \code{short_desc}, and

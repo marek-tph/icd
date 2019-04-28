@@ -12,8 +12,8 @@
 }
 \description{
 This now just contains the final version (2014, version number 32). This is
-actually the same from 2011 to 2014. Use getter functions such as
-\code{\link{get_icd9cm2014_leaf}} instead.
+actually the same from 2011 to 2014. Use \code{get_xxx} functions such as
+\code{\link{get_icd9cm2014}} instead.
 }
 \seealso{
 For 2005 -- 2014, the following functions provide ICD-9-CM data:

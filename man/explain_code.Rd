@@ -65,8 +65,8 @@ which do not correspond to diagnoses, or to three-digit codes, will trigger
 a warning.}
 
 \item{lang}{For WHO ICD-10 codes, the 2016 English and 2008 French
-translations are available. Use 'en' or 'fr' respectively. For ICD-10-CM
-codes, Dutch is also available, indicated by 'nl'.}
+translations are available. Use \code{en} or \code{fr} respectively.
+For ICD-10-CM codes, Dutch is also available, indicated by \code{nl}.}
 }
 \value{
 data frame, or list of data frames, with fields for ICD-9 code, name

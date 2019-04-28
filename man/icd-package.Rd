@@ -19,8 +19,8 @@ Calculate comorbidities, medical risk scores, and
     databases to comorbidities. ICD-9 and ICD-10 comorbidity mappings from
     Quan (Deyo and Elixhauser versions), Elixhauser and AHRQ included.
     Common ambiguities and code formats are handled. Comorbidity
-    computation includes Hierarchical Condition Codes, and a
-    reimplementation of the AHRQ Clinical Classifications Software. Risk
+    computation includes Hierarchical Condition Codes, and an
+    implementation of AHRQ Clinical Classifications. Risk
     scores include those of Charlson and van Walraven.  US Clinical
     Modification, Word Health Organization, Belgian and French ICD-10
     codes are supported, most of which are downloaded on demand.

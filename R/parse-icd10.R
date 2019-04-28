@@ -107,7 +107,7 @@
       )[["chap_desc"]]
   }
   class(dat$code) <- c("icd10cm", "icd10", "character")
-  dat$three_digit <- factor_sorted_levels(dat$three_digit)
+  dat$three_digit <- factor_sorted_levels(as.icd10cm(dat$three_digit))
   class(dat$three_digit) <- c("icd10cm", "icd10", "factor")
   .msg("Correcting order of ", nrow(dat), " codes")
   dat <- dat[order.icd10cm(dat$code), ]

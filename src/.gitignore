@@ -1,4 +1,3 @@
-
 *.dll
 *.gcda
 *.gch
@@ -10,3 +9,4 @@
 .cproject
 .settings/
 Makevars
+prof

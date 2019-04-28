@@ -240,10 +240,9 @@ pccc_pts <- data.frame(
 )
 
 skip_multi <- function() {
-  skip_slow()
-  skip_on_appveyor()
-  skip_on_travis()
   skip_on_cran()
+  skip_on_ci()
+  skip_slow()
   skip_if_offline() # also skips if not interactive
   if (!.icd_data_dir_okay()) {
     skip("Don't have icd data cache directory.")
