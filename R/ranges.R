@@ -345,8 +345,6 @@ icd9_expand_range_short <- function(start,
   assert_flag(defined)
   assert_flag(ex_ambig_start)
   assert_flag(ex_ambig_end)
-  # potentially do some checks on start and end. Determine whether we are doing
-  # N, V or E then lookup start and end indices in sysdata.rda lookup tables
   if (defined) {
     stopifnot(
       is_defined(start, short_code = TRUE),
@@ -421,14 +419,17 @@ expand_range_major.icd9 <- function(start, end, defined = TRUE) {
 #' Expand range of decimal ICD-9 codes
 #' @keywords internal
 #' @noRd
-icd9_expand_range_decimal <- function(start, end, defined = TRUE,
+icd9_expand_range_decimal <- function(start,
+                                      end,
+                                      defined = TRUE,
                                       ex_ambig_start = TRUE,
                                       ex_ambig_end = TRUE) {
   as.decimal_diag(
     icd9(
       short_to_decimal.icd9(
         icd9_expand_range_short(
-          decimal_to_short.icd9(start), decimal_to_short.icd9(end),
+          decimal_to_short.icd9(start),
+          decimal_to_short.icd9(end),
           defined = defined,
           ex_ambig_start = ex_ambig_start,
           ex_ambig_end = ex_ambig_end

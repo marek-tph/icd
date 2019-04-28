@@ -54,7 +54,7 @@ test_that("some WHO codes are not in ICD-10-CM", {
     )
     # workaround https://github.com/r-lib/testthat/issues/867
     expect_true(length(x) && all(grepl("VIH", x)),
-    info = paste("VIH (HIV) code: ", hiv)
+      info = paste("VIH (HIV) code: ", hiv)
     )
   }
 })

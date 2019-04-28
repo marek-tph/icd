@@ -270,11 +270,12 @@
   lookup_fifth <- .rtf_make_lookup_fifth(filtered, re_fifth_range_other)
   filtered_excl <- .rtf_filter_excludes(filtered)
   out <- .rtf_main_filter(filtered_excl)
-  out <- c(out,
-           .rtf_lookup_fourth(
-             out = out,
-             lookup_fourth = .rtf_generate_fourth_lookup(filtered, fourth_rows)
-           )
+  out <- c(
+    out,
+    .rtf_lookup_fourth(
+      out = out,
+      lookup_fourth = .rtf_generate_fourth_lookup(filtered, fourth_rows)
+    )
   )
   out <- c(out, .rtf_lookup_fifth(out, lookup_fifth))
   out <- .rtf_fix_duplicates(out)
@@ -512,7 +513,7 @@
     icd::expand_range("V30", "V37",
       short_code = FALSE, defined = FALSE
     ),
-    #TODO: just undefined
+    # TODO: just undefined
     icd9_children_decimal_unordered_undefined_rcpp("V39")
   )
   range <- grep(re_v30v39_fifth, range, value = TRUE)

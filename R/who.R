@@ -221,6 +221,12 @@
   # just return the rows (we are recursing so can't save anything in this
   # function). Parser can do this.
   if (progress) cat(fill = TRUE)
+  message("DEBUG only")
+  if (!all(vapply(all_new_rows, is.data.frame)) ||
+    !all(vapply(all_new_rows, ncol) == ncol(all_new_rows[[1]]))
+  ) {
+    browser()
+  }
   do.call(rbind, all_new_rows)
 }
 
