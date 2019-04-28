@@ -66,5 +66,5 @@ test_that("sub-chapter parsing for ICD-10 went okay", {
   sc_lookup <- .icd10_generate_subchap_lookup()
   expect_equal(anyDuplicated(sc_lookup$sc_major), 0, info = y)
   # 2019 duplicated/parse errors?
-  expect_true(all(sc_lookup$sc_major %in% c("C7A", "C7B", "D3A")))
+  expect_true(all(c("C7A", "C7B", "D3A") %in% sc_lookup$sc_major))
 })

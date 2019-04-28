@@ -113,8 +113,11 @@ NULL
       .msg("Setting interactivity with env var")
       .set_opt("interact" = .env_var_is_true("ICD_DATA_INTERACT"))
     }
-    .set_opt("interact" = interactive(), overwrite = FALSE)
-    opt <- .get_opt("interact")
+    opt <- .get_opt("interact", default = NA)
+    if (is.na(opt)) {
+      .msg("interact option not set, so falling back on interactive()")
+      .set_opt("interact" = interactive(), overwrite = FALSE)
+    }
     stopifnot(is.logical(opt))
     return(opt)
   }

@@ -53,20 +53,14 @@ test_that("some WHO codes are not in ICD-10-CM", {
       info = paste("VIH (HIV) code: ", hiv)
     )
     # workaround https://github.com/r-lib/testthat/issues/867
-    expect_true(length(x) &&
-      all(grepl("VIH", x)),
+    expect_true(length(x) && all(grepl("VIH", x)),
     info = paste("VIH (HIV) code: ", hiv)
     )
-    # expect_match(x,
-    #   regexp = "VIH",
-    #   info = paste("VIH (HIV) code: ", hiv)
-    # )
-    expect_length(x, 1)
   }
 })
 
 test_that("hand-picked WHO-only codes okay", {
-  skip_missing_icd10who()
+  skip_missing_icd10who(lang = "fr")
   expect_identical(
     explain_code(as.icd10who("F21"), lang = "fr"),
     "Trouble schizotypique"
