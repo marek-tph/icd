@@ -222,8 +222,8 @@
   # function). Parser can do this.
   if (progress) cat(fill = TRUE)
   message("DEBUG only")
-  if (!all(vapply(all_new_rows, is.data.frame)) ||
-    !all(vapply(all_new_rows, ncol) == ncol(all_new_rows[[1]]))
+  if (!all(vapply(all_new_rows, is.data.frame, logical(1))) ||
+    !all(vapply(all_new_rows, ncol) == ncol(all_new_rows[[1]]), logical(1))
   ) {
     browser()
   }
