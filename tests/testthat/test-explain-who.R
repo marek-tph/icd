@@ -60,7 +60,7 @@ test_that("some WHO codes are not in ICD-10-CM", {
 })
 
 test_that("hand-picked WHO-only codes okay", {
-  skip_missing_icd10who(lang = "fr")
+  skip_missing_icd10who(ver = "2008", lang = "fr")
   expect_identical(
     explain_code(as.icd10who("F21"), lang = "fr"),
     "Trouble schizotypique"

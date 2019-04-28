@@ -10,7 +10,7 @@ generate_spelling <- function(save_pkg_data = TRUE) {
   medical <- c(
     "anonymized", "arrythmia", "generalizable",
     "healthcare", "hyperemesis",
-    "Infarction", "laterality", "mellitus", "Meniere's",
+    "Infarction", "laterality", "mellitus", "M\u00E9ni\u00E8re's",
     "Musculoskeletal", "Myocardial",
     "precerebral", "Puerperium", "reproducibility"
   )
@@ -31,9 +31,9 @@ generate_spelling <- function(save_pkg_data = TRUE) {
     "RTF", "SAS", "STL", "VAHHS", "WSU"
   )
   french <- c(
-    "américaine", "beaucoup", "changéements", "Comme", "de",
+    "am\u00E9ricaine", "beaucoup", "chang\u00E9ements", "Comme", "de",
     "Définitions", "des", "française", "internationale", "Juste",
-    "l'année", "l'édition", "l'OMS", "le", "présentée", "statistique"
+    "l'ann\u00E9e", "l'\u00E9dition", "l'OMS", "le", "pr\u00E9sent\u00E9e", "statistique"
   )
   other <- c(
     "Adjustors", "comorbid", "comorbidities", "comorbidity", "hackathon", "MERCHANTABILITY", "OpenMP",
