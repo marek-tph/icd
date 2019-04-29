@@ -377,6 +377,7 @@ get_icd_data_dir <- function(must_work = TRUE) {
                    destroy = FALSE,
                    pattern = ".*",
                    dry_run = FALSE) {
+  pattern <- paste0(".*", pattern, ".*")
   if (env) {
     if (!dry_run) {
       rm(
@@ -390,7 +391,8 @@ get_icd_data_dir <- function(must_work = TRUE) {
   }
   if (destroy) {
     if (askYesNo("Destroy entire resource directory? (Consider hiding?)")) {
-      if (!dry_run) unlink(get_icd_data_dir(), recursive = TRUE)
+      if (!dry_run)
+        unlink(get_icd_data_dir(), recursive = TRUE)
     }
     return(invisible())
   }
@@ -401,7 +403,8 @@ get_icd_data_dir <- function(must_work = TRUE) {
         file.path(get_icd_data_dir(), "memoise"),
         recursive = TRUE
       )
-    }
+    } else
+      message("dry run")
   }
   if (raw) {
     raw_files <- list.files(get_icd_data_dir(),
@@ -414,7 +417,10 @@ get_icd_data_dir <- function(must_work = TRUE) {
     )
     message("Deleting:")
     print(raw_files)
-    if (!dry_run) unlink(raw_files, recursive = FALSE)
+    if (!dry_run)
+      unlink(raw_files, recursive = FALSE)
+    else
+      message("dry run")
   }
   if (rds) {
     rds_files <- list.files(get_icd_data_dir(),
@@ -427,7 +433,8 @@ get_icd_data_dir <- function(must_work = TRUE) {
       unlink(rds_files,
         recursive = FALSE
       )
-    }
+    }       else
+      message("dry run")
   }
 }
 

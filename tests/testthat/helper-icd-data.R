@@ -35,9 +35,6 @@ skip_if_offline <- function() {
   if (.offline()) {
     skip("Offline")
   }
-  if (!.interact()) {
-    skip("Not interactive")
-  }
 }
 
 skip_on_no_rtf <- function(test_year) {

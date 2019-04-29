@@ -28,6 +28,6 @@ test_that("No ranges or NA in code section of WHO data", {
 test_that("HIV is problematic for some reason", {
   skip_multi()
   skip_missing_dat("icd10who2016")
-  b21 <- .who_api_children("B21")
+  b21 <- .dl_icd10who_children("B21")
   expect_match(b21$ID, "^B21\\.[0-9]$")
 })

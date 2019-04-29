@@ -54,7 +54,7 @@ test_that("all available ICD-10-CM data is reported and gettable", {
     }
     expect_true(
       all(
-        .exists_in_cache(res)
+        .exists_anywhere(res)
       ),
       info = paste("procedure code =", pc)
     )

@@ -32,7 +32,7 @@ generate_spelling <- function(save_pkg_data = TRUE) {
   )
   french <- c(
     "am\u00E9ricaine", "beaucoup", "chang\u00E9ements", "Comme", "de",
-    "Définitions", "des", "française", "internationale", "Juste",
+    "D\u00E9finitions", "des", "française", "internationale", "Juste",
     "l'ann\u00E9e", "l'\u00E9dition", "l'OMS", "le", "pr\u00E9sent\u00E9e", "statistique"
   )
   other <- c(
