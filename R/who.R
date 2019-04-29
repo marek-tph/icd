@@ -3,16 +3,39 @@
 #' @param year Four-digit year as integer or character
 #' @template lang
 #' @return
-#' \code{.who_api} returns the JSON data, or fails with NULL
+#' \code{.dl_icd10who_memoise} returns the JSON data, or fails with NULL
 #' @keywords internal datasets
 #' @noRd
-.who_api <- function(resource,
-                     year = 2016,
-                     lang = "en") {
+.dl_icd10who_memoise <- function(resource,
+                                 year = 2016,
+                                 lang = "en") {
   # WHO changed the URL from https://apps.who.int/classifications to
   # https://icd.who.int/browse10 . Nothing complicated: I set this (if unset) in
   # zzz.R on package load. If there is another change, the user can update this
   # with a package update.
+
+  # memoise package has given me problems and crashes. DIY
+  mem_file_name <- paste(
+    "WHO", year, lang,
+    gsub("JsonGetChildrenConcepts\\?ConceptId=|&useHtml=false", "", resource),
+    "json", sep = ".")
+  mem_dir <- file.path(get_icd_data_dir(), "memoise")
+  dir.create(mem_dir, showWarnings = FALSE)
+  mem_path <- file.path(mem_dir, mem_file_name)
+  if (file.exists(mem_path)) {
+    .trc(paste("Have memoised data for ", year, lang, resource,
+               "from", mem_path))
+    readRDS(mem_path)
+  } else {
+    res <- .dl_icd10who_json(year, lang, resource)
+    .trc(paste("Saving memoised data for ", year, lang, resource,
+               "in", mem_path))
+    saveRDS(res, mem_path)
+    res
+  }
+}
+
+.dl_icd10who_json <- function(year, lang, resource) {
   json_url <- paste(
     getOption("icd.data.who_url"),
     year,
@@ -49,10 +72,10 @@
 #' WHO summary data.
 #' @keywords internal
 #' @noRd
-.who_api_chapter_names <- function(ver = "icd10",
-                                   year = 2016,
-                                   lang = "en") {
-  .who_api_children(
+.dl_icd10who_chapter_names <- function(ver = "icd10",
+                                       year = 2016,
+                                       lang = "en") {
+  .dl_icd10who_children(
     ver = ver,
     year = year,
     lang = lang
@@ -62,18 +85,18 @@
 #' Get the children of a concept (ICD-10 chapter, code or range)
 #' @param concept_id NULl for root, concept string for any leaf or intermediate.
 #' @examples
-#' .who_api_children("XXII")
-#' .who_api_children("U84")
+#' .dl_icd10who_children("XXII")
+#' .dl_icd10who_children("U84")
 #' # U85 is a leaf node, returns no children as empty list
-#' .who_api_children("U82-U85")
+#' .dl_icd10who_children("U82-U85")
 #' # https://icd.who.int/browse10/2016/en#/U85
-#' .who_api_children("U85")
+#' .dl_icd10who_children("U85")
 #' # https://icd.who.int/browse10/2016/en#/P90
-#' .who_api_children("P90-P96")
-#' .who_api_children("P90")
+#' .dl_icd10who_children("P90-P96")
+#' .dl_icd10who_children("P90")
 #' @keywords internal
 #' @noRd
-.who_api_children <- function(concept_id = NULL, ...) {
+.dl_icd10who_children <- function(concept_id = NULL, ...) {
   resource <- if (is.null(concept_id)) {
     "JsonGetRootConcepts?useHtml=false"
   } else {
@@ -83,7 +106,7 @@
       "&useHtml=false"
     )
   }
-  .who_api(resource = resource, ...)
+  .dl_icd10who_memoise(resource = resource, ...)
 }
 
 #' Use public interface to fetch ICD-10 WHO data for a given version
@@ -95,22 +118,20 @@
 #'   sub-sub-chapter). You cannot query a single code with this interface.
 #' @param year integer 4-digit year
 #' @param lang Currently it seems only 'en' works
-#' @param ... further arguments passed to self recursively, or \code{.who_api}
+#' @param ... further arguments passed to self recursively, or \code{.dl_icd10who_memoise}
 #' @examples
 #' .make_make_httr_retry()
-#' .dl_icd10who(year = 2016, lang = "en", concept_id = "B20-B24")
+#' .dl_icd10who_walk(year = 2016, lang = "en", concept_id = "B20-B24")
 #' @keywords internal
 #' @noRd
-.dl_icd10who <- function(concept_id = NULL,
-                         year = 2016,
-                         lang = "en",
-                         progress = TRUE,
-                         hier_code = character(),
-                         hier_desc = character(),
-                         parallel = TRUE,
-                         ...) {
+.dl_icd10who_walk <- function(concept_id = NULL,
+                              year = 2016,
+                              lang = "en",
+                              hier_code = character(),
+                              hier_desc = character(),
+                              parallel = TRUE,
+                              ...) {
   if (parallel) {
-    progress <- FALSE
     if (.verbose() > 1) {
       .dbg("Parallel WHO processing disabled with this verbosity level")
       parallel <- FALSE
@@ -119,7 +140,7 @@
     }
   }
   .dbg(
-    ".who_api with concept_id = ",
+    ".dl_icd10who_memoise with concept_id = ",
     ifelse(is.null(concept_id), "NULL", concept_id)
   )
   .dbg(paste(hier_code, collapse = " -> "))
@@ -127,7 +148,7 @@
     .msg("Returning NULL because offline")
     return()
   }
-  tree_json <- .who_api_children(
+  tree_json <- .dl_icd10who_children(
     concept_id = concept_id,
     year = year,
     lang = lang,
@@ -167,7 +188,7 @@
       hier_desc[new_hier] <- child_desc
       sub_sub_chapter <- NA
       hier_three_digit_idx <- which(nchar(hier_code) == 3 &
-        !grepl("[XVI-]", hier_code))
+                                      !grepl("[XVI-]", hier_code))
       if (length(hier_code) >= 3 && nchar(hier_code[3]) > 3) {
         sub_sub_chapter <- hier_desc[3]
       }
@@ -194,8 +215,7 @@
           paste(new_rows$code, collapse = ", "),
           " not a leaf, so recursing"
         )
-        if (progress) cat(".")
-        recursed_rows <- .dl_icd10who(
+        recursed_rows <- .dl_icd10who_walk(
           concept_id = child_code,
           year = year,
           lang = lang,
@@ -220,10 +240,8 @@
   }
   # just return the rows (we are recursing so can't save anything in this
   # function). Parser can do this.
-  if (progress) cat(fill = TRUE)
-  message("DEBUG only")
   if (!all(vapply(all_new_rows, is.data.frame, logical(1))) ||
-    !all(vapply(all_new_rows, ncol) == ncol(all_new_rows[[1]]), logical(1))
+      !all(vapply(all_new_rows, ncol, integer(1)) == ncol(all_new_rows[[1]]))
   ) {
     browser()
   }
@@ -259,7 +277,7 @@
 .parse_icd10who2016 <- function(...) {
   if (!.confirm_download()) return()
   .dl_icd10who_finalize(
-    .dl_icd10who(year = 2016, lang = "en", ...),
+    .dl_icd10who_walk(year = 2016, lang = "en", ...),
     2016, "en"
   )
 }
@@ -267,7 +285,7 @@
 .parse_icd10who2008fr <- function(...) {
   if (!.confirm_download()) return()
   .dl_icd10who_finalize(
-    .dl_icd10who(year = 2008, lang = "fr", ...),
+    .dl_icd10who_walk(year = 2008, lang = "fr", ...),
     2008,
     "fr"
   )
