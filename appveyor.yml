@@ -19,7 +19,7 @@ cache:
 
 before_build:
   - ls -aR
-  - tools/dump-env.sh
+  - bash tools/dump-env.sh
   - rm .Rinstignore  # do install everything for testing
   - sed -i'' -e '/.*[Dd]ata.*/d' .Rbuildignore # do include data for testing, some data not in github though
 
