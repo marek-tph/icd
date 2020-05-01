@@ -63,6 +63,8 @@ matrix:
 
 build_script:
   - travis-tool.sh install_deps
+  #- see https://github.com/craigcitro/r-travis/wiki#configuration-options
+  #- travis-tool.sh install_github r-lib/covr
 
 test_script:
   - travis-tool.sh run_tests
@@ -71,12 +73,12 @@ on_failure:
   - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
 
-after_build:
+after_success:
   - pwd
-  - IF NOT "%MINI_BENCH%"=="" cd benchmarks/icd-JSS3447-replication
-  - IF NOT "%MINI_BENCH%"=="" make bench3
+  - IF "%MINI_BENCH%"=="yes" cd benchmarks/icd-JSS3447-replication
+  - IF "%MINI_BENCH%"=="yes" make bench3
     #  - IF NOT "%MINI_BENCH%"=="" make replmat # needs to call Rscript on appveyor path.
-  - IF NOT "%MINI_BENCH%"=="" cd ../..
+  - IF "%MINI_BENCH%"=="yes" cd ../..
 
 artifacts:
   - path: '*.Rcheck\**\*.log'
