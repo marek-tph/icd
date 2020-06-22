@@ -9,7 +9,7 @@
 #' @keywords internal datasets
 #' @noRd
 .dl_icd10who_memoise <- function(resource,
-                                 year = 2016,
+                                 year = 2019,
                                  lang = "en") {
   # WHO changed the URL from https://apps.who.int/classifications to
   # https://icd.who.int/browse10 . Nothing complicated: I set this (if unset) in
@@ -58,8 +58,10 @@
   }
   .msg("Getting WHO data with JSON: ", json_url)
   http_response <- httr::RETRY("GET", json_url)
+  Sys.sleep(0.5)
   if (hs <- http_response$status_code >= 400) {
     .msg("trying once more")
+    Sys.sleep(5)
     http_response <- httr::RETRY("GET", json_url)
     if (hs <- http_response$status_code >= 400) {
       stop(
@@ -71,7 +73,7 @@
     }
   } # end 400+
   json_data <- httr::content(http_response, simplifyDataFrame=TRUE)
-  jsonlite::fromJSON(json_data)
+  json_data
 }
 
 #' Use WHO API to discover chapters
@@ -81,7 +83,7 @@
 #' @keywords internal
 #' @noRd
 .dl_icd10who_chapter_names <- function(ver = "icd10",
-                                       year = 2016,
+                                       year = 2019,
                                        lang = "en") {
   .dl_icd10who_children(
     ver = ver,
@@ -131,12 +133,12 @@
 #'   \code{.dl_icd10who_memoise}
 #' @examples
 #' \dontrun{
-#' .dl_icd10who_walk(year = 2016, lang = "en", concept_id = "B20-B24")
+#' .dl_icd10who_walk(year = 2019, lang = "en", concept_id = "B20-B24")
 #' }
 #' @keywords internal
 #' @noRd
 .dl_icd10who_walk <- function(concept_id = NULL,
-                              year = 2016,
+                              year = 2019,
                               lang = "en",
                               hier_code = character(),
                               hier_desc = character(),
@@ -285,7 +287,7 @@
     return()
   }
   .dl_icd10who_finalize(
-    .dl_icd10who_walk(year = 2016, lang = "en", ...),
+    .dl_icd10who_walk(year = 2019, lang = "en", ...),
     2016, "en"
   )
 }
